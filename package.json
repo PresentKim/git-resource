@@ -1,5 +1,5 @@
 {
-  "name": "git-resource-viewer",
+  "name": "git-resource",
   "description": "A single-page web app for previewing image files from a github repository URL",
   "version": "0.0.0",
   "type": "module",

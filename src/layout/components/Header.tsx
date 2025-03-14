@@ -54,7 +54,7 @@ export default function Header({
         </NavLink>
         {!owner || !repo ? (
           <NavLink to="/" aria-label="Home" className="font-bold select-none">
-            git-resource-viewer
+            git-resource
           </NavLink>
         ) : (
           <DropdownMenu>

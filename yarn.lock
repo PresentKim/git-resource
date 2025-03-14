@@ -2487,9 +2487,9 @@ __metadata:
   languageName: node
   linkType: hard
 
-"git-resource-viewer@workspace:.":
+"git-resource@workspace:.":
   version: 0.0.0-use.local
-  resolution: "git-resource-viewer@workspace:."
+  resolution: "git-resource@workspace:."
   dependencies:
     "@eslint/js": "npm:^9.19.0"
     "@hookform/resolvers": "npm:^4.1.0"
