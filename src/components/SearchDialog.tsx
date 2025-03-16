@@ -1,6 +1,11 @@
 import {useCallback} from 'react'
 import {useForm} from 'react-hook-form'
-import {EraserIcon} from 'lucide-react'
+import {} from 'lucide-react'
+import {
+  Settings as SettingsIcon,
+  Info,
+  Eraser as EraserIcon,
+} from 'lucide-react'
 
 import {
   Form,
@@ -20,12 +25,13 @@ import {
 } from '@/components/ui/dialog'
 import {useTargetRepository} from '@/hooks/useTargetRepository'
 import {useSearchDialogStore} from '@/stores/searchDialogStore'
+import {parseGithubUrl} from '@/utils'
 
 type FormValues = {
   input: string
 }
 
-function SearchForm({onComplected}: {onComplected?: () => void}) {
+export function SearchForm({onComplected}: {onComplected?: () => void}) {
   const [, setTargetRepository] = useTargetRepository()
 
   const form = useForm<FormValues>({
@@ -36,15 +42,10 @@ function SearchForm({onComplected}: {onComplected?: () => void}) {
 
   const onSubmit = useCallback(
     ({input}: FormValues) => {
-      // Remove http://github.com or https://github.com or git@github.com: from the input, and remove .git or / on end
-      const cleanInput = input
-        .trim()
-        .replace(/^(?:https?:\/\/)?(?:www\.)?(git@|github\.com)?[/:]?/i, '')
-        .replace(/(\/|\?.+|\.git)$/i, '')
-        .trim()
+      const cleanInput = input.trim()
 
       // Validate the input field is not empty
-      if (!input.trim()) {
+      if (!cleanInput) {
         form.setError('input', {
           type: 'required',
           message: 'Repository URL is required',
@@ -54,21 +55,8 @@ function SearchForm({onComplected}: {onComplected?: () => void}) {
         return
       }
 
-      /**
-       * Validate the input field is in the correct format
-       *
-       * Supports the following formats:
-       * - owner/repo
-       * - owner/repo@ref
-       * - owner/repo/@ref
-       * - owner/repo/ref
-       * - owner/repo/tree/ref
-       * - owner/repo/commit/ref
-       */
-      const regexMatch = cleanInput.match(
-        /^(?<owner>[a-z0-9_-]+)\/(?<repo>[a-z0-9_-]+)(?:\/tree\/|\/commit\/|\/?@|\/)?(?<ref>[a-z0-9/_.-]+)?$/i,
-      )
-      if (!regexMatch || !regexMatch.groups) {
+      const parsedRepository = parseGithubUrl(cleanInput)
+      if (!parsedRepository) {
         form.setError('input', {
           type: 'invalid',
           message: 'Invalid repository URL',
@@ -78,9 +66,9 @@ function SearchForm({onComplected}: {onComplected?: () => void}) {
       }
 
       setTargetRepository(
-        regexMatch.groups.owner,
-        regexMatch.groups.repo,
-        regexMatch.groups.ref,
+        parsedRepository.owner,
+        parsedRepository.name,
+        parsedRepository.ref,
       )
 
       form.clearErrors('input')

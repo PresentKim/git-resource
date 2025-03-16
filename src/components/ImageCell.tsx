@@ -6,15 +6,14 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import {type GithubRepo, createRawImageUrl} from '@/utils'
 
 interface ImageCellProps {
-  owner: string
-  repo: string
-  ref: string
+  repo: GithubRepo
   path: string
 }
 
-const Image = memo(function Image({owner, repo, ref, path}: ImageCellProps) {
+const Image = memo(function Image({repo, path}: ImageCellProps) {
   const [loading, setLoading] = useState(true)
   const imgRef = useRef<HTMLImageElement>(null)
 
@@ -39,7 +38,7 @@ const Image = memo(function Image({owner, repo, ref, path}: ImageCellProps) {
       </div>
       <img
         ref={imgRef}
-        src={`https://raw.githubusercontent.com/${owner}/${repo}/${ref}/${path}`}
+        src={createRawImageUrl(repo, path)}
         alt={path}
         className="size-full object-contain"
         onLoad={handleLoad}
@@ -49,23 +48,18 @@ const Image = memo(function Image({owner, repo, ref, path}: ImageCellProps) {
   )
 })
 
-const ImageCell = memo(function ImageCell({
-  owner,
-  repo,
-  ref,
-  path,
-}: ImageCellProps) {
+const ImageCell = memo(function ImageCell({repo, path}: ImageCellProps) {
   const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0
 
   return isTouchDevice ? (
     <div className="aspect-square size-full ring-foreground transition-all active:ring-2 active:rounded-xs">
-      <Image owner={owner} repo={repo} ref={ref} path={path} />
+      <Image repo={repo} path={path} />
     </div>
   ) : (
     <TooltipProvider key={path}>
       <Tooltip>
         <TooltipTrigger className="aspect-square size-full ring-foreground transition-all hover:ring-2 hover:rounded-xs">
-          <Image owner={owner} repo={repo} ref={ref} path={path} />
+          <Image repo={repo} path={path} />
         </TooltipTrigger>
         <TooltipContent
           side="bottom"

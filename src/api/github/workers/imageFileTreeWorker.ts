@@ -13,15 +13,15 @@ class ImageFileTreeWorker extends BaseGithubWorker<
   GithubImageFileTree
 > {
   protected getCacheKey(request: ImageFileTreeRequest): string {
-    return `${request.owner}/${request.repo}/${request.ref}`
+    return `${request.owner}/${request.name}/${request.ref}`
   }
 
   protected fetchData(
-    {owner, repo, ref}: ImageFileTreeRequest,
+    {owner, name, ref}: ImageFileTreeRequest,
     headers: HeadersInit,
   ): Promise<Response> {
     return fetch(
-      `https://api.github.com/repos/${owner}/${repo}/git/trees/${ref}?recursive=1`,
+      `https://api.github.com/repos/${owner}/${name}/git/trees/${ref}?recursive=1`,
       {headers},
     )
   }

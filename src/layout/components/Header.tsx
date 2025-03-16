@@ -19,7 +19,7 @@ export default function Header({
   className,
   ...props
 }: React.InputHTMLAttributes<HTMLInputElement>) {
-  const [{owner, repo, ref}] = useTargetRepository()
+  const [{owner, name, ref}] = useTargetRepository()
   const openSearchDialog = useSearchDialogStore(state => state.open)
 
   return (
@@ -41,19 +41,19 @@ export default function Header({
           className="font-bold select-none self-start mt-2">
           <HeaderIcon strokeWidth={3} className="size-6 min-w-6 self-start" />
         </NavLink>
-        {!owner || !repo ? (
+        {!owner || !name ? (
           <NavLink to="/" aria-label="Home" className="font-bold select-none">
             git-resource
           </NavLink>
         ) : (
           <DropdownMenu>
             <DropdownMenuTrigger className="hover:cursor-pointer flex-1 w-full">
-              <BreadcrumbList items={[owner, repo, ref]} />
+              <BreadcrumbList items={[owner, name, ref]} />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               <DropdownMenuItem asChild>
                 <a
-                  href={`https://github.com/${owner}/${repo}${ref ? `/tree/${ref}` : ''}`}
+                  href={`https://github.com/${owner}/${name}${ref ? `/tree/${ref}` : ''}`}
                   target="_blank"
                   rel="noreferrer">
                   View on GitHub

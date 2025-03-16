@@ -11,14 +11,14 @@ class DefaultBranchWorker extends BaseGithubWorker<
   GithubDefaultBranch
 > {
   protected getCacheKey(request: DefaultBranchRequest): string {
-    return `${request.owner}/${request.repo}/default-branch`
+    return `${request.owner}/${request.name}/default-branch`
   }
 
   protected fetchData(
-    {owner, repo}: DefaultBranchRequest,
+    {owner, name}: DefaultBranchRequest,
     headers: HeadersInit,
   ): Promise<Response> {
-    return fetch(`https://api.github.com/repos/${owner}/${repo}`, {headers})
+    return fetch(`https://api.github.com/repos/${owner}/${name}`, {headers})
   }
 
   protected parseResponse(

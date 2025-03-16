@@ -19,7 +19,7 @@ import {
 } from '@/utils/randomMessages'
 
 export default function RepoView() {
-  const [{owner, repo, ref}, setTargetRepository] = useTargetRepository()
+  const [repo, setTargetRepository] = useTargetRepository()
   const [isLoadRef, getDefaultBranch] = usePromise(useGithubDefaultBranch())
   const [isLoadImagePaths, getImagePaths] = usePromise(useGithubImageFileTree())
   const [imageFiles, setImageFiles] = useState<GithubImageFileTree | null>(null)
@@ -34,16 +34,25 @@ export default function RepoView() {
   }, [])
 
   useEffect(() => {
-    if (owner && repo && !ref) {
-      getDefaultBranch({owner, repo})
-        .then(defaultBranch => setTargetRepository(owner, repo, defaultBranch))
+    if (repo.owner && repo.name && !repo.ref) {
+      getDefaultBranch(repo)
+        .then(defaultBranch =>
+          setTargetRepository(repo.owner, repo.name, defaultBranch),
+        )
         .catch(console.error)
     } else {
-      getImagePaths({owner, repo, ref})
+      getImagePaths(repo)
         .then(imageFileTree => setImageFiles(imageFileTree))
         .catch(console.error)
     }
-  }, [owner, repo, ref, getDefaultBranch, setTargetRepository, getImagePaths])
+  }, [
+    repo.owner,
+    repo.name,
+    repo.ref,
+    getDefaultBranch,
+    setTargetRepository,
+    getImagePaths,
+  ])
 
   const filteredImageFiles = useMemo(() => {
     const result = imageFiles?.filter(path => {
@@ -61,9 +70,9 @@ export default function RepoView() {
 
   const itemRenderer = useCallback(
     ({index, item}: RenderData<string>) => (
-      <ImageCell key={index} owner={owner} repo={repo} ref={ref} path={item} />
+      <ImageCell key={index} repo={repo} path={item} />
     ),
-    [owner, repo, ref],
+    [repo.owner, repo.name, repo.ref],
   )
 
   if (isLoadRef) {

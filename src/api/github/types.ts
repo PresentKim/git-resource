@@ -21,7 +21,7 @@ export interface GithubApiCacheData<T> {
 
 export interface DefaultBranchRequest {
   owner: string
-  repo: string
+  name: string
 }
 export interface DefaultBranchResponse {
   default_branch: string
@@ -30,7 +30,7 @@ export type GithubDefaultBranch = string
 
 export interface ImageFileTreeRequest {
   owner: string
-  repo: string
+  name: string
   ref: string
 }
 export interface ImageFileTreeResponse {
