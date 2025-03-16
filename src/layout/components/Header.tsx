@@ -1,4 +1,3 @@
-import {useCallback} from 'react'
 import {NavLink} from 'react-router-dom'
 import {SettingsIcon} from 'lucide-react'
 import {
@@ -9,14 +8,12 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import {Button} from '@/components/ui/button'
-import {Input} from '@/components/ui/input'
 import {BreadcrumbList} from '@/components/BreadcrumbList'
 import {LogoIcon as HeaderIcon} from '@/components/LogoIcon'
 import {FloatingHeader} from '@/components/FloatingHeader'
 import {useTargetRepository} from '@/hooks/useTargetRepository'
-import {useFilterQuery} from '@/hooks/useFilterQuery'
 import {useSearchDialogStore} from '@/stores/searchDialogStore'
-import {cn, debounce} from '@/utils'
+import {cn} from '@/utils'
 
 export default function Header({
   className,
@@ -24,14 +21,6 @@ export default function Header({
 }: React.InputHTMLAttributes<HTMLInputElement>) {
   const [{owner, repo, ref}] = useTargetRepository()
   const openSearchDialog = useSearchDialogStore(state => state.open)
-
-  const [filter, setFilterQuery] = useFilterQuery()
-  const setFilter = debounce(setFilterQuery, 300)
-
-  const handleInputChange = useCallback(
-    (e: React.ChangeEvent<HTMLInputElement>) => setFilter(e.target.value),
-    [setFilter],
-  )
 
   return (
     <FloatingHeader
@@ -83,11 +72,6 @@ export default function Header({
       <div
         data-slot="header-side"
         className="flex items-center h-full ml-8 gap-2">
-        <Input
-          defaultValue={filter}
-          onChange={handleInputChange}
-          placeholder="includes -excludes"
-          className="w-40"></Input>
         <NavLink
           to="/settings"
           aria-label="Settings"

@@ -5,6 +5,7 @@ import {
   type RenderData,
 } from '@/components/VitualizedFlexGrid'
 import {ImageCell} from '@/components/ImageCell'
+import {FilterInput} from '@/components/FilterInput'
 import {useGithubDefaultBranch} from '@/api/github/hooks/useGithubDefaultBranch'
 import {useGithubImageFileTree} from '@/api/github/hooks/useGithubImageFileTree'
 import type {GithubImageFileTree} from '@/api/github/types'
@@ -82,16 +83,24 @@ export default function RepoView() {
       </RandomMessageLoader>
     )
   } else if (!filteredImageFiles || !filteredImageFiles.length) {
-    return <RandomMessageLoader provider={generateNoImagesMessage} />
+    return (
+      <>
+        <FilterInput />
+        <RandomMessageLoader provider={generateNoImagesMessage} />
+      </>
+    )
   }
 
   return (
-    <VirtualizedFlexGrid
-      items={filteredImageFiles}
-      columnCount={columnCount}
-      overscan={5}
-      gap={10}
-      render={itemRenderer}
-    />
+    <>
+      <FilterInput />
+      <VirtualizedFlexGrid
+        items={filteredImageFiles}
+        columnCount={columnCount}
+        overscan={5}
+        gap={10}
+        render={itemRenderer}
+      />
+    </>
   )
 }
