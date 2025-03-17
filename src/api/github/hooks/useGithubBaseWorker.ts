@@ -1,14 +1,14 @@
 import {useCallback, useEffect, useRef} from 'react'
-import {
-  useGithubApiTokenStore,
-  useGithubRateLimitStore,
-} from '@/stores/githubApiStore'
-import {WorkerResponse} from '../types'
+
+import {useGithubRateLimitStore} from '@/stores/githubApiStore'
+import {useSettingStore} from '@/stores/settingStore'
+
+import type {WorkerResponse} from '../types'
 
 export function useGithubWorker<TRequest, TResponse>(workerUrl: string) {
   const workerRef = useRef<Worker | null>(null)
   const setRateLimit = useGithubRateLimitStore(state => state.setRateLimit)
-  const githubToken = useGithubApiTokenStore(state => state.githubToken)
+  const githubToken = useSettingStore(state => state.githubToken)
 
   useEffect(() => {
     workerRef.current = new Worker(workerUrl, {type: 'module'})

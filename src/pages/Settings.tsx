@@ -1,7 +1,7 @@
 import {useCallback, useState} from 'react'
 import {useForm} from 'react-hook-form'
-import {EraserIcon} from 'lucide-react'
 
+import {EraserIcon, SquareAsteriskIcon, SquareIcon} from 'lucide-react'
 import {
   Form,
   FormItem,
@@ -12,16 +12,15 @@ import {
 } from '@/components/ui/form'
 import {Button} from '@/components/ui/button'
 import {Input} from '@/components/ui/input'
-import {useGithubApiTokenStore} from '@/stores/githubApiStore'
-import {SquareAsteriskIcon, SquareIcon} from 'lucide-react'
+
+import {useSettingStore} from '@/stores/settingStore'
 
 type FormValues = {
   input: string
 }
 
 export default function Settings() {
-  const {githubToken, setGithubToken, clearGithubToken} =
-    useGithubApiTokenStore()
+  const {githubToken, setGithubToken} = useSettingStore()
   const [inputVisible, setInputVisible] = useState(false)
 
   const form = useForm<FormValues>({
@@ -44,10 +43,10 @@ export default function Settings() {
   }, [inputVisible])
 
   const onClockResetButton = useCallback(() => {
-    clearGithubToken()
+    setGithubToken('')
     form.setValue('input', '')
     form.setFocus('input')
-  }, [clearGithubToken, form])
+  }, [setGithubToken, form])
 
   const onInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
