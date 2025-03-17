@@ -1,83 +1,73 @@
 import {NavLink} from 'react-router-dom'
-import {SettingsIcon} from 'lucide-react'
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu'
-import {Button} from '@/components/ui/button'
-import {BreadcrumbList} from '@/components/BreadcrumbList'
-import {LogoIcon as HeaderIcon} from '@/components/LogoIcon'
+
+import {Settings as SettingsIcon} from 'lucide-react'
 import {FloatingHeader} from '@/components/FloatingHeader'
+import {LogoIcon} from '@/components/LogoIcon'
 import {useTargetRepository} from '@/hooks/useTargetRepository'
-import {useSearchDialogStore} from '@/stores/searchDialogStore'
 import {cn} from '@/utils'
+import {Button} from '@/components/ui/button'
 
-export default function Header({
-  className,
-  ...props
-}: React.InputHTMLAttributes<HTMLInputElement>) {
-  const [{owner, name, ref}] = useTargetRepository()
-  const openSearchDialog = useSearchDialogStore(state => state.open)
+function HomeButton() {
+  return (
+    <NavLink
+      to="/"
+      aria-label="Home"
+      className="flex items-center gap-1 h-full w-fit text-2xl select-none">
+      <LogoIcon strokeWidth={3} className="size-8 min-w-8" />
+      <span className="font-bold">Github</span>
+      <span className="text-card-foreground">resource</span>
+    </NavLink>
+  )
+}
 
+function RepoInfo() {
+  const [repo] = useTargetRepository()
+
+  return (
+    repo.owner && (
+      <div className="hidden md:block">
+        <a
+          href={repo.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="text-sm hover:underline text-muted-foreground">
+          {repo.displayName}
+        </a>
+      </div>
+    )
+  )
+}
+
+function SettingButton() {
+  return (
+    <Button size="icon" variant="ghost" aria-label="Settings">
+      <SettingsIcon className="size-6 min-w-6" />
+      {/* TODO: Add settings modal */}
+    </Button>
+  )
+}
+
+export default function Header(
+  props: Omit<React.ComponentProps<'header'>, 'ref' | 'className'>,
+) {
   return (
     <FloatingHeader
       data-slot="header"
-      className={cn(
-        'flex justify-between items-center align-middle duration-700',
-        'w-full max-w-full px-4 py-2',
-        'shadow-xs shadow-primary-foreground bg-background',
-        className,
-      )}
+      className="w-full border-b border-border/40 bg-background/80 backdrop-blur-lg"
       {...props}>
       <div
-        data-slot="header-title"
-        className="flex flex-1 items-center h-full min-h-10 min-w-0 gap-2">
-        <NavLink
-          to="/"
-          aria-label="Home"
-          className="font-bold select-none self-start mt-2">
-          <HeaderIcon strokeWidth={3} className="size-6 min-w-6 self-start" />
-        </NavLink>
-        {!owner || !name ? (
-          <NavLink to="/" aria-label="Home" className="font-bold select-none">
-            git-resource
-          </NavLink>
-        ) : (
-          <DropdownMenu>
-            <DropdownMenuTrigger className="hover:cursor-pointer flex-1 w-full">
-              <BreadcrumbList items={[owner, name, ref]} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="start">
-              <DropdownMenuItem asChild>
-                <a
-                  href={`https://github.com/${owner}/${name}${ref ? `/tree/${ref}` : ''}`}
-                  target="_blank"
-                  rel="noreferrer">
-                  View on GitHub
-                </a>
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Button variant="ghost" onClick={openSearchDialog}>
-                  Open New Repository
-                </Button>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        )}
-      </div>
-      <div
-        data-slot="header-side"
-        className="flex items-center h-full ml-8 gap-2">
-        <NavLink
-          to="/settings"
-          aria-label="Settings"
-          className="self-start hover:rotate-90 [&.active]:rotate-90 transition-transform">
-          <SettingsIcon className="size-6 min-w-6" />
-        </NavLink>
+        data-slot="header"
+        className={cn(
+          'flex items-center justify-between',
+          'w-full max-w-screen-xl group-[wide]:max-w-full  h-full min-h-10 mx-auto py-2 px-4 sm:px-6',
+        )}>
+        <div data-slot="header-title" className="flex-1 items-center">
+          <HomeButton />
+        </div>
+        <div data-slot="header-side" className="flex items-center gap-4">
+          <RepoInfo />
+          <SettingButton />
+        </div>
       </div>
     </FloatingHeader>
   )

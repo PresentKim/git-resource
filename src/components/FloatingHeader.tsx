@@ -31,7 +31,7 @@ export function FloatingHeader({
       <header
         ref={headerRef}
         className={cn(
-          'fixed top-0 left-0 z-50 transition-all',
+          'fixed top-0 z-50 transition-all',
           isVisible ? 'translate-y-0' : '-translate-y-full',
           className,
         )}
