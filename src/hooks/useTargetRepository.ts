@@ -1,21 +1,23 @@
-import {type GithubRepo, createGithubRepo} from '@/utils'
 import {useCallback, useMemo} from 'react'
 import {useParams, useNavigate} from 'react-router-dom'
-
-interface Params extends Record<string, string | undefined> {
-  owner: string | undefined
-  repo: string | undefined
-  '*': string | undefined
-}
+import {createGithubRepo, type GithubRepo, parseGithubUrl} from '@/utils'
 
 export function useTargetRepository() {
-  const {owner, repo, '*': ref} = useParams<Params>()
+  const {'*': path} = useParams<'*'>()
   const navigate = useNavigate()
 
-  const targetRepository: GithubRepo = useMemo(
-    () => createGithubRepo(owner ?? '', repo ?? '', ref ?? ''),
-    [owner, repo, ref],
-  )
+  const targetRepository: GithubRepo = useMemo(() => {
+    // If the path is valid, return the parsed repository
+    if (path) {
+      const parsedRepo = parseGithubUrl(path)
+      if (parsedRepo) {
+        return parsedRepo
+      }
+    }
+
+    // If the path is invalid, return an empty repository
+    return createGithubRepo('', '', '')
+  }, [path])
 
   const setTargetRepository = useCallback(
     (owner: string, name: string, ref: string | null | undefined) => {

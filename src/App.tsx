@@ -5,7 +5,6 @@ const BaseLayout = lazy(() => import('@/layout/BaseLayout'))
 const Home = lazy(() => import('@/pages/Home'))
 const Settings = lazy(() => import('@/pages/Settings'))
 const RepoView = lazy(() => import('@/pages/RepoView'))
-const NotFound = lazy(() => import('@/pages/NotFound'))
 
 function App() {
   return (
@@ -15,9 +14,8 @@ function App() {
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Home />} />
             <Route path="/settings" element={<Settings />} />
-            <Route path="/:owner/:repo/*" element={<RepoView />} />
+            <Route path="/*" element={<RepoView />} />
           </Route>
-          <Route path="*" element={<NotFound />} />
         </Routes>
       </Router>
     </Suspense>
