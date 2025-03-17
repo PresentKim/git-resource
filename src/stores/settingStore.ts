@@ -23,7 +23,7 @@ export const useSettingStore = create<SettingsStore>(() => ({
   setColumnCount: columnCount =>
     localStorage.setItem(COLUMN_COUNT_KEY, columnCount.toString()),
 
-  pixelated: localStorage.getItem(PIXELATED_KEY) === 'true',
+  pixelated: localStorage.getItem(PIXELATED_KEY) !== 'false',
   setPixelated: (pixelated: boolean) =>
     localStorage.setItem(PIXELATED_KEY, pixelated.toString()),
 }))
