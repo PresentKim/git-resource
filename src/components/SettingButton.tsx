@@ -44,7 +44,11 @@ export function SettingButton() {
   return (
     <Dialog onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
-        <Button variant="ghost" size="icon" className="rounded-full">
+        <Button
+          aria-label="Settings"
+          variant="ghost"
+          size="icon"
+          className="rounded-full">
           <SettingsIcon className="h-5 w-5" />
         </Button>
       </DialogTrigger>
