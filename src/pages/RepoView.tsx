@@ -116,7 +116,7 @@ export default function RepoView() {
         items={filteredImageFiles}
         columnCount={columnCount}
         overscan={5}
-        gap={10}
+        gap={5}
         render={itemRenderer}
         className={pixelated ? 'pixelated' : ''}
       />
