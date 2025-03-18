@@ -3,7 +3,6 @@ import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 
 const BaseLayout = lazy(() => import('@/layout/BaseLayout'))
 const Home = lazy(() => import('@/pages/Home'))
-const Settings = lazy(() => import('@/pages/Settings'))
 const RepoView = lazy(() => import('@/pages/RepoView'))
 
 function App() {
@@ -13,7 +12,6 @@ function App() {
         <Routes>
           <Route element={<BaseLayout />}>
             <Route path="/" element={<Home />} />
-            <Route path="/settings" element={<Settings />} />
             <Route path="/*" element={<RepoView />} />
           </Route>
         </Routes>
