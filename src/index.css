@@ -11,9 +11,6 @@
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 
-  image-rendering: pixelated;
-  -ms-interpolation-mode: nearest-neighbor;
-
   --background: #1d1d1d;
   --foreground: #e1e1e1;
   --card: #2d2d2d;
@@ -72,6 +69,11 @@ a:not(:disabled) {
 @layer utilities {
   .hover-underlined {
     @apply relative after:absolute after:bottom-0 after:left-0 after:h-px after:w-0 after:bg-current after:transition-all hover:after:w-full;
+  }
+
+  .pixelated {
+    image-rendering: pixelated;
+    -ms-interpolation-mode: nearest-neighbor;
   }
 }
 

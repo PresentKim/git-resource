@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
 
-import {Loader as LoaderIcon} from 'lucide-react'
 import {RandomMessageLoader} from '@/components/RandomMessageLoader'
 import {
   VirtualizedFlexGrid,
@@ -20,6 +19,7 @@ import {
   generateImageFetchMessage,
   generateNoImagesMessage,
 } from '@/utils/randomMessages'
+import {useSettingStore} from '@/stores/settingStore'
 
 export default function RepoView() {
   const [filter] = useFilterQuery()
@@ -28,14 +28,10 @@ export default function RepoView() {
   const [isLoadImagePaths, getImagePaths] = usePromise(useGithubImageFileTree())
   const [imageFiles, setImageFiles] = useState<GithubImageFileTree | null>(null)
   const [error, setError] = useState<Error | null>(null)
+  const columnCount = useSettingStore(state => state.filledColumnCount)
+  const pixelated = useSettingStore(state => state.pixelated)
 
   const filters = useMemo(() => filter.split(' ').filter(Boolean), [filter])
-
-  const columnCount = useMemo(() => {
-    const ASPECT_ITEM_SIZE = 64
-    const calculatedColumns = Math.floor(window.innerWidth / ASPECT_ITEM_SIZE)
-    return Math.max(2, Math.min(calculatedColumns, 15))
-  }, [])
 
   useEffect(() => {
     if (!repo.ref) {
@@ -122,6 +118,7 @@ export default function RepoView() {
         overscan={5}
         gap={10}
         render={itemRenderer}
+        className={pixelated ? 'pixelated' : ''}
       />
     </>
   )
