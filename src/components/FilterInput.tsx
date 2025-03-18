@@ -56,6 +56,7 @@ export function FilterInput({
           className="w-full pr-8 peer"
         />
         <Button
+          aria-label="Clear filter"
           onClick={handleClearFilter}
           size="icon"
           variant="ghost"
@@ -63,7 +64,11 @@ export function FilterInput({
           <XIcon className="h-4 w-4" />
         </Button>
       </div>
-      <Button onClick={handleApplyFilter} size="icon" variant="outline">
+      <Button
+        aria-label="Apply filter"
+        onClick={handleApplyFilter}
+        size="icon"
+        variant="outline">
         <FilterIcon className="h-4 w-4" />
       </Button>
     </div>
