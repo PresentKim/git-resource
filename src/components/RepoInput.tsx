@@ -7,8 +7,7 @@ import {Button} from '@/components/ui/button'
 import {useTargetRepository} from '@/hooks/useTargetRepository'
 import {cn, parseGithubUrl} from '@/utils'
 
-interface RepoInputProps extends React.ComponentProps<'div'> {}
-export function RepoInput({className, ...props}: RepoInputProps) {
+export function RepoInput({className, ...props}: React.ComponentProps<'div'>) {
   const [, setRepo] = useTargetRepository()
   const inputRef = useRef<HTMLInputElement>(null)
 

@@ -7,8 +7,10 @@ import {Button} from '@/components/ui/button'
 import {useFilterQuery} from '@/hooks/useFilterQuery'
 import {cn} from '@/utils'
 
-interface FilterInputProps extends React.ComponentProps<'div'> {}
-export function FilterInput({className, ...props}: FilterInputProps) {
+export function FilterInput({
+  className,
+  ...props
+}: React.ComponentProps<'div'>) {
   const [filter, setFilter] = useFilterQuery()
   const inputRef = useRef<HTMLInputElement>(null)
 
