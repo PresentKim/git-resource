@@ -7,6 +7,7 @@ import {
 } from '@/components/VitualizedFlexGrid'
 import {ImageCell} from '@/components/ImageCell'
 import {FilterInput} from '@/components/FilterInput'
+import {Button} from '@/components/ui/button'
 
 import {useGithubDefaultBranch} from '@/api/github/hooks/useGithubDefaultBranch'
 import {useGithubImageFileTree} from '@/api/github/hooks/useGithubImageFileTree'
@@ -20,6 +21,8 @@ import {
   generateNoImagesMessage,
 } from '@/utils/randomMessages'
 import {useSettingStore} from '@/stores/settingStore'
+import {downloadImagesAsZip} from '@/utils'
+import {Download as DownloadIcon, Loader as LoaderIcon} from 'lucide-react'
 
 export default function RepoView() {
   const [filter] = useFilterQuery()
@@ -67,6 +70,9 @@ export default function RepoView() {
     ),
     [repo.owner, repo.name, repo.ref],
   )
+  const [isDownloading, downloadAll] = usePromise(
+    downloadImagesAsZip.bind(null, repo, imageFiles || []),
+  )
 
   if (error) {
     return (
@@ -111,7 +117,26 @@ export default function RepoView() {
 
   return (
     <>
-      <FilterInput />
+      <div className="flex w-full items-center justify-center gap-2 mt-8 text-lg">
+        <FilterInput />
+        <Button
+          aria-label="Download All Images"
+          disabled={isDownloading}
+          onClick={downloadAll}
+          className="text-xs font-bold">
+          {isDownloading ? (
+            <>
+              <LoaderIcon className="size-4 animate-spin" />
+              <p className="hidden sm:block">Downloading...</p>
+            </>
+          ) : (
+            <>
+              <DownloadIcon className="size-4" />
+              <p className="hidden sm:block">Download All</p>
+            </>
+          )}
+        </Button>
+      </div>
       <VirtualizedFlexGrid
         items={filteredImageFiles}
         columnCount={columnCount}
