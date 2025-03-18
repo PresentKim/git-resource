@@ -22,5 +22,5 @@ export const downloadImagesAsZip = async (
 
   await Promise.all(downloadPromises)
   const content = await zip.generateAsync({type: 'blob'})
-  saveAs(content, 'github-images.zip')
+  saveAs(content, `${repo.owner}-${repo.name}.zip`)
 }
