@@ -1,8 +1,9 @@
-import {useCallback, useEffect, useRef} from 'react'
-import {Filter as FilterIcon, X as XIcon} from 'lucide-react'
+import {useEffect, useRef} from 'react'
 
+import {Filter as FilterIcon, X as XIcon} from 'lucide-react'
 import {Input} from '@/components/ui/input'
 import {Button} from '@/components/ui/button'
+
 import {useFilterQuery} from '@/hooks/useFilterQuery'
 import {cn} from '@/utils'
 
