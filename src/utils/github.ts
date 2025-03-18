@@ -1,5 +1,3 @@
-import type {TargetRepository} from '@/hooks/useTargetRepository'
-
 export interface GithubRepo {
   /** The owner of the repository */
   owner: string
