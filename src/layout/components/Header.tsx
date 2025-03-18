@@ -1,11 +1,11 @@
 import {NavLink} from 'react-router-dom'
 
-import {Settings as SettingsIcon} from 'lucide-react'
 import {FloatingHeader} from '@/components/FloatingHeader'
 import {LogoIcon} from '@/components/LogoIcon'
+import {SettingButton} from '@/components/SettingButton'
+
 import {useTargetRepository} from '@/hooks/useTargetRepository'
 import {cn} from '@/utils'
-import {Button} from '@/components/ui/button'
 
 function HomeButton() {
   return (
@@ -35,15 +35,6 @@ function RepoInfo() {
         </a>
       </div>
     )
-  )
-}
-
-function SettingButton() {
-  return (
-    <Button size="icon" variant="ghost" aria-label="Settings">
-      <SettingsIcon className="size-6 min-w-6" />
-      {/* TODO: Add settings modal */}
-    </Button>
   )
 }
 
