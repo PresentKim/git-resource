@@ -40,6 +40,7 @@ const RAW_RUNTIME_STATE =
           ["@radix-ui/react-tooltip", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:1.1.8"],\
           ["@tailwindcss/vite", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:4.0.11"],\
           ["@types/file-saver", "npm:2.0.7"],\
+          ["@types/jszip", "npm:3.4.1"],\
           ["@types/node", "npm:22.13.9"],\
           ["@types/react", "npm:19.0.10"],\
           ["@types/react-dom", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:19.0.4"],\
@@ -2295,6 +2296,16 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@types/jszip", [\
+      ["npm:3.4.1", {\
+        "packageLocation": "./.yarn/cache/@types-jszip-npm-3.4.1-1cc54cb6cf-c775913cbb.zip/node_modules/@types/jszip/",\
+        "packageDependencies": [\
+          ["@types/jszip", "npm:3.4.1"],\
+          ["jszip", "npm:3.10.1"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@types/node", [\
       ["npm:22.13.9", {\
         "packageLocation": "./.yarn/cache/@types-node-npm-22.13.9-565bb4cd14-eb6acd0416.zip/node_modules/@types/node/",\
@@ -3433,6 +3444,7 @@ const RAW_RUNTIME_STATE =
           ["@radix-ui/react-tooltip", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:1.1.8"],\
           ["@tailwindcss/vite", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:4.0.11"],\
           ["@types/file-saver", "npm:2.0.7"],\
+          ["@types/jszip", "npm:3.4.1"],\
           ["@types/node", "npm:22.13.9"],\
           ["@types/react", "npm:19.0.10"],\
           ["@types/react-dom", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:19.0.4"],\
