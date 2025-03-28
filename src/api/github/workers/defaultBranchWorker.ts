@@ -1,3 +1,4 @@
+import {proxyFetch} from '@/utils/proxyFetch'
 import type {
   WorkerRequestBase,
   DefaultBranchRequest,
@@ -19,6 +20,31 @@ class DefaultBranchWorker extends BaseGithubWorker<
     headers: HeadersInit,
   ): Promise<Response> {
     return fetch(`https://api.github.com/repos/${owner}/${name}`, {headers})
+  }
+  protected async fallbackFetchData({
+    owner,
+    name,
+  }: DefaultBranchRequest): Promise<GithubDefaultBranch> {
+    const response = await proxyFetch(`https://github.com/${owner}/${name}`)
+    if (!response.ok) {
+      throw new Error(`HTTP error! Status: ${response.status}`)
+    }
+
+    const html = await response.text()
+
+    // Try to find the default branch in the HTML
+    for (const pattern of [
+      /aria-label="([^"]+)\sbranch"/i, // aria-label="dev/1.3.0 branch"
+      new RegExp(`href="/${owner}/${name}/commits/([^/]+)/"`), // href="/owner/name/commits/dev/1.3.0/"
+      /data-default-branch="([^"]+)"/i, // data-default-branch="dev/1.3.0"
+    ]) {
+      const match = html.match(pattern)
+      if (match && match[1]) {
+        return match[1].trim()
+      }
+    }
+
+    throw new Error('Default branch not found in any pattern')
   }
 
   protected parseResponse(

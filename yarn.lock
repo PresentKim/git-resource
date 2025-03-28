@@ -1700,6 +1700,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/jszip@npm:^3.4.1":
+  version: 3.4.1
+  resolution: "@types/jszip@npm:3.4.1"
+  dependencies:
+    jszip: "npm:*"
+  checksum: 10c0/c775913cbb754d9ca04f0f2dcbee678255f22ab9658a2a4b02a9655dca85d676d5485cca634b02b39764ac844bce01f767ad045830453f5da116884074c42d37
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^22.13.4":
   version: 22.13.9
   resolution: "@types/node@npm:22.13.9"
@@ -2632,6 +2641,7 @@ __metadata:
     "@radix-ui/react-tooltip": "npm:^1.1.8"
     "@tailwindcss/vite": "npm:^4.0.6"
     "@types/file-saver": "npm:^2"
+    "@types/jszip": "npm:^3.4.1"
     "@types/node": "npm:^22.13.4"
     "@types/react": "npm:^19.0.8"
     "@types/react-dom": "npm:^19.0.3"
@@ -2969,7 +2979,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"jszip@npm:^3.10.1":
+"jszip@npm:*, jszip@npm:^3.10.1":
   version: 3.10.1
   resolution: "jszip@npm:3.10.1"
   dependencies:

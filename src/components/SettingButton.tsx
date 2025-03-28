@@ -79,18 +79,11 @@ export function SettingButton() {
               id="githubToken"
               value={githubToken}
               onChange={e => setGithubToken(e.target.value)}
-              placeholder="Enter your GitHub token for higher rate limits"
+              placeholder="github_pat_1234567890"
               className="text-sm"
             />
             <div className="text-sm text-accent">
-              Required for increase
-              <a
-                href="https://docs.github.com/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#primary-rate-limit-for-unauthenticated-users"
-                target="_blank"
-                rel="noreferrer"
-                className="underline ml-1">
-                api rate limit
-              </a>
+              Required for access private repositories
             </div>
           </div>
           <hr />

@@ -9,6 +9,7 @@ export abstract class BaseGithubWorker<TRequest, TResponse> {
     request: TRequest,
     headers: HeadersInit,
   ): Promise<Response>
+  protected abstract fallbackFetchData(request: TRequest): Promise<TResponse>
   protected abstract parseResponse(response: unknown): TResponse
 
   async handleRequest(request: TRequest & WorkerRequestBase) {
@@ -62,6 +63,15 @@ export abstract class BaseGithubWorker<TRequest, TResponse> {
 
       return this.createResponse(parsedData, rateLimit)
     } catch (error) {
+      if ((error as Error).message === 'GitHub API request failed: 403') {
+        try {
+          const responseData = await this.fallbackFetchData(request)
+          await this.storage.setCache(cacheKey, '', responseData)
+          return this.createResponse(responseData, {limit: 0, remaining: 0})
+        } catch (fallbackError) {
+          return this.createErrorResponse((fallbackError as Error).message)
+        }
+      }
       return this.createErrorResponse((error as Error).message)
     }
   }
