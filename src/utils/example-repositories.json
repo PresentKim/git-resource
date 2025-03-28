@@ -2,7 +2,7 @@
   ["Mojang", "bedrock-samples", "bedrock-samples"],
   ["ExcessiveAmountsOfZombies", "Croptopia", "v3_1.21"],
   ["Buuz135", "FunctionalStorage", "1.21"],
-  ["Team-EnderIO/EnderIO", "dev", "1.21.1"],
+  ["Team-EnderIO", "EnderIO", "dev/1.21.1"],
   ["Creators-of-Create", "Create", "mc1.20.1/dev"],
   ["vectorwing", "FarmersDelight", "1.20"],
   ["Umpaz", "BrewinAndChewin", "main"],
