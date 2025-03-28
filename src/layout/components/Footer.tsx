@@ -1,10 +1,6 @@
 import {FolderGit2Icon as GithubIcon} from 'lucide-react'
 
-import {useGithubRateLimitStore} from '@/stores/githubApiStore'
-
 export default function Footer() {
-  const {limit, remaining} = useGithubRateLimitStore()
-
   return (
     <footer className="flex w-full items-center justify-center gap-0.5 py-4 text-xs text-muted-foreground">
       <GithubIcon className="size-4" />
@@ -23,11 +19,6 @@ export default function Footer() {
         className="hover-underlined">
         git-resource
       </a>
-      <div
-        aria-label="Github API rate limit"
-        className="fixed text-xs right-4 bottom-4 select-none">
-        {remaining || '-'}/{limit || '-'}
-      </div>
     </footer>
   )
 }
