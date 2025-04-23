@@ -1,4 +1,3 @@
-import {proxyFetch} from '@/utils/proxyFetch'
 import type {
   WorkerRequestBase,
   DefaultBranchRequest,
@@ -25,7 +24,7 @@ class DefaultBranchWorker extends BaseGithubWorker<
     owner,
     name,
   }: DefaultBranchRequest): Promise<GithubDefaultBranch> {
-    const response = await proxyFetch(`https://github.com/${owner}/${name}`)
+    const response = await fetch(`/proxy/github/${owner}/${name}`)
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`)
     }
