@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState, useRef, memo} from 'react'
+import {useCallback, useState, useRef, memo} from 'react'
 import {LoaderCircleIcon} from 'lucide-react'
 import {type GithubRepo, createRawImageUrl, cn} from '@/utils'
 
@@ -11,20 +11,21 @@ interface ImageCellProps {
 const ImageCell = memo(function ImageCell({repo, path, onClick}: ImageCellProps) {
   const [loading, setLoading] = useState(true)
   const imgRef = useRef<HTMLImageElement>(null)
+  const currentPathRef = useRef<string>(path)
 
   const handleLoad = useCallback(() => {
     setLoading(false)
   }, [])
 
-  useEffect(() => {
-    const timeoutId = setTimeout(() => {
+  const handleImageRef = useCallback((img: HTMLImageElement | null) => {
+    imgRef.current = img
+    if (currentPathRef.current !== path) {
+      currentPathRef.current = path
       setLoading(true)
-      const img = imgRef.current
-      if (img && img.complete) {
-        setLoading(false)
-      }
-    }, 0)
-    return () => clearTimeout(timeoutId)
+    }
+    if (img && img.complete) {
+      setLoading(false)
+    }
   }, [path])
 
   return (
@@ -37,7 +38,7 @@ const ImageCell = memo(function ImageCell({repo, path, onClick}: ImageCellProps)
         <LoaderCircleIcon className="size-full object-contain text-muted animate-spin duration-[3s]" />
       </div>
       <img
-        ref={imgRef}
+        ref={handleImageRef}
         src={createRawImageUrl(repo, path)}
         alt={path}
         className="size-full object-contain peer"
