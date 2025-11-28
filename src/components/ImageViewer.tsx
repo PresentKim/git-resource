@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react'
-import {ChevronLeft, ChevronRight, X} from 'lucide-react'
+import {ChevronLeft, ChevronRight, X, LoaderCircleIcon} from 'lucide-react'
 import {
   Dialog,
   DialogClose,
@@ -32,8 +32,9 @@ export function ImageViewer({
   const [loading, setLoading] = useState(true)
   const [imageError, setImageError] = useState(false)
   const pixelated = useSettingStore(state => state.pixelated)
-  const prevImageRef = useRef<string | undefined>(undefined)
   const dialogContentRef = useRef<HTMLDivElement>(null)
+  const imgRef = useRef<HTMLImageElement>(null)
+  const currentImageRef = useRef<string | undefined>(undefined)
 
   const currentImage = images[currentIndex]
   const hasPrevious = currentIndex > 0
@@ -71,18 +72,17 @@ export function ImageViewer({
     setImageError(true)
   }, [])
 
-  useEffect(() => {
-    if (open && currentImage && prevImageRef.current !== currentImage) {
-      prevImageRef.current = currentImage
-      const timeoutId = setTimeout(() => {
-        setLoading(true)
-        setImageError(false)
-      }, 0)
-      return () => clearTimeout(timeoutId)
-    } else if (open && currentImage) {
-      prevImageRef.current = currentImage
+  const handleImageRef = useCallback((img: HTMLImageElement | null) => {
+    imgRef.current = img
+    if (currentImageRef.current !== currentImage) {
+      currentImageRef.current = currentImage
+      setLoading(true)
+      setImageError(false)
     }
-  }, [open, currentImage])
+    if (img && img.complete) {
+      setLoading(false)
+    }
+  }, [currentImage])
 
   useEffect(() => {
     if (open && dialogContentRef.current) {
@@ -158,7 +158,9 @@ export function ImageViewer({
           <div className="relative flex items-center justify-center w-full h-full pt-24 pb-28 px-8">
             {loading && (
               <div className="absolute inset-0 flex items-center justify-center z-10">
-                <div className="text-white text-lg">로딩 중...</div>
+                <div className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md">
+                  <LoaderCircleIcon className="size-full object-contain text-muted animate-spin duration-[3s]" />
+                </div>
               </div>
             )}
             {imageError ? (
@@ -168,6 +170,7 @@ export function ImageViewer({
               </div>
             ) : (
               <img
+                ref={handleImageRef}
                 src={createRawImageUrl(repo, currentImage)}
                 alt={currentImage}
                 className={cn(
