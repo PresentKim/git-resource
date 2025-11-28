@@ -38,7 +38,6 @@ export function ImageViewer({
   const hasPrevious = currentIndex > 0
   const hasNext = currentIndex < images.length - 1
 
-  // 파일명과 경로 분리
   const fileName = currentImage?.split('/').pop() || currentImage
   const filePath = currentImage?.includes('/')
     ? currentImage.substring(0, currentImage.lastIndexOf('/'))
@@ -121,7 +120,6 @@ export function ImageViewer({
             onOpenChange(false)
           }}>
         <div className="relative flex flex-col w-full h-full">
-          {/* 닫기 버튼 */}
           <DialogClose asChild>
             <Button
               variant="ghost"
@@ -132,7 +130,6 @@ export function ImageViewer({
             </Button>
           </DialogClose>
 
-          {/* 이미지 이름 (상단) */}
           <div className="absolute top-4 left-0 right-0 flex justify-center z-50 px-4">
             <div className="bg-black/50 px-4 py-3 rounded-md text-white max-w-[90%] wrap-break-word text-center">
               <div className="text-base sm:text-lg font-semibold mb-1">
@@ -146,7 +143,6 @@ export function ImageViewer({
             </div>
           </div>
 
-          {/* 이미지 컨테이너 */}
           <div className="relative flex items-center justify-center w-full h-full pt-24 pb-28 px-8">
             {loading && (
               <div className="absolute inset-0 flex items-center justify-center z-10">
@@ -173,7 +169,6 @@ export function ImageViewer({
             )}
           </div>
 
-          {/* 이전 버튼 (데스크톱) */}
           {hasPrevious && (
             <Button
               variant="ghost"
@@ -188,7 +183,6 @@ export function ImageViewer({
             </Button>
           )}
 
-          {/* 다음 버튼 (데스크톱) */}
           {hasNext && (
             <Button
               variant="ghost"
@@ -203,13 +197,10 @@ export function ImageViewer({
             </Button>
           )}
 
-          {/* 순서 표시 및 모바일 네비게이션 (하단) */}
           <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-50">
-            {/* 데스크톱 인덱스 표시 */}
             <div className="bg-black/50 px-4 py-2 rounded-md text-white text-sm hidden sm:block">
               {currentIndex + 1} / {images.length}
             </div>
-            {/* 모바일 네비게이션 버튼 및 인덱스 */}
             <div className="flex items-center gap-4 sm:hidden">
               {hasPrevious && (
                 <Button

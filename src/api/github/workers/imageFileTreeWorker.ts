@@ -44,7 +44,7 @@ class ImageFileTreeWorker extends BaseGithubWorker<
       zipData: JSZip,
     ): GithubImageFileTree {
       const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp']
-      const rootFolder = files[0].split('/')[0] // 예: 'repo-main'
+      const rootFolder = files[0].split('/')[0]
 
       return files
         .filter(
