@@ -5,9 +5,10 @@ import {type GithubRepo, createRawImageUrl, cn} from '@/utils'
 interface ImageCellProps {
   repo: GithubRepo
   path: string
+  onClick?: () => void
 }
 
-const ImageCell = memo(function ImageCell({repo, path}: ImageCellProps) {
+const ImageCell = memo(function ImageCell({repo, path, onClick}: ImageCellProps) {
   const [loading, setLoading] = useState(true)
   const imgRef = useRef<HTMLImageElement>(null)
 
@@ -27,7 +28,9 @@ const ImageCell = memo(function ImageCell({repo, path}: ImageCellProps) {
   }, [path])
 
   return (
-    <div className="relative aspect-square size-full ring-foreground transition-all active:ring-2 active:rounded-xs">
+    <div 
+      className="relative aspect-square size-full ring-foreground transition-all active:ring-2 active:rounded-xs"
+      onClick={onClick}>
       <div
         className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md"
         style={{display: loading ? 'block' : 'none'}}>
