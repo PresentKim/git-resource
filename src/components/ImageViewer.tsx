@@ -155,7 +155,7 @@ export function ImageViewer({
         <DialogPrimitive.Content
           className={cn(
             'fixed inset-0 z-50',
-            'w-screen h-screen',
+            'w-screen h-dvh',
             'p-0 border-0 bg-transparent rounded-none',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
@@ -166,7 +166,7 @@ export function ImageViewer({
             e.preventDefault()
             onOpenChange(false)
           }}>
-        <div ref={dialogContentRef} className="relative flex flex-col w-full h-full">
+        <div ref={dialogContentRef} className="relative flex flex-col w-full h-full max-h-dvh">
           <DialogClose asChild>
             <Button
               variant="ghost"
@@ -190,7 +190,7 @@ export function ImageViewer({
             </div>
           </div>
 
-          <div className="relative flex items-center justify-center w-full h-full pt-24 pb-28 px-8">
+          <div className="relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-28 px-8">
             {loading && (
               <div className="absolute inset-0 flex items-center justify-center z-10" aria-live="polite" aria-label="Loading image">
                 <div className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md" aria-hidden="true">
