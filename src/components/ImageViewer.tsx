@@ -35,6 +35,7 @@ export function ImageViewer({
   const dialogContentRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
   const currentImageRef = useRef<string | undefined>(undefined)
+  const lastWheelTimeRef = useRef<number>(0)
 
   const currentImage = images[currentIndex]
   const hasPrevious = currentIndex > 0
@@ -108,8 +109,39 @@ export function ImageViewer({
       }
     }
 
+    const wheelThrottle = 100
+
+    const handleWheel = (e: WheelEvent) => {
+      const container = dialogContentRef.current
+      if (!container || !container.contains(e.target as Node)) {
+        return
+      }
+
+      const now = Date.now()
+      if (now - lastWheelTimeRef.current < wheelThrottle) {
+        e.preventDefault()
+        e.stopPropagation()
+        return
+      }
+      lastWheelTimeRef.current = now
+
+      e.preventDefault()
+      e.stopPropagation()
+      if (Math.abs(e.deltaY) > 10) {
+        if (e.deltaY > 0) {
+          handleNext()
+        } else if (e.deltaY < 0) {
+          handlePrevious()
+        }
+      }
+    }
+
     window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
+    window.addEventListener('wheel', handleWheel, {passive: false, capture: true})
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('wheel', handleWheel, {capture: true})
+    }
   }, [open, handlePrevious, handleNext, onOpenChange])
 
   if (!currentImage) return null
