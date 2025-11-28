@@ -54,7 +54,12 @@ export function FilterInput({
           type="text"
           placeholder="'keyword' to include, '-keyword' to exclude"
           className="w-full pr-8 peer"
+          aria-label="Filter images"
+          aria-describedby="filter-description"
         />
+        <span id="filter-description" className="sr-only">
+          Enter keywords to include or exclude images. Use '-keyword' to exclude.
+        </span>
         <Button
           aria-label="Clear filter"
           onClick={handleClearFilter}
