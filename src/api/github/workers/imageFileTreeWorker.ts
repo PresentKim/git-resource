@@ -78,7 +78,7 @@ class ImageFileTreeWorker extends BaseGithubWorker<
       return filterImageFiles(files, zipData)
     }
 
-    const chunks: Uint8Array[] = []
+    const chunks: BlobPart[] = []
     const reader = response.body.getReader()
     while (true) {
       const {done, value} = await reader.read()
