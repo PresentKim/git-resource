@@ -40,7 +40,8 @@ export default function Home() {
             key={index}
             variant="outline"
             className="text-sm"
-            onClick={() => setTargetRepository(owner, name, ref)}>
+            onClick={() => setTargetRepository(owner, name, ref)}
+            aria-label={`Open repository ${owner}/${name}`}>
             {`${owner}/${name}`}
           </Button>
         ))}
