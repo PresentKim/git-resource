@@ -137,7 +137,7 @@ export function ImageViewer({
               variant="ghost"
               size="icon"
               className="absolute top-4 right-4 z-60 bg-black/50 hover:bg-black/70 text-white"
-              aria-label="닫기">
+              aria-label="Close">
               <X className="size-6" />
             </Button>
           </DialogClose>
@@ -165,7 +165,7 @@ export function ImageViewer({
             )}
             {imageError ? (
               <div className="flex flex-col items-center justify-center text-white">
-                <p className="text-lg mb-2">이미지를 불러올 수 없습니다</p>
+                <p className="text-lg mb-2">Failed to load image</p>
                 <p className="text-sm text-gray-400">{currentImage}</p>
               </div>
             ) : (
@@ -193,7 +193,7 @@ export function ImageViewer({
                 'hidden sm:flex',
               )}
               onClick={handlePrevious}
-              aria-label="이전 이미지">
+              aria-label="Previous image">
               <ChevronLeft className="size-8" />
             </Button>
           )}
@@ -207,7 +207,7 @@ export function ImageViewer({
                 'hidden sm:flex',
               )}
               onClick={handleNext}
-              aria-label="다음 이미지">
+              aria-label="Next image">
               <ChevronRight className="size-8" />
             </Button>
           )}
@@ -223,7 +223,7 @@ export function ImageViewer({
                   size="icon"
                   className="bg-black/50 hover:bg-black/70 text-white size-14 min-w-14"
                   onClick={handlePrevious}
-                  aria-label="이전 이미지">
+                  aria-label="Previous image">
                   <ChevronLeft className="size-10" />
                 </Button>
               )}
@@ -236,7 +236,7 @@ export function ImageViewer({
                   size="icon"
                   className="bg-black/50 hover:bg-black/70 text-white size-14 min-w-14"
                   onClick={handleNext}
-                  aria-label="다음 이미지">
+                  aria-label="Next image">
                   <ChevronRight className="size-10" />
                 </Button>
               )}
