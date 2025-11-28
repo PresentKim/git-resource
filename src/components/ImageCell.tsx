@@ -5,10 +5,9 @@ import {type GithubRepo, createRawImageUrl, cn} from '@/utils'
 interface ImageCellProps {
   repo: GithubRepo
   path: string
-  onClick?: () => void
 }
 
-const ImageCell = memo(function ImageCell({repo, path, onClick}: ImageCellProps) {
+const ImageCell = memo(function ImageCell({repo, path}: ImageCellProps) {
   const [loading, setLoading] = useState(true)
   const imgRef = useRef<HTMLImageElement>(null)
 
