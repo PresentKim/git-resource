@@ -28,10 +28,24 @@ const ImageCell = memo(function ImageCell({repo, path, onClick}: ImageCellProps)
     }
   }, [path])
 
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLDivElement>) => {
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault()
+        onClick?.()
+      }
+    },
+    [onClick],
+  )
+
   return (
-    <div 
-      className="relative aspect-square size-full ring-foreground transition-all active:ring-2 active:rounded-xs"
-      onClick={onClick}>
+    <div
+      role="button"
+      tabIndex={0}
+      className="relative aspect-square size-full ring-foreground transition-all active:ring-2 active:rounded-xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-ring"
+      onClick={onClick}
+      onKeyDown={handleKeyDown}
+      aria-label={`View image: ${path}`}>
       <div
         className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md"
         style={{display: loading ? 'block' : 'none'}}>

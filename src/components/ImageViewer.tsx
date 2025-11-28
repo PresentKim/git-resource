@@ -33,6 +33,7 @@ export function ImageViewer({
   const [imageError, setImageError] = useState(false)
   const pixelated = useSettingStore(state => state.pixelated)
   const prevImageRef = useRef<string | undefined>(undefined)
+  const dialogContentRef = useRef<HTMLDivElement>(null)
 
   const currentImage = images[currentIndex]
   const hasPrevious = currentIndex > 0
@@ -84,6 +85,17 @@ export function ImageViewer({
   }, [open, currentImage])
 
   useEffect(() => {
+    if (open && dialogContentRef.current) {
+      const firstFocusable = dialogContentRef.current.querySelector(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      ) as HTMLElement | null
+      if (firstFocusable) {
+        firstFocusable.focus()
+      }
+    }
+  }, [open])
+
+  useEffect(() => {
     if (!open) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -119,7 +131,7 @@ export function ImageViewer({
             e.preventDefault()
             onOpenChange(false)
           }}>
-        <div className="relative flex flex-col w-full h-full">
+        <div ref={dialogContentRef} className="relative flex flex-col w-full h-full">
           <DialogClose asChild>
             <Button
               variant="ghost"
