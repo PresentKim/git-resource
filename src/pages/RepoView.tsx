@@ -51,7 +51,7 @@ export default function RepoView() {
         .then(imageFileTree => setImageFiles(imageFileTree))
         .catch(setError)
     }
-  }, [repo.owner, repo.name, repo.ref])
+  }, [repo, getDefaultBranch, getImagePaths, setTargetRepository])
 
   const filteredImageFiles = useMemo(() => {
     const result = imageFiles?.filter(path => {
@@ -84,7 +84,7 @@ export default function RepoView() {
         onClick={() => handleImageClick(index)}
       />
     ),
-    [repo.owner, repo.name, repo.ref, handleImageClick],
+    [repo, handleImageClick],
   )
   const [isDownloading, downloadAll] = usePromise(
     downloadImagesAsZip.bind(null, repo, imageFiles || []),

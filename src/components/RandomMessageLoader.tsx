@@ -12,7 +12,7 @@ export function RandomMessageLoader({
   children,
   ...props
 }: RandomMessageLoaderProps) {
-  const {title, description, footer} = useMemo(provider, [provider])
+  const {title, description, footer} = useMemo(() => provider(), [provider])
 
   return (
     <div

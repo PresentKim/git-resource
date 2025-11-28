@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react'
+import {useCallback, useEffect, useRef, useState} from 'react'
 import {ChevronLeft, ChevronRight, X} from 'lucide-react'
 import {
   Dialog,
@@ -32,6 +32,7 @@ export function ImageViewer({
   const [loading, setLoading] = useState(true)
   const [imageError, setImageError] = useState(false)
   const pixelated = useSettingStore(state => state.pixelated)
+  const prevImageRef = useRef<string | undefined>(undefined)
 
   const currentImage = images[currentIndex]
   const hasPrevious = currentIndex > 0
@@ -71,9 +72,15 @@ export function ImageViewer({
   }, [])
 
   useEffect(() => {
-    if (open && currentImage) {
-      setLoading(true)
-      setImageError(false)
+    if (open && currentImage && prevImageRef.current !== currentImage) {
+      prevImageRef.current = currentImage
+      const timeoutId = setTimeout(() => {
+        setLoading(true)
+        setImageError(false)
+      }, 0)
+      return () => clearTimeout(timeoutId)
+    } else if (open && currentImage) {
+      prevImageRef.current = currentImage
     }
   }, [open, currentImage])
 
@@ -119,7 +126,7 @@ export function ImageViewer({
             <Button
               variant="ghost"
               size="icon"
-              className="absolute top-4 right-4 z-[60] bg-black/50 hover:bg-black/70 text-white"
+              className="absolute top-4 right-4 z-60 bg-black/50 hover:bg-black/70 text-white"
               aria-label="닫기">
               <X className="size-6" />
             </Button>
@@ -127,7 +134,7 @@ export function ImageViewer({
 
           {/* 이미지 이름 (상단) */}
           <div className="absolute top-4 left-0 right-0 flex justify-center z-50 px-4">
-            <div className="bg-black/50 px-4 py-3 rounded-md text-white max-w-[90%] break-words text-center">
+            <div className="bg-black/50 px-4 py-3 rounded-md text-white max-w-[90%] wrap-break-word text-center">
               <div className="text-base sm:text-lg font-semibold mb-1">
                 {fileName}
               </div>

@@ -17,26 +17,18 @@ const ImageCell = memo(function ImageCell({repo, path, onClick}: ImageCellProps)
   }, [])
 
   useEffect(() => {
-    setLoading(true)
-    const img = imgRef.current
-    if (img && img.complete) {
-      setLoading(false)
-    }
+    const timeoutId = setTimeout(() => {
+      setLoading(true)
+      const img = imgRef.current
+      if (img && img.complete) {
+        setLoading(false)
+      }
+    }, 0)
+    return () => clearTimeout(timeoutId)
   }, [path])
 
   return (
-    <div
-      className="relative aspect-square size-full ring-foreground transition-all active:ring-2 active:rounded-xs cursor-pointer"
-      onClick={onClick}
-      role="button"
-      tabIndex={0}
-      onKeyDown={e => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          onClick?.()
-        }
-      }}
-      aria-label={`이미지 보기: ${path}`}>
+    <div className="relative aspect-square size-full ring-foreground transition-all active:ring-2 active:rounded-xs">
       <div
         className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md"
         style={{display: loading ? 'block' : 'none'}}>
