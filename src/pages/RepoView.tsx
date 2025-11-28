@@ -94,7 +94,7 @@ export default function RepoView() {
     return (
       <div className="flex h-full items-center justify-center gap-2 mt-8 text-lg">
         <div className="flex h-full items-center justify-center">
-          <div className="text-center">
+          <div className="text-center" role="alert">
             <h1 className="text-4xl font-bold mb-4">An error occurred.</h1>
             <p className="text-xl mb-4">{error.message}</p>
             <a href="/" className="text-blue-500 hover:text-blue-700 underline">
@@ -109,7 +109,7 @@ export default function RepoView() {
   if (isLoadRef) {
     return (
       <RandomMessageLoader provider={generateBranchFetchMessage}>
-        <div className="flex items-center justify-center gap-2 mt-8 text-lg loading">
+        <div className="flex items-center justify-center gap-2 mt-8 text-lg loading" aria-live="polite" aria-label="Loading default branch">
           loading default branch...
         </div>
       </RandomMessageLoader>
@@ -117,7 +117,7 @@ export default function RepoView() {
   } else if (isLoadImagePaths) {
     return (
       <RandomMessageLoader provider={generateImageFetchMessage}>
-        <div className="flex items-center justify-center gap-2 mt-8 text-lg loading">
+        <div className="flex items-center justify-center gap-2 mt-8 text-lg loading" aria-live="polite" aria-label="Loading images">
           loading images...
         </div>
       </RandomMessageLoader>
@@ -153,14 +153,16 @@ export default function RepoView() {
           )}
         </Button>
       </div>
-      <VirtualizedFlexGrid
-        items={filteredImageFiles}
-        columnCount={columnCount}
-        overscan={5}
-        gap={5}
-        render={itemRenderer}
-        className={pixelated ? 'pixelated' : ''}
-      />
+      <div role="region" aria-label="Image gallery" aria-live="polite">
+        <VirtualizedFlexGrid
+          items={filteredImageFiles}
+          columnCount={columnCount}
+          overscan={5}
+          gap={5}
+          render={itemRenderer}
+          className={pixelated ? 'pixelated' : ''}
+        />
+      </div>
       {filteredImageFiles && (
         <ImageViewer
           open={viewerOpen}
