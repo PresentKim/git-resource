@@ -8,6 +8,7 @@ import {
 import {ImageCell} from '@/components/ImageCell'
 import {FilterInput} from '@/components/FilterInput'
 import {Button} from '@/components/ui/button'
+import {ImageViewer} from '@/components/ImageViewer'
 
 import {useGithubDefaultBranch} from '@/api/github/hooks/useGithubDefaultBranch'
 import {useGithubImageFileTree} from '@/api/github/hooks/useGithubImageFileTree'
@@ -31,6 +32,8 @@ export default function RepoView() {
   const [isLoadImagePaths, getImagePaths] = usePromise(useGithubImageFileTree())
   const [imageFiles, setImageFiles] = useState<GithubImageFileTree | null>(null)
   const [error, setError] = useState<Error | null>(null)
+  const [viewerOpen, setViewerOpen] = useState(false)
+  const [viewerIndex, setViewerIndex] = useState(0)
   const columnCount = useSettingStore(state => state.filledColumnCount)
   const pixelated = useSettingStore(state => state.pixelated)
 
@@ -64,11 +67,24 @@ export default function RepoView() {
     return result
   }, [imageFiles, filters])
 
+  const handleImageClick = useCallback(
+    (index: number) => {
+      setViewerIndex(index)
+      setViewerOpen(true)
+    },
+    [],
+  )
+
   const itemRenderer = useCallback(
     ({index, item}: RenderData<string>) => (
-      <ImageCell key={index} repo={repo} path={item} />
+      <ImageCell
+        key={index}
+        repo={repo}
+        path={item}
+        onClick={() => handleImageClick(index)}
+      />
     ),
-    [repo.owner, repo.name, repo.ref],
+    [repo.owner, repo.name, repo.ref, handleImageClick],
   )
   const [isDownloading, downloadAll] = usePromise(
     downloadImagesAsZip.bind(null, repo, imageFiles || []),
@@ -145,6 +161,16 @@ export default function RepoView() {
         render={itemRenderer}
         className={pixelated ? 'pixelated' : ''}
       />
+      {filteredImageFiles && (
+        <ImageViewer
+          open={viewerOpen}
+          onOpenChange={setViewerOpen}
+          images={filteredImageFiles}
+          currentIndex={viewerIndex}
+          repo={repo}
+          onIndexChange={setViewerIndex}
+        />
+      )}
     </>
   )
 }
