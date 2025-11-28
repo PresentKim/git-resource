@@ -48,13 +48,14 @@ const ImageCell = memo(function ImageCell({repo, path, onClick}: ImageCellProps)
       aria-label={`View image: ${path}`}>
       <div
         className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md"
-        style={{display: loading ? 'block' : 'none'}}>
-        <LoaderCircleIcon className="size-full object-contain text-muted animate-spin duration-[3s]" />
+        style={{display: loading ? 'block' : 'none'}}
+        aria-hidden="true">
+        <LoaderCircleIcon className="size-full object-contain text-muted animate-spin duration-[3s]" aria-hidden="true" />
       </div>
       <img
         ref={handleImageRef}
         src={createRawImageUrl(repo, path)}
-        alt={path}
+        alt={`Image from ${path}`}
         className="size-full object-contain peer"
         onLoad={handleLoad}
         style={{display: loading ? 'none' : 'block'}}
