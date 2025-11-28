@@ -50,16 +50,22 @@ export function RepoInput({className, ...props}: React.ComponentProps<'div'>) {
           type="text"
           placeholder="https://github.com/example/test/main"
           className="w-full pr-8 peer"
+          aria-label="GitHub repository URL"
+          aria-describedby="repo-input-description"
         />
+        <span id="repo-input-description" className="sr-only">
+          Enter a GitHub repository URL to browse images
+        </span>
         <Button
           onClick={handleClearRepo}
           size="icon"
           variant="ghost"
-          className="absolute right-0 top-0 max-w-sm h-full px-2 peer-placeholder-shown:hidden">
+          className="absolute right-0 top-0 max-w-sm h-full px-2 peer-placeholder-shown:hidden"
+          aria-label="Clear repository URL">
           <XIcon className="size-4" />
         </Button>
       </div>
-      <Button onClick={handleApplyRepo} className="w-full sm:w-fit gap-2">
+      <Button onClick={handleApplyRepo} className="w-full sm:w-fit gap-2" aria-label="Open repository">
         <SearchIcon strokeWidth={3} className="size-4" />
         <p className="">Open Repo</p>
       </Button>
