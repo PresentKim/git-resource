@@ -20,21 +20,21 @@ function HomeButton() {
   )
 }
 
-function RepoInfo() {
+function RepoInfo({className}: {className?: string}) {
   const [repo] = useTargetRepository()
 
+  if (!repo.owner) return null
+
   return (
-    repo.owner && (
-      <div className="hidden md:block">
-        <a
-          href={repo.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="text-sm hover:underline text-muted-foreground">
-          {repo.displayName}
-        </a>
-      </div>
-    )
+    <div className={className}>
+      <a
+        href={repo.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="text-xs sm:text-sm hover:underline text-muted-foreground">
+        {repo.displayName}
+      </a>
+    </div>
   )
 }
 
@@ -49,16 +49,19 @@ export default function Header(
       <div
         data-slot="header"
         className={cn(
-          'flex items-center justify-between',
-          'w-full max-w-screen-xl group-[wide]:max-w-full  h-full min-h-10 mx-auto py-2 px-4 sm:px-6',
+          'flex flex-col',
+          'w-full max-w-screen-xl group-[wide]:max-w-full h-full mx-auto py-2 px-4 sm:px-6',
         )}>
-        <div data-slot="header-title" className="flex-1 items-center">
-          <HomeButton />
+        <div className="flex items-center justify-between min-h-10">
+          <div data-slot="header-title" className="flex-1 items-center">
+            <HomeButton />
+          </div>
+          <div data-slot="header-side" className="flex items-center gap-4">
+            <RepoInfo className="hidden md:block" />
+            <SettingButton />
+          </div>
         </div>
-        <div data-slot="header-side" className="flex items-center gap-4">
-          <RepoInfo />
-          <SettingButton />
-        </div>
+        <RepoInfo className="md:hidden pb-1" />
       </div>
     </FloatingHeader>
   )
