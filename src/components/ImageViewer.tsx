@@ -159,12 +159,16 @@ export function ImageViewer({
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           )}
           aria-labelledby={imageTitleId}
+          aria-describedby={undefined}
           onPointerDownOutside={e => e.preventDefault()}
           onEscapeKeyDown={e => {
             e.preventDefault()
             onOpenChange(false)
           }}>
         <div ref={dialogContentRef} className="relative flex flex-col w-full h-full max-h-dvh">
+          <DialogPrimitive.Title className="sr-only">
+            {fileName} - Image {currentIndex + 1} of {images.length}
+          </DialogPrimitive.Title>
           <DialogClose asChild>
             <Button
               variant="ghost"
