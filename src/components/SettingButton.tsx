@@ -55,7 +55,7 @@ export function SettingButton() {
           <SettingsIcon className="h-5 w-5" />
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-2xl border-border/70 bg-card shadow-xl shadow-black/40">
+      <DialogContent className="max-h-[min(100vh-2rem,32rem)] w-[min(100vw-1.5rem,40rem)] overflow-y-auto border-border/70 bg-card shadow-xl shadow-black/40 sm:max-w-2xl">
         <DialogHeader className="space-y-1 border-b border-border/60 pb-3">
           <DialogTitle className="flex items-center justify-between text-lg font-semibold">
             <span>Viewer settings</span>
