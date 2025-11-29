@@ -155,7 +155,7 @@ export default function RepoView() {
 
   return (
     <>
-      <div className="flex w-full items-center justify-center gap-2 mt-8 text-lg">
+      <div className="flex w-full items-center justify-center gap-2 text-lg">
         <FilterInput />
         <Button
           aria-label="Download All Images"
