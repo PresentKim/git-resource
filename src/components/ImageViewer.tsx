@@ -3,7 +3,6 @@ import {ChevronLeft, ChevronRight, X, LoaderCircleIcon} from 'lucide-react'
 import {
   Dialog,
   DialogClose,
-  DialogOverlay,
   DialogPortal,
 } from '@/components/ui/dialog'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
@@ -93,16 +92,17 @@ export function ImageViewer({
     }
   }, [currentImage])
 
-  useEffect(() => {
-    if (open && dialogContentRef.current) {
+  const handleOpenAutoFocus = useCallback((e: Event) => {
+    e.preventDefault()
+    if (dialogContentRef.current) {
       const firstFocusable = dialogContentRef.current.querySelector(
         'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
       ) as HTMLElement | null
       if (firstFocusable) {
-        firstFocusable.focus()
+        firstFocusable.focus({preventScroll: true})
       }
     }
-  }, [open])
+  }, [])
 
   useEffect(() => {
     if (!open) return
@@ -147,19 +147,19 @@ export function ImageViewer({
   const imageTitleId = 'image-viewer-title'
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogPortal>
-        <DialogOverlay className="bg-black/95" />
         <DialogPrimitive.Content
           className={cn(
             'fixed inset-0 z-50',
             'w-screen h-dvh',
-            'p-0 border-0 bg-transparent rounded-none',
+            'p-0 border-0 bg-black/95 rounded-none',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
           )}
           aria-labelledby={imageTitleId}
           aria-describedby={undefined}
+          onOpenAutoFocus={handleOpenAutoFocus}
           onPointerDownOutside={e => e.preventDefault()}
           onEscapeKeyDown={e => {
             e.preventDefault()
