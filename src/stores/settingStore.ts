@@ -12,6 +12,9 @@ interface SettingsStore {
 
   pixelated: boolean
   setPixelated: (pixelated: boolean) => void
+
+  animationEnabled: boolean
+  setAnimationEnabled: (animationEnabled: boolean) => void
 }
 
 const getColumnCount = () => {
@@ -27,6 +30,7 @@ const calcColumnCount = () => {
 const GITHUB_TOKEN_KEY = 'settings.token'
 const COLUMN_COUNT_KEY = 'settings.columnCount'
 const PIXELATED_KEY = 'settings.pixelated'
+const ANIMATION_ENABLED_KEY = 'settings.animationEnabled'
 export const useSettingStore = create<SettingsStore>((set, get) => ({
   githubToken: localStorage.getItem(GITHUB_TOKEN_KEY) || '',
   setGithubToken: githubToken => {
@@ -49,6 +53,12 @@ export const useSettingStore = create<SettingsStore>((set, get) => ({
   setPixelated: (pixelated: boolean) => {
     set({pixelated})
     localStorage.setItem(PIXELATED_KEY, pixelated.toString())
+  },
+
+  animationEnabled: localStorage.getItem(ANIMATION_ENABLED_KEY) !== 'false',
+  setAnimationEnabled: (animationEnabled: boolean) => {
+    set({animationEnabled})
+    localStorage.setItem(ANIMATION_ENABLED_KEY, animationEnabled.toString())
   },
 }))
 

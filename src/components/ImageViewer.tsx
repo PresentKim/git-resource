@@ -8,9 +8,10 @@ import {
 } from '@/components/ui/dialog'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {Button} from '@/components/ui/button'
-import {cn, createRawImageUrl} from '@/utils'
+import {cn, createRawImageUrl, getMcmetaPath} from '@/utils'
 import type {GithubRepo} from '@/utils'
 import {useSettingStore} from '@/stores/settingStore'
+import {AnimatedSprite} from './AnimatedSprite'
 
 interface ImageViewerProps {
   open: boolean
@@ -19,6 +20,8 @@ interface ImageViewerProps {
   currentIndex: number
   repo: GithubRepo
   onIndexChange?: (index: number) => void
+  /** Set of mcmeta file paths for checking if images have animation */
+  mcmetaPaths?: Set<string>
 }
 
 export function ImageViewer({
@@ -28,10 +31,12 @@ export function ImageViewer({
   currentIndex,
   repo,
   onIndexChange,
+  mcmetaPaths,
 }: ImageViewerProps) {
   const [loading, setLoading] = useState(true)
   const [imageError, setImageError] = useState(false)
   const pixelated = useSettingStore(state => state.pixelated)
+  const animationEnabled = useSettingStore(state => state.animationEnabled)
   const dialogContentRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
   const currentImageRef = useRef<string | undefined>(undefined)
@@ -39,6 +44,10 @@ export function ImageViewer({
   const currentImage = images[currentIndex]
   const hasPrevious = currentIndex > 0
   const hasNext = currentIndex < images.length - 1
+
+  // Check if current image has animation
+  const mcmetaPath = currentImage ? getMcmetaPath(currentImage) : ''
+  const shouldAnimate = (mcmetaPaths?.has(mcmetaPath) ?? false) && animationEnabled
 
   const fileName = currentImage?.split('/').pop() || currentImage
   const filePath = currentImage?.includes('/')
@@ -192,6 +201,18 @@ export function ImageViewer({
                 <p className="text-lg mb-2">Failed to load image</p>
                 <p className="text-sm text-gray-400">{currentImage}</p>
               </div>
+            ) : shouldAnimate ? (
+              <AnimatedSprite
+                src={createRawImageUrl(repo, currentImage)}
+                alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
+                className={cn(
+                  'w-full h-full max-w-[80vw] max-h-[60vh]',
+                  loading && 'opacity-0',
+                )}
+                pixelated={pixelated}
+                onLoad={handleImageLoad}
+                onError={handleImageError}
+              />
             ) : (
               <img
                 ref={handleImageRef}

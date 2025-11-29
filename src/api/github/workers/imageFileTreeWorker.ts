@@ -9,6 +9,7 @@ import type {
 import {BaseGithubWorker} from './baseWorker'
 
 const IMAGE_FILE_EXTENSIONS_REGEX = /\.(png|jpe?g|gif|webp|svg)$/i
+const MCMETA_FILE_EXTENSIONS_REGEX = /\.mcmeta$/i
 
 class ImageFileTreeWorker extends BaseGithubWorker<
   ImageFileTreeRequest & WorkerRequestBase,
@@ -37,7 +38,7 @@ class ImageFileTreeWorker extends BaseGithubWorker<
      * Remove non-image files from the list, And omit the root folder name.
      * @param files
      * @param zipData
-     * @returns Filtered image file list
+     * @returns Filtered image file list (including .mcmeta files)
      */
     function filterImageFiles(
       files: string[],
@@ -50,7 +51,8 @@ class ImageFileTreeWorker extends BaseGithubWorker<
         .filter(
           file =>
             !zipData.files[file].dir && // Not a directory
-            imageExtensions.some(ext => file.toLowerCase().endsWith(ext)), // Image file
+            (imageExtensions.some(ext => file.toLowerCase().endsWith(ext)) || // Image file
+             file.toLowerCase().endsWith('.mcmeta')), // Or mcmeta file
         )
         .map(file => file.replace(`${rootFolder}/`, '')) // Remove root folder
     }
@@ -103,7 +105,7 @@ class ImageFileTreeWorker extends BaseGithubWorker<
     response: ImageFileTreeResponse,
   ): GithubImageFileTree {
     return response.tree.reduce((acc, {path, type}) => {
-      if (type === 'blob' && IMAGE_FILE_EXTENSIONS_REGEX.test(path)) {
+      if (type === 'blob' && (IMAGE_FILE_EXTENSIONS_REGEX.test(path) || MCMETA_FILE_EXTENSIONS_REGEX.test(path))) {
         acc.push(path)
       }
       return acc

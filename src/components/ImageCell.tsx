@@ -1,17 +1,33 @@
 import {useCallback, useState, useRef, memo} from 'react'
 import {LoaderCircleIcon} from 'lucide-react'
-import {type GithubRepo, createRawImageUrl, cn} from '@/utils'
+import {type GithubRepo, createRawImageUrl, cn, getMcmetaPath} from '@/utils'
+import {AnimatedSprite} from './AnimatedSprite'
 
 interface ImageCellProps {
   repo: GithubRepo
   path: string
   onClick?: () => void
+  /** Set of mcmeta file paths for checking if this image has animation */
+  mcmetaPaths?: Set<string>
+  /** Whether animation is enabled */
+  animationEnabled?: boolean
 }
 
-const ImageCell = memo(function ImageCell({repo, path, onClick}: ImageCellProps) {
+const ImageCell = memo(function ImageCell({
+  repo,
+  path,
+  onClick,
+  mcmetaPaths,
+  animationEnabled = true,
+}: ImageCellProps) {
   const [loading, setLoading] = useState(true)
   const imgRef = useRef<HTMLImageElement>(null)
   const currentPathRef = useRef<string>(path)
+
+  // Check if this image has an associated mcmeta file
+  const mcmetaPath = getMcmetaPath(path)
+  const hasAnimation = mcmetaPaths?.has(mcmetaPath) ?? false
+  const shouldAnimate = hasAnimation && animationEnabled
 
   const handleLoad = useCallback(() => {
     setLoading(false)
@@ -38,6 +54,8 @@ const ImageCell = memo(function ImageCell({repo, path, onClick}: ImageCellProps)
     [onClick],
   )
 
+  const imageUrl = createRawImageUrl(repo, path)
+
   return (
     <div
       role="button"
@@ -46,20 +64,31 @@ const ImageCell = memo(function ImageCell({repo, path, onClick}: ImageCellProps)
       onClick={onClick}
       onKeyDown={handleKeyDown}
       aria-label={`View image: ${path}`}>
-      <div
-        className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md"
-        style={{display: loading ? 'block' : 'none'}}
-        aria-hidden="true">
-        <LoaderCircleIcon className="size-full object-contain text-muted animate-spin duration-[3s]" aria-hidden="true" />
-      </div>
-      <img
-        ref={handleImageRef}
-        src={createRawImageUrl(repo, path)}
-        alt={`Image from ${path}`}
-        className="size-full object-contain peer"
-        onLoad={handleLoad}
-        style={{display: loading ? 'none' : 'block'}}
-      />
+      {shouldAnimate ? (
+        <AnimatedSprite
+          src={imageUrl}
+          alt={`Animated image from ${path}`}
+          className="size-full"
+          onLoad={handleLoad}
+        />
+      ) : (
+        <>
+          <div
+            className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md"
+            style={{display: loading ? 'block' : 'none'}}
+            aria-hidden="true">
+            <LoaderCircleIcon className="size-full object-contain text-muted animate-spin duration-[3s]" aria-hidden="true" />
+          </div>
+          <img
+            ref={handleImageRef}
+            src={imageUrl}
+            alt={`Image from ${path}`}
+            className="size-full object-contain peer"
+            onLoad={handleLoad}
+            style={{display: loading ? 'none' : 'block'}}
+          />
+        </>
+      )}
       <div
         className={cn(
           'absolute inset-0 overflow-hidden',

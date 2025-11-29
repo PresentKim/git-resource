@@ -22,7 +22,7 @@ import {
   generateNoImagesMessage,
 } from '@/utils/randomMessages'
 import {useSettingStore} from '@/stores/settingStore'
-import {downloadImagesAsZip} from '@/utils'
+import {downloadImagesAsZip, isMcmetaFile} from '@/utils'
 import {Download as DownloadIcon, Loader as LoaderIcon} from 'lucide-react'
 
 export default function RepoView() {
@@ -36,8 +36,28 @@ export default function RepoView() {
   const [viewerIndex, setViewerIndex] = useState(0)
   const columnCount = useSettingStore(state => state.filledColumnCount)
   const pixelated = useSettingStore(state => state.pixelated)
+  const animationEnabled = useSettingStore(state => state.animationEnabled)
 
   const filters = useMemo(() => filter.split(' ').filter(Boolean), [filter])
+
+  // Separate image files and mcmeta files
+  const {imageOnlyFiles, mcmetaPaths} = useMemo(() => {
+    if (!imageFiles) {
+      return {imageOnlyFiles: null, mcmetaPaths: new Set<string>()}
+    }
+    const mcmeta = new Set<string>()
+    const images: string[] = []
+    
+    for (const path of imageFiles) {
+      if (isMcmetaFile(path)) {
+        mcmeta.add(path)
+      } else {
+        images.push(path)
+      }
+    }
+    
+    return {imageOnlyFiles: images, mcmetaPaths: mcmeta}
+  }, [imageFiles])
 
   useEffect(() => {
     if (!repo.ref) {
@@ -54,7 +74,7 @@ export default function RepoView() {
   }, [repo, getDefaultBranch, getImagePaths, setTargetRepository])
 
   const filteredImageFiles = useMemo(() => {
-    const result = imageFiles?.filter(path => {
+    const result = imageOnlyFiles?.filter(path => {
       return filters.reduce((acc, filter) => {
         if (!acc || !filter) return acc
         if (filter.startsWith('-')) {
@@ -65,7 +85,7 @@ export default function RepoView() {
       }, true)
     })
     return result
-  }, [imageFiles, filters])
+  }, [imageOnlyFiles, filters])
 
   const handleImageClick = useCallback(
     (index: number) => {
@@ -82,12 +102,14 @@ export default function RepoView() {
         repo={repo}
         path={item}
         onClick={() => handleImageClick(index)}
+        mcmetaPaths={mcmetaPaths}
+        animationEnabled={animationEnabled}
       />
     ),
-    [repo, handleImageClick],
+    [repo, handleImageClick, mcmetaPaths, animationEnabled],
   )
   const [isDownloading, downloadAll] = usePromise(
-    downloadImagesAsZip.bind(null, repo, imageFiles || []),
+    downloadImagesAsZip.bind(null, repo, imageOnlyFiles || []),
   )
 
   if (error) {
@@ -171,6 +193,7 @@ export default function RepoView() {
           currentIndex={viewerIndex}
           repo={repo}
           onIndexChange={setViewerIndex}
+          mcmetaPaths={mcmetaPaths}
         />
       )}
     </>

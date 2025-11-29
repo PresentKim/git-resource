@@ -25,11 +25,13 @@ export function SettingButton() {
   const [githubToken, setGithubToken] = useState('')
   const [columnCount, setColumnCount] = useState(0)
   const [pixelated, setPixelated] = useState(true)
+  const [animationEnabled, setAnimationEnabled] = useState(true)
 
   const handleSave = () => {
     settings.setGithubToken(githubToken)
     settings.setColumnCount(columnCount)
     settings.setPixelated(pixelated)
+    settings.setAnimationEnabled(animationEnabled)
   }
 
   const handleOpenChange = (open: boolean) => {
@@ -38,6 +40,7 @@ export function SettingButton() {
       setGithubToken(settings.githubToken)
       setColumnCount(settings.columnCount)
       setPixelated(settings.pixelated)
+      setAnimationEnabled(settings.animationEnabled)
     }
   }
 
@@ -121,6 +124,22 @@ export function SettingButton() {
             </div>
             <p className="text-sm text-accent">
               Render with distinct pixels for a pixel-art
+            </p>
+          </div>
+          <hr />
+          <div data-slot="animation-toggle" className="flex flex-col gap-2">
+            <div className="flex items-center justify-between space-x-2">
+              <Label htmlFor="animationEnabled" className="text-base">
+                Animate .mcmeta Textures
+              </Label>
+              <Switch
+                id="animationEnabled"
+                checked={animationEnabled}
+                onCheckedChange={setAnimationEnabled}
+              />
+            </div>
+            <p className="text-sm text-accent">
+              Play animations for textures with .mcmeta files (Minecraft)
             </p>
           </div>
         </div>
