@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import {useEffect, useState} from 'react'
 
 import {Button} from '@/components/ui/button'
 import {RepoInput} from '@/components/RepoInput'
@@ -24,28 +24,93 @@ export default function Home() {
   }, [])
 
   return (
-    <div className="flex flex-col items-center max-w-2xl space-y-4 py-16">
-      <h1 className="text-center text-4xl font-bold">Github Resource</h1>
-      <p className="text-center text-lg text-accent">
-        Browse and download images from GitHub repository with ease.
-      </p>
-      <RepoInput />
-      <hr className="w-full my-8" />
-      <p className="text-center text-muted-foreground">
-        Or try one of these example repositories:
-      </p>
-      <div className="flex flex-wrap justify-center items-center space-x-2 space-y-2 px-2">
-        {shuffledExampleRepositories.map(([owner, name, ref], index) => (
-          <Button
-            key={index}
-            variant="outline"
-            className="text-sm"
-            onClick={() => setTargetRepository(owner, name, ref)}
-            aria-label={`Open repository ${owner}/${name}`}>
-            {`${owner}/${name}`}
-          </Button>
-        ))}
+    <section
+      aria-labelledby="hero-title"
+      className="flex w-full justify-center px-4 py-10 sm:py-16">
+      <div className="flex w-full max-w-4xl flex-col gap-10 sm:gap-12">
+        <div className="space-y-4 sm:space-y-6 text-center">
+          <div className="inline-flex items-center justify-center rounded-full border border-border/60 bg-card/50 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
+            <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-chart-2" />
+            Browse GitHub repository images instantly
+          </div>
+          <div className="space-y-3 sm:space-y-4">
+            <h1
+              id="hero-title"
+              className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
+              Explore GitHub images
+              <span className="block bg-gradient-to-r from-chart-1 via-chart-4 to-chart-2 bg-clip-text text-transparent">
+                filter, preview, and download in one place
+              </span>
+            </h1>
+            <p className="mx-auto max-w-2xl text-balance text-sm text-muted-foreground sm:text-base">
+              Paste any public GitHub repository URL and
+              <span className="font-semibold text-accent">
+                {' '}
+                browse all image assets with powerful filtering and download
+              </span>
+              .
+            </p>
+            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground sm:text-sm">
+              <li>🔍 include / -exclude text filter</li>
+              <li>⚡ caching + lazy loading</li>
+              <li>🌓 dark-mode-friendly layout</li>
+            </ul>
+          </div>
+        </div>
+
+        <div className="mx-auto w-full max-w-2xl rounded-2xl border border-border/70 bg-card/70 p-4 shadow-lg shadow-black/20 backdrop-blur sm:p-5">
+          <h2 className="mb-3 text-sm font-medium text-muted-foreground sm:text-base">
+            Start with a repository URL
+          </h2>
+          <div className="w-full">
+            <RepoInput />
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
+            Example:{' '}
+            <span className="font-mono text-[0.7rem] text-accent sm:text-xs">
+              https://github.com/owner/repo
+            </span>
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3 text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
+          <div className="h-px flex-1 bg-border/60" />
+          <span>OR</span>
+          <div className="h-px flex-1 bg-border/60" />
+        </div>
+
+        <div className="mx-auto w-full max-w-3xl space-y-4 rounded-xl border border-dashed border-border/70 bg-card/40 p-4 sm:space-y-5 sm:p-5">
+          <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
+            <p className="text-sm font-medium text-muted-foreground">
+              Explore with example repositories
+            </p>
+            <p className="text-xs text-muted-foreground">
+              Pick a curated repo to see how the image gallery works.
+            </p>
+          </div>
+
+          <div
+            className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4"
+            role="list"
+            aria-label="Example repositories">
+            {shuffledExampleRepositories.map(([owner, name, ref], index) => (
+              <Button
+                key={index}
+                role="listitem"
+                variant="outline"
+                size="sm"
+                className="flex h-9 items-center justify-start gap-1 overflow-hidden text-ellipsis whitespace-nowrap border-border/60 bg-background/40 text-[0.7rem] font-normal text-muted-foreground hover:bg-accent/20 hover:text-foreground sm:text-xs"
+                onClick={() => setTargetRepository(owner, name, ref)}
+                aria-label={`Open example repository ${owner}/${name}`}>
+                <span className="text-[0.6rem]">★</span>
+                <span className="font-mono">
+                  {owner}/{name}
+                </span>
+              </Button>
+            ))}
+          </div>
+        </div>
       </div>
-    </div>
+    </section>
   )
 }

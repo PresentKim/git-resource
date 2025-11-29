@@ -24,7 +24,7 @@
   --muted: #5a5a5a;
   --muted-foreground: #a1a1a1;
   --accent: #888888;
-  --accent-foreground: #3a3a3a;
+  --accent-foreground: #111111;
   --destructive: hsl(0 70% 45%);
   --destructive-foreground: #e1e1e1;
   --border: #404040;
@@ -74,6 +74,14 @@ a:not(:disabled) {
   .pixelated {
     image-rendering: pixelated;
     -ms-interpolation-mode: nearest-neighbor;
+  }
+
+  .soft-card {
+    @apply border border-border/70 bg-card/60 shadow-lg shadow-black/10;
+  }
+
+  .interactive-hover {
+    @apply transition-all duration-200 ease-out hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/30;
   }
 }
 

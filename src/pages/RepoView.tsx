@@ -59,6 +59,8 @@ export default function RepoView() {
     return {imageOnlyFiles: images, mcmetaPaths: mcmeta}
   }, [imageFiles])
 
+  const totalCount = imageOnlyFiles?.length ?? 0
+
   useEffect(() => {
     if (!repo.ref) {
       getDefaultBranch(repo)
@@ -112,90 +114,129 @@ export default function RepoView() {
     downloadImagesAsZip.bind(null, repo, imageOnlyFiles || []),
   )
 
-  if (error) {
-    return (
-      <div className="flex h-full items-center justify-center gap-2 mt-8 text-lg">
-        <div className="flex h-full items-center justify-center">
-          <div className="text-center" role="alert">
-            <h1 className="text-4xl font-bold mb-4">An error occurred.</h1>
-            <p className="text-xl mb-4">{error.message}</p>
-            <a href="/" className="text-blue-500 hover:text-blue-700 underline">
-              Return to Home
-            </a>
+  return (
+    <section
+      aria-label="Repository image viewer"
+      className="flex w-full flex-col gap-3 sm:gap-4">
+      <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card/60 p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3">
+        <div className="flex-1 sm:order-2">
+          <FilterInput />
+        </div>
+
+        <div className="mt-1 flex items-center justify-between gap-2 text-[0.7rem] text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start sm:text-xs">
+          <span className="rounded-full bg-background/70 px-2 py-1">
+            Showing{' '}
+            <span className="font-semibold text-accent">
+              {filteredImageFiles?.length ?? 0}
+            </span>
+            {' of '}
+            {totalCount.toLocaleString()} images
+          </span>
+          <Button
+            aria-label="Download all currently visible images as ZIP"
+            disabled={isDownloading || !filteredImageFiles?.length}
+            onClick={downloadAll}
+            size="sm"
+            className="text-[0.7rem] font-semibold sm:text-xs">
+            {isDownloading ? (
+              <>
+                <LoaderIcon className="size-4 animate-spin" />
+                <span>Downloading visible...</span>
+              </>
+            ) : (
+              <>
+                <DownloadIcon className="size-4" />
+                <span>Download visible</span>
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
+
+      {error && (
+        <div
+          role="alert"
+          className="flex flex-col items-center gap-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-center text-sm text-destructive-foreground">
+          <p className="text-base font-semibold">
+            Something went wrong while loading images.
+          </p>
+          <p className="max-w-xl text-xs text-muted-foreground">
+            {error.message}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
+            <span>· Check that the repository URL is valid and public.</span>
+            <span>· You may have hit the GitHub API rate limit.</span>
+          </div>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => window.location.reload()}
+            className="mt-1">
+            Try again
+          </Button>
+        </div>
+      )}
+
+      {isLoadRef || isLoadImagePaths ? (
+        <div className="flex flex-1 items-center justify-center rounded-xl border border-border/60 bg-card/40 p-6 sm:p-8">
+          <RandomMessageLoader
+            provider={
+              isLoadRef ? generateBranchFetchMessage : generateImageFetchMessage
+            }>
+            <div
+              className="flex flex-col items-center gap-3 text-center"
+              aria-live="polite">
+              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                <LoaderIcon className="size-4 animate-spin" />
+                <span>
+                  {isLoadRef
+                    ? 'Fetching default branch...'
+                    : 'Fetching image list...'}
+                </span>
+              </div>
+            </div>
+          </RandomMessageLoader>
+        </div>
+      ) : !filteredImageFiles || !filteredImageFiles.length ? (
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border/60 bg-card/40 p-6 text-center">
+          <RandomMessageLoader provider={generateNoImagesMessage} />
+          <div className="space-y-2 text-xs text-muted-foreground">
+            <p>No images were found for this repository and filter.</p>
+            <ul className="space-y-1 text-left">
+              <li>· Make sure the repo contains PNG/JPEG/GIF/SVG images.</li>
+              <li>· Check that the filter does not exclude everything.</li>
+            </ul>
           </div>
         </div>
-      </div>
-    )
-  }
-
-  if (isLoadRef) {
-    return (
-      <RandomMessageLoader provider={generateBranchFetchMessage}>
-        <div className="flex items-center justify-center gap-2 mt-8 text-lg loading" aria-live="polite" aria-label="Loading default branch">
-          loading default branch...
-        </div>
-      </RandomMessageLoader>
-    )
-  } else if (isLoadImagePaths) {
-    return (
-      <RandomMessageLoader provider={generateImageFetchMessage}>
-        <div className="flex items-center justify-center gap-2 mt-8 text-lg loading" aria-live="polite" aria-label="Loading images">
-          loading images...
-        </div>
-      </RandomMessageLoader>
-    )
-  } else if (!filteredImageFiles || !filteredImageFiles.length) {
-    return (
-      <>
-        <FilterInput />
-        <RandomMessageLoader provider={generateNoImagesMessage} />
-      </>
-    )
-  }
-
-  return (
-    <>
-      <div className="flex w-full items-center justify-center gap-2 text-lg">
-        <FilterInput />
-        <Button
-          aria-label="Download All Images"
-          disabled={isDownloading}
-          onClick={downloadAll}
-          className="text-xs font-bold">
-          {isDownloading ? (
-            <>
-              <LoaderIcon className="size-4 animate-spin" />
-              <p className="hidden sm:block">Downloading...</p>
-            </>
-          ) : (
-            <>
-              <DownloadIcon className="size-4" />
-              <p className="hidden sm:block">Download All</p>
-            </>
+      ) : (
+        <>
+          <div
+            role="region"
+            aria-label="Image gallery"
+            aria-live="polite"
+            className="rounded-xl border border-border/60 bg-card/40 p-2 sm:p-3">
+            <VirtualizedFlexGrid
+              items={filteredImageFiles}
+              columnCount={columnCount}
+              overscan={5}
+              gap={8}
+              render={itemRenderer}
+              className={pixelated ? 'pixelated' : ''}
+            />
+          </div>
+          {filteredImageFiles && (
+            <ImageViewer
+              open={viewerOpen}
+              onOpenChange={setViewerOpen}
+              images={filteredImageFiles}
+              currentIndex={viewerIndex}
+              repo={repo}
+              onIndexChange={setViewerIndex}
+              mcmetaPaths={mcmetaPaths}
+            />
           )}
-        </Button>
-      </div>
-      <div role="region" aria-label="Image gallery" aria-live="polite">
-        <VirtualizedFlexGrid
-          items={filteredImageFiles}
-          columnCount={columnCount}
-          overscan={5}
-          gap={5}
-          render={itemRenderer}
-          className={pixelated ? 'pixelated' : ''}
-        />
-      </div>
-      {filteredImageFiles && (
-        <ImageViewer
-          open={viewerOpen}
-          onOpenChange={setViewerOpen}
-          images={filteredImageFiles}
-          currentIndex={viewerIndex}
-          repo={repo}
-          onIndexChange={setViewerIndex}
-          mcmetaPaths={mcmetaPaths}
-        />
+        </>
       )}
-    </>
+    </section>
   )
 }

@@ -6,9 +6,9 @@ import Footer from './components/Footer'
 export default function BaseLayout() {
   return (
     <>
-      <div className="flex flex-col h-full w-full max-w-full">
+      <div className="flex h-full w-full max-w-full flex-col">
         <Header />
-        <main className="flex flex-col flex-1 justify-start items-center w-full px-4 py-4 space-y-6">
+        <main className="flex flex-1 w-full justify-start px-2 py-4 sm:px-4">
           <Outlet />
         </main>
         <Footer />
