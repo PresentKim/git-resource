@@ -1,27 +1,41 @@
 import {useEffect, useState} from 'react'
+import {Shuffle} from 'lucide-react'
 
 import {Button} from '@/components/ui/button'
 import {RepoInput} from '@/components/RepoInput'
 
 import {useTargetRepository} from '@/hooks/useTargetRepository'
 
-const EXAMPLE_REPO_COUNT = 10
+const EXAMPLE_REPO_COUNT = 5
 
 export default function Home() {
   const [, setTargetRepository] = useTargetRepository()
+  const [exampleRepositories, setExampleRepositories] = useState<
+    [string, string, string][]
+  >([])
   const [shuffledExampleRepositories, setShuffledExampleRepositories] =
     useState<[string, string, string][]>([])
 
+  const pickRandomExamples = (
+    list: [string, string, string][],
+  ): [string, string, string][] => {
+    return [...list]
+      .sort(() => Math.random() - 0.5)
+      .slice(0, EXAMPLE_REPO_COUNT) as [string, string, string][]
+  }
+
   useEffect(() => {
     import('@/utils/example-repositories.json').then(module => {
-      const exampleRepositories = module.default
-      const shuffled = [...exampleRepositories]
-        .sort(() => Math.random() - 0.5)
-        .slice(0, EXAMPLE_REPO_COUNT) as [string, string, string][]
-
-      setShuffledExampleRepositories(shuffled)
+      const loaded = module.default as [string, string, string][]
+      setExampleRepositories(loaded)
+      setShuffledExampleRepositories(pickRandomExamples(loaded))
     })
   }, [])
+
+  const handleRerollExamples = () => {
+    if (!exampleRepositories.length) return
+    setShuffledExampleRepositories(pickRandomExamples(exampleRepositories))
+  }
 
   return (
     <section
@@ -81,16 +95,28 @@ export default function Home() {
 
         <div className="mx-auto w-full max-w-3xl space-y-4 rounded-xl border border-dashed border-border/70 bg-card/40 p-4 sm:space-y-5 sm:p-5">
           <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
-            <p className="text-sm font-medium text-muted-foreground">
-              Explore with example repositories
-            </p>
-            <p className="text-xs text-muted-foreground">
-              Pick a curated repo to see how the image gallery works.
-            </p>
+            <div className="space-y-1">
+              <p className="text-sm font-medium text-muted-foreground">
+                Explore with example repositories
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Pick a curated repo to see how the image gallery works.
+              </p>
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              className="flex items-center gap-1 text-xs"
+              onClick={handleRerollExamples}
+              aria-label="Shuffle example repositories">
+              <Shuffle className="h-3.5 w-3.5" />
+              <span>Shuffle examples</span>
+            </Button>
           </div>
 
           <div
-            className="grid w-full grid-cols-2 gap-2 sm:grid-cols-3 md:grid-cols-4"
+            className="grid w-full grid-cols-1 gap-2"
             role="list"
             aria-label="Example repositories">
             {shuffledExampleRepositories.map(([owner, name, ref], index) => (
@@ -99,10 +125,9 @@ export default function Home() {
                 role="listitem"
                 variant="outline"
                 size="sm"
-                className="flex h-9 items-center justify-start gap-1 overflow-hidden text-ellipsis whitespace-nowrap border-border/60 bg-background/40 text-[0.7rem] font-normal text-muted-foreground hover:bg-accent/20 hover:text-foreground sm:text-xs"
+                className="flex h-9 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap border-border/60 bg-background/40 text-[0.7rem] font-normal text-muted-foreground hover:bg-accent/20 hover:text-foreground sm:text-xs"
                 onClick={() => setTargetRepository(owner, name, ref)}
                 aria-label={`Open example repository ${owner}/${name}`}>
-                <span className="text-[0.6rem]">★</span>
                 <span className="font-mono">
                   {owner}/{name}
                 </span>
