@@ -137,16 +137,16 @@ export default function RepoView() {
             disabled={isDownloading || !filteredImageFiles?.length}
             onClick={downloadAll}
             size="sm"
-            className="text-[0.7rem] font-semibold sm:text-xs">
+            className="text-[0.7rem] font-semibold sm:text-xs bg-background text-forground border border-inputa hover:bg-background/90">
             {isDownloading ? (
               <>
                 <LoaderIcon className="size-4 animate-spin" />
-                <span>Downloading visible...</span>
+                <span>DOWNLOADING VISIBLE...</span>
               </>
             ) : (
               <>
                 <DownloadIcon className="size-4" />
-                <span>Download visible</span>
+                <span>DOWNLOAD VISIBLE</span>
               </>
             )}
           </Button>
@@ -213,8 +213,7 @@ export default function RepoView() {
           <div
             role="region"
             aria-label="Image gallery"
-            aria-live="polite"
-            className="rounded-xl border border-border/60 bg-card/40 p-2 sm:p-3">
+            aria-live="polite">
             <VirtualizedFlexGrid
               items={filteredImageFiles}
               columnCount={columnCount}
