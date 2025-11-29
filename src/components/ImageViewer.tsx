@@ -1,5 +1,5 @@
 import {useCallback, useEffect, useRef, useState} from 'react'
-import {ChevronLeft, ChevronRight, X, LoaderCircleIcon} from 'lucide-react'
+import {ChevronLeft, ChevronRight, Download, LoaderCircleIcon, X} from 'lucide-react'
 import {
   Dialog,
   DialogClose,
@@ -8,6 +8,7 @@ import {
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {Button} from '@/components/ui/button'
 import {cn, createRawImageUrl, getMcmetaPath} from '@/utils'
+import {saveAs} from 'file-saver'
 import type {GithubRepo} from '@/utils'
 import {useSettingStore} from '@/stores/settingStore'
 import {AnimatedSprite} from './AnimatedSprite'
@@ -52,6 +53,18 @@ export function ImageViewer({
   const filePath = currentImage?.includes('/')
     ? currentImage.substring(0, currentImage.lastIndexOf('/'))
     : null
+
+  const handleDownloadCurrent = useCallback(async () => {
+    try {
+      const url = createRawImageUrl(repo, currentImage)
+      const response = await fetch(url)
+      const blob = await response.blob()
+      saveAs(blob, fileName || 'image.png')
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error('Failed to download image', err)
+    }
+  }, [currentImage, fileName, repo])
 
   const handlePrevious = useCallback(() => {
     if (hasPrevious) {
@@ -262,8 +275,20 @@ export function ImageViewer({
           )}
 
           <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-50">
-            <div className="bg-black/50 px-4 py-2 rounded-md text-white text-sm hidden sm:block" aria-live="polite" aria-atomic="true">
-              Image {currentIndex + 1} of {images.length}
+            <div className="hidden items-center gap-3 rounded-md bg-black/50 px-4 py-2 text-xs text-white sm:flex" aria-live="polite" aria-atomic="true">
+              <span>
+                Image {currentIndex + 1} of {images.length}
+              </span>
+              <Button
+                type="button"
+                size="sm"
+                variant="outline"
+                className="border-white/30 bg-black/40 px-2 py-1 text-[0.7rem] font-semibold text-white hover:bg-white/10"
+                onClick={handleDownloadCurrent}
+                aria-label="Download current image">
+                <Download className="mr-1 h-3.5 w-3.5" />
+                DOWNLOAD
+              </Button>
             </div>
             <div className="flex items-center gap-4 sm:hidden">
               {hasPrevious && (
@@ -276,8 +301,19 @@ export function ImageViewer({
                   <ChevronLeft className="size-10" />
                 </Button>
               )}
-              <div className="bg-black/50 px-4 py-2 rounded-md text-white text-sm" aria-live="polite" aria-atomic="true">
-                Image {currentIndex + 1} of {images.length}
+              <div className="flex items-center gap-2 rounded-md bg-black/50 px-4 py-2 text-xs text-white" aria-live="polite" aria-atomic="true">
+                <span>
+                  Image {currentIndex + 1} of {images.length}
+                </span>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="h-8 border-white/30 bg-black/40 px-2 py-1 text-[0.65rem] font-semibold text-white hover:bg-white/10"
+                  onClick={handleDownloadCurrent}
+                  aria-label="Download current image">
+                  <Download className="h-3 w-3" />
+                </Button>
               </div>
               {hasNext && (
                 <Button
