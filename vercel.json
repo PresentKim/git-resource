@@ -1,12 +1,12 @@
 {
   "rewrites": [
     {
-      "source": "(?!/proxy)/(.*)",
-      "destination": "/index.html"
-    },
-    {
       "source": "/proxy/github/:path*",
       "destination": "https://github.com/:path*"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ]
 }
