@@ -34,17 +34,19 @@ export default function Home() {
       <p className="text-center text-muted-foreground">
         Or try one of these example repositories:
       </p>
-      <div className="flex flex-wrap justify-center items-center space-x-2 space-y-2 px-2">
+      <ul className="flex flex-wrap justify-center items-center gap-2 px-2 list-none">
         {shuffledExampleRepositories.map(([owner, name, ref], index) => (
-          <Button
-            key={index}
-            variant="outline"
-            className="text-sm"
-            onClick={() => setTargetRepository(owner, name, ref)}>
-            {`${owner}/${name}`}
-          </Button>
+          <li key={index}>
+            <Button
+              variant="outline"
+              className="text-sm"
+              aria-label={`Open example repository ${owner}/${name}`}
+              onClick={() => setTargetRepository(owner, name, ref)}>
+              {`${owner}/${name}`}
+            </Button>
+          </li>
         ))}
-      </div>
+      </ul>
     </div>
   )
 }
