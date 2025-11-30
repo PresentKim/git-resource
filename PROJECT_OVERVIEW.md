@@ -1,38 +1,43 @@
-## 📌 Project Overview: Git Resource Viewer
+## Project Overview: Git Resource Viewer
 
 ### 1. Project Introduction
 
-**Git Resource Viewer** is a **single-page web app** for previewing image files from a github repository URL.
-It is deployed via Vercel and utilizes **Lazy Loading** techniques to efficiently explore all images within a repository.
+**Git Resource Viewer** is a **single-page web app** for previewing image files from a GitHub repository URL.
+It is deployed via Vercel and utilizes **custom virtual scrolling** and **Web Worker** techniques to efficiently explore all images within a repository.
 
 ### 2. Key Features
 
 - **GitHub Repository Image Retrieval**  
-  Users can enter a GitHub repository URL to fetch and display all image files stored within that repository.
+  Users can enter a GitHub repository URL or select an example repository to fetch and display all image files stored within that repository. The default branch is automatically detected to retrieve the image list.
 
 - **URL Sharing**  
-  By utilizing React Hash Router, this project supports static single-page routing, allowing filter settings to be stored in query parameters.
-  This ensures that the same view can be recreated when sharing a URL.
+  Routing is implemented using React Router's BrowserRouter, and filter settings are stored in query parameters through the nuqs library, allowing the same view to be recreated when sharing a URL.
 
 - **Image Filtering**  
-  Users can filter displayed images by including or excluding specific keywords. (Example: `include -exclude` format)
+  Users can filter displayed images by including or excluding specific keywords. (Example: `keyword -exclude` format)
 
-- **Lazy Loading**  
-  The `react-virtualized` library is used to optimize rendering performance by loading only the images currently visible on the screen.
+- **Image ZIP Download**  
+  All currently displayed images can be downloaded as a ZIP file in bulk.
+
+- **Custom Virtual Scrolling**  
+  Instead of react-virtualized, a custom virtual scrolling system is implemented to optimize rendering performance for large numbers of images. IntersectionObserver is used to render only visible images.
 
 - **GitHub API Request Caching**  
-  To prevent functionality from being interrupted due to GitHub’s API rate limit, caching mechanisms are implemented.
+  A hybrid caching strategy using IndexedDB and localStorage is implemented to prevent functionality interruption due to API rate limits. ETag-based HTTP 304 response handling minimizes API calls.
 
 - **Support for GitHub Personal Access Tokens**  
-  Users can enter their GitHub personal access token to perform authenticated requests, increasing the API request limit.
+  Users can enter their GitHub personal access token to perform authenticated requests, increasing the API request limit and enabling access to private repositories.
+
+- **User Settings**  
+  Customizable settings such as grid column count adjustment (auto/manual) and pixelated rendering options are provided.
 
 - **Responsive UI**  
   The application is designed to provide an optimal user experience across different screen sizes.
 
 ### 3. Technology Stack & Justification
 
-- **Frontend**: React  
-  React’s component-based architecture enhances maintainability and reusability while simplifying state management and event handling.
+- **Frontend**: React 19, TypeScript, Vite  
+  Code splitting using React 19's Suspense and Lazy Loading optimizes initial loading performance, and TypeScript ensures type safety.
 
 - **Styling**: Tailwind CSS  
   A utility-first approach enables rapid and intuitive styling, reducing redundant code and improving readability.
@@ -40,42 +45,76 @@ It is deployed via Vercel and utilizes **Lazy Loading** techniques to efficientl
 - **State Management**: Zustand  
   A lightweight state management library that reduces unnecessary complexity, optimizes performance, and improves maintainability with a simple API.
 
-- **Component Library**: Shadcn  
-  Prebuilt UI components accelerate development while ensuring consistent design.
+- **URL State Management**: nuqs  
+  Integrated with React Router, it allows easy management of URL query parameters as React state, enabling filter setting sharing functionality.
 
-- **Data Caching**: IndexedDB  
-  IndexedDB Storage is used for large-scale caching, with localStorage as a fallback for unsupported browsers.
+- **Component Library**: Radix UI (Shadcn-based)  
+  Prebuilt UI components with accessibility in mind accelerate development while ensuring consistent design.
 
-- **Routing**: React Hash Router  
-  Hash-based routing ensures seamless navigation in static deployments.
+- **Data Caching**: IndexedDB (idb-keyval)  
+  IndexedDB Storage is used for large-scale caching. A hybrid caching system is implemented with localStorage as a fallback for unsupported browsers.
 
-- **Performance Optimization**: Lazy Loading  
-  `react-virtualized` optimizes large-scale image rendering, while the Intersection Observer API ensures that only visible images are loaded, improving efficiency.
+- **Routing**: React Router (BrowserRouter)  
+  Routing is implemented for static sites through Vercel's redirect configuration.
 
-- **Deployment**: Vercel + CI/CD
-  Vercel allows for long-term static hosting without server management,
-  and GitHub integration automates the CI/CD pipeline for seamless updates upon commits.
+- **Performance Optimization**: Custom Virtual Scrolling + Web Workers  
+  A custom virtual scrolling system is implemented instead of react-virtualized to reduce bundle size and optimize scroll performance. Web Workers are utilized to offload heavy data processing tasks from the main thread, preventing browser freezing.
 
-### 4. Project Goals
+- **Image Download**: jszip, file-saver  
+  Functionality to compress and download multiple images as a ZIP file is implemented.
 
-- **Componentization with React Hooks**: Improve maintainability and reusability by modularizing components effectively.
-- **Optimized Responsive Web Design**: Use media queries and Tailwind CSS’s responsive features to ensure optimal UI on various screen sizes.
-- **Performance Optimization**: Minimize unnecessary re-renders by leveraging React.memo, useMemo, and useCallback.
-- **Web Accessibility Enhancement**: Adhere to ARIA standards to improve accessibility.
-- **Semantic Commit Messaging**: Adopt a structured commit message format for better collaboration and code tracking.
-- **CI/CD Pipeline Implementation**: Automate deployment and testing with GitHub Actions.
+- **Deployment**: Vercel  
+  The application is deployed as a static site via Vercel without separate server management. Automatic deployment occurs on commits through GitHub integration.
 
-### 5. Future Enhancements
+### 4. Problem-Solving Cases
 
-- **PWA (Progressive Web App) Support**: Convert the application into a PWA for installation and offline capabilities.
-- **Image Compression & Download**: Enable users to download selected images in a compressed format.
-- **Screenshot Capture for Current Image List**: Allow users to capture and save a snapshot of the currently displayed image list.
+#### Large-Scale Image Rendering Issue
 
-### 6. Deployment Strategy
+**Problem**: Browser lag when rendering thousands of images  
+**Solution**: Custom virtual scrolling system implementation
 
-- The application is deployed as a static site using Vercel.
-- CI/CD automation is implemented via GitHub integration to facilitate seamless updates.
+- Optimize memory usage by rendering only visible images using IntersectionObserver
+- Implement responsive layout through dynamic grid size calculation
+- Provide seamless user experience during scrolling through overscan area management
 
----
+#### Browser Freezing Issue
 
-> This document was automatically translated from a Korean-written document.
+**Problem**: Browser freezing during processing of thousands of file lists (up to 30 seconds)  
+**Solution**: Web Worker-based asynchronous processing system implementation
+
+- Ensure reusability through abstract class-based Worker system design
+- Implement independent caching and error recovery mechanisms for each Worker
+- Design efficient communication structure between main thread and Workers
+
+#### GitHub API Rate Limit Resolution
+
+**Problem**: Service interruption risk due to 50 requests per hour API limit  
+**Solution**: Multi-layered caching strategy and rate limit bypass logic implementation
+
+- Minimize API calls through ETag-based HTTP 304 response handling
+- Build hybrid caching system using IndexedDB as primary storage with localStorage as fallback
+- Design abstracted caching interface accessible from Worker environment with the same interface
+- Implement fallback data collection logic through HTML parsing when API fails
+
+### 5. Achievements and Reflection
+
+#### Technical Growth
+
+- Gained experience in performance optimization using browser APIs
+- Enhanced ability to design stable codebase based on type systems
+- Developed skills in establishing optimization strategies for large-scale data processing
+- Improved ability to efficiently utilize external APIs with limitations and design client-side strategies to complement them
+
+#### Architecture Design Experience
+
+- Designed Worker-based asynchronous processing architecture
+- Implemented caching system utilizing multiple storage solutions
+- Designed stable system with error recovery mechanisms
+- Gained practical experience in caching strategies, state management, and asynchronous flow control in React applications
+
+#### Problem-Solving Capabilities
+
+- Learned that asynchronous processing is necessary even for data refinement tasks with large datasets
+- Established strategies to overcome API limitations through multi-layered caching
+- Implemented optimization strategies considering both performance and user experience
+- Gained experience in designing efficient communication structures between Worker environment and main thread

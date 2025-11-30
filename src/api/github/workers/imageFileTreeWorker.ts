@@ -1,5 +1,4 @@
 import JSZip from 'jszip'
-import {proxyFetch} from '@/utils/proxyFetch'
 import type {
   WorkerRequestBase,
   ImageFileTreeRequest,
@@ -57,8 +56,8 @@ class ImageFileTreeWorker extends BaseGithubWorker<
         .map(file => file.replace(`${rootFolder}/`, '')) // Remove root folder
     }
 
-    const response = await proxyFetch(
-      `https://github.com/${owner}/${name}/archive/refs/heads/${ref}.zip`,
+    const response = await fetch(
+      `/proxy/github/${owner}/${name}/archive/refs/heads/${ref}.zip`,
       {
         method: 'GET',
         headers: {
