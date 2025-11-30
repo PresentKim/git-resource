@@ -23,15 +23,16 @@ export default defineConfig(({mode}) => {
           manualChunks: id => {
             // Vendor chunks for better caching
             if (id.includes('node_modules')) {
-              // React and React DOM
+              // Keep React and React DOM in vendor chunk (don't split)
+              // Splitting React can cause loading order issues
               if (id.includes('react') || id.includes('react-dom')) {
-                return 'react-vendor'
+                return 'vendor'
               }
-              // React Router
+              // React Router (depends on React)
               if (id.includes('react-router')) {
                 return 'router-vendor'
               }
-              // Radix UI components
+              // Radix UI components (depends on React)
               if (id.includes('@radix-ui')) {
                 return 'radix-vendor'
               }
@@ -43,7 +44,7 @@ export default defineConfig(({mode}) => {
               if (id.includes('lucide-react')) {
                 return 'icons-vendor'
               }
-              // Large utility libraries
+              // Large utility libraries (dynamic imports, so separate)
               if (id.includes('jszip') || id.includes('file-saver')) {
                 return 'zip-vendor'
               }
