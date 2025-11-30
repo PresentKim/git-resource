@@ -111,6 +111,27 @@ export function ImageViewer({
     [currentImage],
   )
 
+  // Handle browser back button to close viewer
+  useEffect(() => {
+    if (!open) return
+
+    // Push state when viewer opens
+    const state = {viewer: true, index: currentIndex}
+    window.history.pushState(state, '', window.location.href)
+
+    // Handle popstate (back button)
+    const handlePopState = () => {
+      // Close the viewer when back button is pressed
+      onOpenChange(false)
+    }
+
+    window.addEventListener('popstate', handlePopState)
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState)
+    }
+  }, [open, currentIndex, onOpenChange])
+
   const handleOpenAutoFocus = useCallback((e: Event) => {
     e.preventDefault()
     if (dialogContentRef.current) {
