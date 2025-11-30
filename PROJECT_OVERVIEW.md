@@ -19,6 +19,12 @@ It is deployed via Vercel and utilizes **custom virtual scrolling** and **Web Wo
 - **Image ZIP Download**  
   All currently displayed images can be downloaded as a ZIP file in bulk.
 
+- **Image Viewer**  
+  Click on any image to view it in a full-screen viewer. Navigate between images using keyboard arrow keys or mouse wheel, and download individual images.
+
+- **Minecraft Animation Support**  
+  Parses `.mcmeta` files from Minecraft resource packs to support sprite sheet animations. Canvas-based animation rendering accurately plays game textures.
+
 - **Custom Virtual Scrolling**  
   Instead of react-virtualized, a custom virtual scrolling system is implemented to optimize rendering performance for large numbers of images. IntersectionObserver is used to render only visible images.
 
@@ -29,7 +35,7 @@ It is deployed via Vercel and utilizes **custom virtual scrolling** and **Web Wo
   Users can enter their GitHub personal access token to perform authenticated requests, increasing the API request limit and enabling access to private repositories.
 
 - **User Settings**  
-  Customizable settings such as grid column count adjustment (auto/manual) and pixelated rendering options are provided.
+  Customizable settings such as grid column count adjustment (auto/manual), pixelated rendering options, and Minecraft animation enable/disable are provided.
 
 - **Responsive UI**  
   The application is designed to provide an optimal user experience across different screen sizes.
@@ -62,6 +68,9 @@ It is deployed via Vercel and utilizes **custom virtual scrolling** and **Web Wo
 
 - **Image Download**: jszip, file-saver  
   Functionality to compress and download multiple images as a ZIP file is implemented.
+
+- **Animation Rendering**: Canvas API  
+  Parses Minecraft `.mcmeta` files to implement sprite sheet animations using Canvas API.
 
 - **Deployment**: Vercel  
   The application is deployed as a static site via Vercel without separate server management. Automatic deployment occurs on commits through GitHub integration.

@@ -15,6 +15,12 @@ A single-page web app for previewing image files from a GitHub repository URL
 - **Image ZIP Download**  
   Download all currently displayed images as a ZIP file in bulk.
 
+- **Image Viewer**  
+  Click any image to view it in full-screen. Navigate with arrow keys or mouse wheel, and download individual images.
+
+- **Minecraft Animation Support**  
+  Supports `.mcmeta` sprite sheet animations from Minecraft resource packs with canvas-based rendering.
+
 - **Custom Virtual Scrolling**  
   Optimized rendering performance for thousands of images using a custom virtual scrolling system with IntersectionObserver.
 
@@ -25,7 +31,7 @@ A single-page web app for previewing image files from a GitHub repository URL
   Enter your GitHub personal access token to access private repositories and increase API request limits.
 
 - **User Settings**  
-  Customize grid column count (auto/manual) and pixelated rendering options.
+  Customize grid column count (auto/manual), pixelated rendering, and Minecraft animation settings.
 
 - **URL Sharing**  
   Share filtered views with others through URL query parameters.
@@ -39,8 +45,10 @@ A single-page web app for previewing image files from a GitHub repository URL
 2. Or select one of the example repositories.
 3. The app automatically detects the default branch and fetches all image files.
 4. Use the filter input to include/exclude images by keywords.
-5. Click "Download All" to download all displayed images as a ZIP file.
-6. Adjust settings (gear icon) to customize your experience.
+5. Click on any image to view it in full-screen viewer.
+6. Use arrow keys or mouse wheel to navigate between images in the viewer.
+7. Click "Download Visible" to download all currently displayed images as a ZIP file.
+8. Adjust settings (gear icon) to customize your experience (grid columns, pixelated rendering, animations).
 
 ## Technologies
 
