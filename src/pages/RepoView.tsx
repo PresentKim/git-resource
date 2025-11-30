@@ -39,8 +39,6 @@ export default function RepoView() {
   const animationEnabled = useSettingStore(state => state.animationEnabled)
   const gridBackground = useSettingStore(state => state.gridBackground)
 
-  const filters = useMemo(() => filter.split(' ').filter(Boolean), [filter])
-
   // Separate image files and mcmeta files
   const {imageOnlyFiles, mcmetaPaths} = useMemo(() => {
     if (!imageFiles) {
@@ -62,6 +60,26 @@ export default function RepoView() {
 
   const totalCount = imageOnlyFiles?.length ?? 0
 
+  // Optimize filter parsing: separate include and exclude filters
+  const {includeFilters, excludeFilters} = useMemo(() => {
+    const rawFilters = filter.split(' ').filter(Boolean)
+    const include: string[] = []
+    const exclude: string[] = []
+
+    for (const f of rawFilters) {
+      if (f.startsWith('-')) {
+        const excludeTerm = f.slice(1)
+        if (excludeTerm) {
+          exclude.push(excludeTerm)
+        }
+      } else {
+        include.push(f)
+      }
+    }
+
+    return {includeFilters: include, excludeFilters: exclude}
+  }, [filter])
+
   useEffect(() => {
     if (!repo.ref) {
       getDefaultBranch(repo)
@@ -76,19 +94,37 @@ export default function RepoView() {
     }
   }, [repo, getDefaultBranch, getImagePaths, setTargetRepository])
 
+  // Optimized filtering algorithm
   const filteredImageFiles = useMemo(() => {
-    const result = imageOnlyFiles?.filter(path => {
-      return filters.reduce((acc, filter) => {
-        if (!acc || !filter) return acc
-        if (filter.startsWith('-')) {
-          return !path.includes(filter.slice(1))
-        }
+    if (!imageOnlyFiles) return null
 
-        return path.includes(filter)
-      }, true)
+    // Early return if no filters
+    if (includeFilters.length === 0 && excludeFilters.length === 0) {
+      return imageOnlyFiles
+    }
+
+    return imageOnlyFiles.filter(path => {
+      // All include filters must match (AND logic)
+      if (includeFilters.length > 0) {
+        const allIncludeMatch = includeFilters.every(term =>
+          path.includes(term),
+        )
+        if (!allIncludeMatch) {
+          return false
+        }
+      }
+
+      // Path must not match any exclude filter
+      if (excludeFilters.length > 0) {
+        const matchesExclude = excludeFilters.some(term => path.includes(term))
+        if (matchesExclude) {
+          return false
+        }
+      }
+
+      return true
     })
-    return result
-  }, [imageOnlyFiles, filters])
+  }, [imageOnlyFiles, includeFilters, excludeFilters])
 
   const handleImageClick = useCallback((index: number) => {
     setViewerIndex(index)
