@@ -56,6 +56,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
   const animationStateRef = useRef<AnimationState | null>(null)
   const animationFrameRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
+  const animateRef = useRef<((currentTime: number) => void) | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -158,10 +159,17 @@ const AnimatedSprite = memo(function AnimatedSprite({
       drawFrame(ctx, imageRef.current, frameIndex)
 
       // Continue animation loop
-      animationFrameRef.current = requestAnimationFrame(animate)
+      if (animateRef.current) {
+        animationFrameRef.current = requestAnimationFrame(animateRef.current)
+      }
     },
     [paused, speed, drawFrame],
   )
+
+  // Store animate function in ref
+  useEffect(() => {
+    animateRef.current = animate
+  }, [animate])
 
   // Initialize animation
   const initAnimation = useCallback(
@@ -225,9 +233,11 @@ const AnimatedSprite = memo(function AnimatedSprite({
 
       // Start animation
       lastTimeRef.current = 0
-      animationFrameRef.current = requestAnimationFrame(animate)
+      if (animateRef.current) {
+        animationFrameRef.current = requestAnimationFrame(animateRef.current)
+      }
     },
-    [mcmetaUrl, preloadedMcmetaData, animate],
+    [mcmetaUrl, preloadedMcmetaData],
   )
 
   // Load image
@@ -262,9 +272,9 @@ const AnimatedSprite = memo(function AnimatedSprite({
 
   // Handle pause/resume
   useEffect(() => {
-    if (!paused && animationStateRef.current) {
+    if (!paused && animationStateRef.current && animateRef.current) {
       lastTimeRef.current = 0
-      animationFrameRef.current = requestAnimationFrame(animate)
+      animationFrameRef.current = requestAnimationFrame(animateRef.current)
     } else if (paused && animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current)
     }
@@ -274,7 +284,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [paused, animate])
+  }, [paused])
 
   if (error) {
     return (

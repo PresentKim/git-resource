@@ -64,7 +64,6 @@ export function ImageViewer({
       const blob = await response.blob()
       saveAs(blob, fileName || 'image.png')
     } catch (err) {
-      // eslint-disable-next-line no-console
       console.error('Failed to download image', err)
     }
   }, [currentImage, fileName, repo])
