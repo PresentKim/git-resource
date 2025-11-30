@@ -5,6 +5,9 @@ import {
   Download,
   LoaderCircleIcon,
   X,
+  ZoomIn,
+  ZoomOut,
+  RotateCcw,
 } from 'lucide-react'
 import {Dialog, DialogClose, DialogPortal} from '@/components/ui/dialog'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
@@ -43,6 +46,15 @@ export function ImageViewer({
   const dialogContentRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
   const currentImageRef = useRef<string | undefined>(undefined)
+  const imageContainerRef = useRef<HTMLDivElement>(null)
+
+  // Zoom state
+  const [scale, setScale] = useState(1)
+  const [translateX, setTranslateX] = useState(0)
+  const [translateY, setTranslateY] = useState(0)
+  const [isDragging, setIsDragging] = useState(false)
+  const dragStartRef = useRef({x: 0, y: 0, translateX: 0, translateY: 0})
+  const lastDistanceRef = useRef<number | null>(null)
 
   const currentImage = images[currentIndex]
   const hasPrevious = currentIndex > 0
@@ -103,6 +115,10 @@ export function ImageViewer({
         currentImageRef.current = currentImage
         setLoading(true)
         setImageError(false)
+        // Reset zoom when image changes
+        setScale(1)
+        setTranslateX(0)
+        setTranslateY(0)
       }
       if (img && img.complete) {
         setLoading(false)
@@ -110,6 +126,170 @@ export function ImageViewer({
     },
     [currentImage],
   )
+
+  // Reset zoom
+  const handleResetZoom = useCallback(() => {
+    setScale(1)
+    setTranslateX(0)
+    setTranslateY(0)
+  }, [])
+
+  // Zoom in/out
+  const handleZoom = useCallback(
+    (delta: number, centerX?: number, centerY?: number) => {
+      setScale(prevScale => {
+        const newScale = Math.max(0.5, Math.min(5, prevScale + delta))
+        
+        // Zoom towards center point if provided
+        if (centerX !== undefined && centerY !== undefined && imageContainerRef.current) {
+          const container = imageContainerRef.current
+          const rect = container.getBoundingClientRect()
+          const containerCenterX = rect.width / 2
+          const containerCenterY = rect.height / 2
+          
+          const scaleChange = newScale / prevScale
+          const newTranslateX = centerX - (centerX - translateX) * scaleChange
+          const newTranslateY = centerY - (centerY - translateY) * scaleChange
+          
+          setTranslateX(newTranslateX)
+          setTranslateY(newTranslateY)
+        }
+        
+        return newScale
+      })
+    },
+    [translateX, translateY],
+  )
+
+  // Handle mouse wheel zoom (Ctrl/Cmd + wheel)
+  const handleWheelZoom = useCallback(
+    (e: WheelEvent) => {
+      if (!(e.ctrlKey || e.metaKey)) return
+      
+      e.preventDefault()
+      const container = imageContainerRef.current
+      if (!container) return
+      
+      const rect = container.getBoundingClientRect()
+      const centerX = e.clientX - rect.left - rect.width / 2
+      const centerY = e.clientY - rect.top - rect.height / 2
+      
+      const delta = -e.deltaY * 0.001
+      handleZoom(delta, centerX, centerY)
+    },
+    [handleZoom],
+  )
+
+  // Handle double click to toggle fit/original
+  const handleDoubleClick = useCallback(() => {
+    if (scale === 1) {
+      // Zoom to 2x at center
+      handleZoom(1, 0, 0)
+    } else {
+      // Reset to fit
+      handleResetZoom()
+    }
+  }, [scale, handleZoom, handleResetZoom])
+
+  // Handle drag start
+  const handleMouseDown = useCallback(
+    (e: React.MouseEvent) => {
+      if (scale <= 1) return
+      setIsDragging(true)
+      dragStartRef.current = {
+        x: e.clientX,
+        y: e.clientY,
+        translateX,
+        translateY,
+      }
+    },
+    [scale, translateX, translateY],
+  )
+
+  // Handle drag
+  useEffect(() => {
+    if (!isDragging) return
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const deltaX = e.clientX - dragStartRef.current.x
+      const deltaY = e.clientY - dragStartRef.current.y
+      setTranslateX(dragStartRef.current.translateX + deltaX)
+      setTranslateY(dragStartRef.current.translateY + deltaY)
+    }
+
+    const handleMouseUp = () => {
+      setIsDragging(false)
+    }
+
+    window.addEventListener('mousemove', handleMouseMove)
+    window.addEventListener('mouseup', handleMouseUp)
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove)
+      window.removeEventListener('mouseup', handleMouseUp)
+    }
+  }, [isDragging])
+
+  // Handle pinch zoom (touch)
+  useEffect(() => {
+    if (!open || !imageContainerRef.current) return
+
+    const container = imageContainerRef.current
+    let touches: Touch[] = []
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touches = Array.from(e.touches)
+      if (touches.length === 2) {
+        const distance = Math.hypot(
+          touches[0].clientX - touches[1].clientX,
+          touches[0].clientY - touches[1].clientY,
+        )
+        lastDistanceRef.current = distance
+      }
+    }
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 2 || lastDistanceRef.current === null) return
+
+      e.preventDefault()
+      const newTouches = Array.from(e.touches)
+      const newDistance = Math.hypot(
+        newTouches[0].clientX - newTouches[1].clientX,
+        newTouches[0].clientY - newTouches[1].clientY,
+      )
+
+      const rect = container.getBoundingClientRect()
+      const centerX =
+        (newTouches[0].clientX + newTouches[1].clientX) / 2 -
+        rect.left -
+        rect.width / 2
+      const centerY =
+        (newTouches[0].clientY + newTouches[1].clientY) / 2 -
+        rect.top -
+        rect.height / 2
+
+      const scaleChange = newDistance / lastDistanceRef.current
+      const delta = (scaleChange - 1) * 0.5
+      handleZoom(delta, centerX, centerY)
+
+      lastDistanceRef.current = newDistance
+    }
+
+    const handleTouchEnd = () => {
+      touches = []
+      lastDistanceRef.current = null
+    }
+
+    container.addEventListener('touchstart', handleTouchStart, {passive: false})
+    container.addEventListener('touchmove', handleTouchMove, {passive: false})
+    container.addEventListener('touchend', handleTouchEnd)
+
+    return () => {
+      container.removeEventListener('touchstart', handleTouchStart)
+      container.removeEventListener('touchmove', handleTouchMove)
+      container.removeEventListener('touchend', handleTouchEnd)
+    }
+  }, [open, handleZoom])
 
   // Handle browser back button to close viewer
   useEffect(() => {
@@ -163,6 +343,12 @@ export function ImageViewer({
         return
       }
 
+      // If Ctrl/Cmd is pressed, handle zoom instead
+      if (e.ctrlKey || e.metaKey) {
+        handleWheelZoom(e)
+        return
+      }
+
       e.preventDefault()
       e.stopPropagation()
       if (Math.abs(e.deltaY) > 10) {
@@ -183,7 +369,7 @@ export function ImageViewer({
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('wheel', handleWheel, {capture: true})
     }
-  }, [open, handlePrevious, handleNext, onOpenChange])
+  }, [open, handlePrevious, handleNext, onOpenChange, handleWheelZoom])
 
   if (!currentImage) return null
 
@@ -199,7 +385,7 @@ export function ImageViewer({
             'p-0 border-0 rounded-none',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-            'bg-background',
+            'bg-overlay-strong',
           )}
           aria-labelledby={imageTitleId}
           aria-describedby={undefined}
@@ -242,13 +428,18 @@ export function ImageViewer({
 
             <div
               id="image-viewer-content"
+              ref={imageContainerRef}
               className={cn(
-                'relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-28 px-8',
+                'relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-28 px-8 overflow-hidden',
                 gridBackground === 'auto' && 'bg-background',
                 gridBackground === 'white' && 'bg-white',
                 gridBackground === 'black' && 'bg-black',
                 gridBackground === 'transparent' && 'bg-transparent-grid',
-              )}>
+                isDragging && 'cursor-grabbing',
+                scale > 1 && 'cursor-grab',
+              )}
+              onDoubleClick={handleDoubleClick}
+              onMouseDown={handleMouseDown}>
               {loading && (
                 <div
                   className="absolute inset-0 flex items-center justify-center z-10"
@@ -272,30 +463,47 @@ export function ImageViewer({
                   <p className="text-sm opacity-70">{currentImage}</p>
                 </div>
               ) : shouldAnimate ? (
-                <AnimatedSprite
-                  src={createRawImageUrl(repo, currentImage)}
-                  alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
-                  className={cn(
-                    'w-full h-full max-w-[80vw] max-h-[60vh]',
-                    loading && 'opacity-0',
-                  )}
-                  pixelated={pixelated}
-                  onLoad={handleImageLoad}
-                  onError={handleImageError}
-                />
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{
+                    transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+                    transformOrigin: 'center center',
+                    transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+                  }}>
+                  <AnimatedSprite
+                    src={createRawImageUrl(repo, currentImage)}
+                    alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
+                    className={cn(
+                      'w-full h-full max-w-[80vw] max-h-[60vh]',
+                      loading && 'opacity-0',
+                    )}
+                    pixelated={pixelated}
+                    onLoad={handleImageLoad}
+                    onError={handleImageError}
+                  />
+                </div>
               ) : (
-                <img
-                  ref={handleImageRef}
-                  src={createRawImageUrl(repo, currentImage)}
-                  alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
-                  className={cn(
-                    'w-full h-full object-contain',
-                    pixelated && 'pixelated',
-                    loading && 'opacity-0',
-                  )}
-                  onLoad={handleImageLoad}
-                  onError={handleImageError}
-                />
+                <div
+                  className="w-full h-full flex items-center justify-center"
+                  style={{
+                    transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
+                    transformOrigin: 'center center',
+                    transition: isDragging ? 'none' : 'transform 0.1s ease-out',
+                  }}>
+                  <img
+                    ref={handleImageRef}
+                    src={createRawImageUrl(repo, currentImage)}
+                    alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
+                    className={cn(
+                      'w-full h-full object-contain',
+                      pixelated && 'pixelated',
+                      loading && 'opacity-0',
+                    )}
+                    onLoad={handleImageLoad}
+                    onError={handleImageError}
+                    draggable={false}
+                  />
+                </div>
               )}
             </div>
 
@@ -329,6 +537,42 @@ export function ImageViewer({
                 <span>
                   Image {currentIndex + 1} of {images.length}
                 </span>
+                <div className="flex items-center gap-1">
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="px-2 py-1 text-[0.7rem] font-semibold overlay-button-outline"
+                    onClick={() => handleZoom(-0.2)}
+                    aria-label="Zoom out"
+                    disabled={scale <= 0.5}>
+                    <ZoomOut className="h-3.5 w-3.5" />
+                  </Button>
+                  <span className="px-2 text-[0.7rem] min-w-[3rem] text-center">
+                    {Math.round(scale * 100)}%
+                  </span>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="px-2 py-1 text-[0.7rem] font-semibold overlay-button-outline"
+                    onClick={() => handleZoom(0.2)}
+                    aria-label="Zoom in"
+                    disabled={scale >= 5}>
+                    <ZoomIn className="h-3.5 w-3.5" />
+                  </Button>
+                  {scale !== 1 && (
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="px-2 py-1 text-[0.7rem] font-semibold overlay-button-outline"
+                      onClick={handleResetZoom}
+                      aria-label="Reset zoom">
+                      <RotateCcw className="h-3.5 w-3.5" />
+                    </Button>
+                  )}
+                </div>
                 <Button
                   type="button"
                   size="sm"
@@ -340,45 +584,81 @@ export function ImageViewer({
                   DOWNLOAD
                 </Button>
               </div>
-              <div className="flex items-center gap-4 sm:hidden">
-                {hasPrevious && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-14 min-w-14 overlay-button"
-                    onClick={handlePrevious}
-                    aria-label="Previous image">
-                    <ChevronLeft className="size-10" />
-                  </Button>
-                )}
-                <div
-                  className="flex items-center gap-2 rounded-md px-4 py-2 text-xs overlay-bg"
-                  aria-live="polite"
-                  aria-atomic="true">
-                  <span>
-                    Image {currentIndex + 1} of {images.length}
-                  </span>
-                  <Button
-                    type="button"
-                    size="sm"
-                    variant="outline"
-                    className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
-                    onClick={handleDownloadCurrent}
-                    aria-label="Download current image">
-                    <Download className="h-3 w-3" />
-                  </Button>
+                <div className="flex items-center gap-4 sm:hidden">
+                  {hasPrevious && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-14 min-w-14 overlay-button"
+                      onClick={handlePrevious}
+                      aria-label="Previous image">
+                      <ChevronLeft className="size-10" />
+                    </Button>
+                  )}
+                  <div
+                    className="flex items-center gap-2 rounded-md px-4 py-2 text-xs overlay-bg"
+                    aria-live="polite"
+                    aria-atomic="true">
+                    <span>
+                      Image {currentIndex + 1} of {images.length}
+                    </span>
+                    <div className="flex items-center gap-1">
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
+                        onClick={() => handleZoom(-0.2)}
+                        aria-label="Zoom out"
+                        disabled={scale <= 0.5}>
+                        <ZoomOut className="h-3 w-3" />
+                      </Button>
+                      <span className="px-1 text-[0.65rem] min-w-[2.5rem] text-center">
+                        {Math.round(scale * 100)}%
+                      </span>
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
+                        onClick={() => handleZoom(0.2)}
+                        aria-label="Zoom in"
+                        disabled={scale >= 5}>
+                        <ZoomIn className="h-3 w-3" />
+                      </Button>
+                      {scale !== 1 && (
+                        <Button
+                          type="button"
+                          size="sm"
+                          variant="outline"
+                          className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
+                          onClick={handleResetZoom}
+                          aria-label="Reset zoom">
+                          <RotateCcw className="h-3 w-3" />
+                        </Button>
+                      )}
+                    </div>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
+                      onClick={handleDownloadCurrent}
+                      aria-label="Download current image">
+                      <Download className="h-3 w-3" />
+                    </Button>
+                  </div>
+                  {hasNext && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="size-14 min-w-14 overlay-button"
+                      onClick={handleNext}
+                      aria-label="Next image">
+                      <ChevronRight className="size-10" />
+                    </Button>
+                  )}
                 </div>
-                {hasNext && (
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="size-14 min-w-14 overlay-button"
-                    onClick={handleNext}
-                    aria-label="Next image">
-                    <ChevronRight className="size-10" />
-                  </Button>
-                )}
-              </div>
             </div>
           </div>
         </DialogPrimitive.Content>
