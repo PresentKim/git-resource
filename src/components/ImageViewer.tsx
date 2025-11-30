@@ -39,6 +39,7 @@ export function ImageViewer({
   const [imageError, setImageError] = useState(false)
   const pixelated = useSettingStore(state => state.pixelated)
   const animationEnabled = useSettingStore(state => state.animationEnabled)
+  const gridBackground = useSettingStore(state => state.gridBackground)
   const dialogContentRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
   const currentImageRef = useRef<string | undefined>(undefined)
@@ -174,9 +175,10 @@ export function ImageViewer({
           className={cn(
             'fixed inset-0 z-50',
             'w-screen h-dvh',
-            'p-0 border-0 bg-black/95 rounded-none',
+            'p-0 border-0 rounded-none',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
+            'bg-overlay-strong',
           )}
           aria-labelledby={imageTitleId}
           aria-describedby={undefined}
@@ -196,28 +198,36 @@ export function ImageViewer({
               <Button
                 variant="ghost"
                 size="icon"
-                className="absolute top-4 right-4 z-60 bg-black/50 hover:bg-black/70 text-white"
+                className="absolute top-4 right-4 z-60 overlay-button"
                 aria-label="Close">
                 <X className="size-6" />
               </Button>
             </DialogClose>
 
             <div className="absolute top-4 left-0 right-0 flex justify-center z-50 px-4">
-              <div className="bg-black/50 px-4 py-3 rounded-md text-white max-w-[90%] wrap-break-word text-center">
+              <div className="px-4 py-3 rounded-md max-w-[90%] wrap-break-word text-center overlay-bg">
                 <div
                   id={imageTitleId}
                   className="text-base sm:text-lg font-semibold mb-1">
                   {fileName}
                 </div>
                 {filePath && (
-                  <div className="text-xs sm:text-sm text-gray-300 opacity-80">
+                  <div className="text-xs sm:text-sm opacity-80">
                     {filePath}
                   </div>
                 )}
               </div>
             </div>
 
-            <div className="relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-28 px-8">
+            <div
+              id="image-viewer-content"
+              className={cn(
+                'relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-28 px-8',
+                gridBackground === 'auto' && 'bg-background',
+                gridBackground === 'white' && 'bg-white',
+                gridBackground === 'black' && 'bg-black',
+                gridBackground === 'transparent' && 'bg-transparent-grid',
+              )}>
               {loading && (
                 <div
                   className="absolute inset-0 flex items-center justify-center z-10"
@@ -235,10 +245,10 @@ export function ImageViewer({
               )}
               {imageError ? (
                 <div
-                  className="flex flex-col items-center justify-center text-white"
+                  className="flex flex-col items-center justify-center overlay-bg"
                   role="alert">
                   <p className="text-lg mb-2">Failed to load image</p>
-                  <p className="text-sm text-gray-400">{currentImage}</p>
+                  <p className="text-sm opacity-70">{currentImage}</p>
                 </div>
               ) : shouldAnimate ? (
                 <AnimatedSprite
@@ -272,10 +282,7 @@ export function ImageViewer({
               <Button
                 variant="ghost"
                 size="icon"
-                className={cn(
-                  'absolute left-4 top-1/2 -translate-y-1/2 z-50 bg-black/50 hover:bg-black/70 text-white',
-                  'hidden sm:flex',
-                )}
+                className="absolute left-4 top-1/2 -translate-y-1/2 z-50 hidden sm:flex overlay-button"
                 onClick={handlePrevious}
                 aria-label="Previous image">
                 <ChevronLeft className="size-8" />
@@ -286,10 +293,7 @@ export function ImageViewer({
               <Button
                 variant="ghost"
                 size="icon"
-                className={cn(
-                  'absolute right-4 top-1/2 -translate-y-1/2 z-50 bg-black/50 hover:bg-black/70 text-white',
-                  'hidden sm:flex',
-                )}
+                className="absolute right-4 top-1/2 -translate-y-1/2 z-50 hidden sm:flex overlay-button"
                 onClick={handleNext}
                 aria-label="Next image">
                 <ChevronRight className="size-8" />
@@ -298,7 +302,7 @@ export function ImageViewer({
 
             <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-50">
               <div
-                className="hidden items-center gap-3 rounded-md bg-black/50 px-4 py-2 text-xs text-white sm:flex"
+                className="hidden items-center gap-3 rounded-md px-4 py-2 text-xs sm:flex overlay-bg"
                 aria-live="polite"
                 aria-atomic="true">
                 <span>
@@ -308,7 +312,7 @@ export function ImageViewer({
                   type="button"
                   size="sm"
                   variant="outline"
-                  className="border-white/30 bg-black/40 px-2 py-1 text-[0.7rem] font-semibold text-white hover:bg-white/10"
+                  className="px-2 py-1 text-[0.7rem] font-semibold overlay-button-outline"
                   onClick={handleDownloadCurrent}
                   aria-label="Download current image">
                   <Download className="mr-1 h-3.5 w-3.5" />
@@ -320,14 +324,14 @@ export function ImageViewer({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="bg-black/50 hover:bg-black/70 text-white size-14 min-w-14"
+                    className="size-14 min-w-14 overlay-button"
                     onClick={handlePrevious}
                     aria-label="Previous image">
                     <ChevronLeft className="size-10" />
                   </Button>
                 )}
                 <div
-                  className="flex items-center gap-2 rounded-md bg-black/50 px-4 py-2 text-xs text-white"
+                  className="flex items-center gap-2 rounded-md px-4 py-2 text-xs overlay-bg"
                   aria-live="polite"
                   aria-atomic="true">
                   <span>
@@ -337,7 +341,7 @@ export function ImageViewer({
                     type="button"
                     size="sm"
                     variant="outline"
-                    className="h-8 border-white/30 bg-black/40 px-2 py-1 text-[0.65rem] font-semibold text-white hover:bg-white/10"
+                    className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
                     onClick={handleDownloadCurrent}
                     aria-label="Download current image">
                     <Download className="h-3 w-3" />
@@ -347,7 +351,7 @@ export function ImageViewer({
                   <Button
                     variant="ghost"
                     size="icon"
-                    className="bg-black/50 hover:bg-black/70 text-white size-14 min-w-14"
+                    className="size-14 min-w-14 overlay-button"
                     onClick={handleNext}
                     aria-label="Next image">
                     <ChevronRight className="size-10" />

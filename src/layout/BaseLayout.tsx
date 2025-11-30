@@ -8,7 +8,7 @@ export default function BaseLayout() {
     <>
       <div className="flex h-full w-full max-w-full flex-col">
         <Header />
-        <main className="flex flex-1 w-full justify-start px-2 py-4 sm:px-4">
+        <main className="flex flex-1 w-full justify-start">
           <Outlet />
         </main>
         <Footer />

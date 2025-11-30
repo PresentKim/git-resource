@@ -1,4 +1,4 @@
-import {Settings as SettingsIcon, Info} from 'lucide-react'
+import {Settings as SettingsIcon, Info, Sun, Moon} from 'lucide-react'
 import {
   Dialog,
   DialogContent,
@@ -15,9 +15,13 @@ import {Label} from '@/components/ui/label'
 import {Slider} from '@/components/ui/slider'
 import {Switch} from '@/components/ui/switch'
 
-import {useSettingStore} from '@/stores/settingStore'
+import {
+  useSettingStore,
+  type Theme,
+  type GridBackground,
+} from '@/stores/settingStore'
 import {useGithubRateLimitStore} from '@/stores/githubApiStore'
-import {useState} from 'react'
+import {useState, useMemo} from 'react'
 
 export function SettingButton() {
   const settings = useSettingStore()
@@ -26,21 +30,72 @@ export function SettingButton() {
   const [columnCount, setColumnCount] = useState(0)
   const [pixelated, setPixelated] = useState(true)
   const [animationEnabled, setAnimationEnabled] = useState(true)
+  const [theme, setTheme] = useState<Theme>('dark')
+  const [gridBackground, setGridBackground] = useState<GridBackground>('auto')
+  const [initialValues, setInitialValues] = useState({
+    githubToken: '',
+    columnCount: 0,
+    pixelated: true,
+    animationEnabled: true,
+    theme: 'dark' as Theme,
+    gridBackground: 'auto' as GridBackground,
+  })
+
+  const hasChanges = useMemo(() => {
+    return (
+      githubToken !== initialValues.githubToken ||
+      columnCount !== initialValues.columnCount ||
+      pixelated !== initialValues.pixelated ||
+      animationEnabled !== initialValues.animationEnabled ||
+      theme !== initialValues.theme ||
+      gridBackground !== initialValues.gridBackground
+    )
+  }, [
+    githubToken,
+    columnCount,
+    pixelated,
+    animationEnabled,
+    theme,
+    gridBackground,
+    initialValues,
+  ])
 
   const handleSave = () => {
     settings.setGithubToken(githubToken)
     settings.setColumnCount(columnCount)
     settings.setPixelated(pixelated)
     settings.setAnimationEnabled(animationEnabled)
+    settings.setTheme(theme)
+    settings.setGridBackground(gridBackground)
+    // Update initial values after saving
+    setInitialValues({
+      githubToken,
+      columnCount,
+      pixelated,
+      animationEnabled,
+      theme,
+      gridBackground,
+    })
   }
 
   const handleOpenChange = (open: boolean) => {
     // Reset the values if the dialog is opened
     if (open) {
-      setGithubToken(settings.githubToken)
-      setColumnCount(settings.columnCount)
-      setPixelated(settings.pixelated)
-      setAnimationEnabled(settings.animationEnabled)
+      const initial = {
+        githubToken: settings.githubToken,
+        columnCount: settings.columnCount,
+        pixelated: settings.pixelated,
+        animationEnabled: settings.animationEnabled,
+        theme: settings.theme,
+        gridBackground: settings.gridBackground,
+      }
+      setGithubToken(initial.githubToken)
+      setColumnCount(initial.columnCount)
+      setPixelated(initial.pixelated)
+      setAnimationEnabled(initial.animationEnabled)
+      setTheme(initial.theme)
+      setGridBackground(initial.gridBackground)
+      setInitialValues(initial)
     }
   }
 
@@ -131,8 +186,88 @@ export function SettingButton() {
             </div>
           </div>
 
-          <div className="space-y-4 rounded-lg border border-border/60 bg-background/40 p-3">
-            <div data-slot="pixelated-toggle" className="space-y-1.5">
+          <div className="space-y-4 rounded-lg border border-border/60 bg-background/40 p-3 min-w-0">
+            <div data-slot="theme-selector" className="space-y-2 min-w-0">
+              <Label className="text-sm font-medium">Theme</Label>
+              <div className="flex gap-2 w-full min-w-0">
+                <Button
+                  type="button"
+                  variant={theme === 'light' ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="flex-1 gap-1.5 min-w-0"
+                  onClick={() => setTheme('light')}>
+                  <Sun className="h-4 w-4 shrink-0" />
+                  <span className="text-xs whitespace-nowrap">Light</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={theme === 'dark' ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="flex-1 gap-1.5 min-w-0"
+                  onClick={() => setTheme('dark')}>
+                  <Moon className="h-4 w-4 shrink-0" />
+                  <span className="text-xs whitespace-nowrap">Dark</span>
+                </Button>
+              </div>
+              <p className="text-[0.7rem] text-muted-foreground">
+                Choose your preferred color theme.
+              </p>
+            </div>
+
+            <div
+              data-slot="grid-background-selector"
+              className="space-y-2 border-t border-border/50 pt-3">
+              <Label className="text-sm font-medium">Grid background</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant={gridBackground === 'auto' ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="gap-1.5 justify-start"
+                  onClick={() => setGridBackground('auto')}>
+                  <div className="h-4 w-4 rounded border border-border shrink-0 flex items-center justify-center text-[0.65rem] font-semibold">
+                    A
+                  </div>
+                  <span className="text-xs">Auto</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={
+                    gridBackground === 'transparent' ? 'secondary' : 'outline'
+                  }
+                  size="sm"
+                  className="gap-1.5 justify-start"
+                  onClick={() => setGridBackground('transparent')}>
+                  <div className="h-4 w-4 rounded border border-border shrink-0 bg-transparent-grid" />
+                  <span className="text-xs">Grid</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={gridBackground === 'white' ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="gap-1.5 justify-start"
+                  onClick={() => setGridBackground('white')}>
+                  <div className="h-4 w-4 rounded border border-border shrink-0 bg-white" />
+                  <span className="text-xs">White</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={gridBackground === 'black' ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="gap-1.5 justify-start"
+                  onClick={() => setGridBackground('black')}>
+                  <div className="h-4 w-4 rounded border border-border shrink-0 bg-black" />
+                  <span className="text-xs">Black</span>
+                </Button>
+              </div>
+              <p className="text-[0.7rem] text-muted-foreground">
+                Background color for the image grid.
+              </p>
+            </div>
+
+            <div
+              data-slot="pixelated-toggle"
+              className="space-y-1.5 border-t border-border/50 pt-3">
               <div className="flex items-center justify-between gap-2">
                 <Label htmlFor="pixelated" className="text-sm font-medium">
                   Pixelated images
@@ -186,6 +321,7 @@ export function SettingButton() {
           <DialogClose asChild>
             <Button
               type="button"
+              variant={hasChanges ? 'default' : 'secondary'}
               size="sm"
               className="font-bold"
               onClick={handleSave}>

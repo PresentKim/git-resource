@@ -72,7 +72,7 @@ export default function Home() {
           </div>
         </div>
 
-        <div className="mx-auto w-full max-w-2xl rounded-2xl border border-border/70 bg-card/70 p-4 shadow-lg shadow-black/20 backdrop-blur sm:p-5">
+        <div className="mx-auto w-full max-w-2xl rounded-2xl border border-border/70 bg-card/70 p-4 shadow-lg backdrop-blur sm:p-5">
           <h2 className="mb-3 text-sm font-medium text-muted-foreground sm:text-base">
             Start with a repository URL
           </h2>

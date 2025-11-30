@@ -1,5 +1,8 @@
 import {create} from 'zustand'
 
+export type Theme = 'light' | 'dark'
+export type GridBackground = 'auto' | 'white' | 'black' | 'transparent'
+
 interface SettingsStore {
   githubToken: string
   setGithubToken: (token: string) => void
@@ -15,6 +18,12 @@ interface SettingsStore {
 
   animationEnabled: boolean
   setAnimationEnabled: (animationEnabled: boolean) => void
+
+  theme: Theme
+  setTheme: (theme: Theme) => void
+
+  gridBackground: GridBackground
+  setGridBackground: (background: GridBackground) => void
 }
 
 const getColumnCount = () => {
@@ -31,6 +40,8 @@ const GITHUB_TOKEN_KEY = 'settings.token'
 const COLUMN_COUNT_KEY = 'settings.columnCount'
 const PIXELATED_KEY = 'settings.pixelated'
 const ANIMATION_ENABLED_KEY = 'settings.animationEnabled'
+const THEME_KEY = 'settings.theme'
+const GRID_BACKGROUND_KEY = 'settings.gridBackground'
 export const useSettingStore = create<SettingsStore>((set, get) => ({
   githubToken: localStorage.getItem(GITHUB_TOKEN_KEY) || '',
   setGithubToken: githubToken => {
@@ -59,6 +70,26 @@ export const useSettingStore = create<SettingsStore>((set, get) => ({
   setAnimationEnabled: (animationEnabled: boolean) => {
     set({animationEnabled})
     localStorage.setItem(ANIMATION_ENABLED_KEY, animationEnabled.toString())
+  },
+
+  theme: (() => {
+    const stored = localStorage.getItem(THEME_KEY) as Theme | 'system' | null
+    // Migrate 'system' to 'dark'
+    if (stored === 'system' || !stored) {
+      return 'dark'
+    }
+    return stored
+  })(),
+  setTheme: (theme: Theme) => {
+    set({theme})
+    localStorage.setItem(THEME_KEY, theme)
+  },
+
+  gridBackground:
+    (localStorage.getItem(GRID_BACKGROUND_KEY) as GridBackground) || 'auto',
+  setGridBackground: (background: GridBackground) => {
+    set({gridBackground: background})
+    localStorage.setItem(GRID_BACKGROUND_KEY, background)
   },
 }))
 

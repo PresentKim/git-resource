@@ -22,7 +22,7 @@ import {
   generateNoImagesMessage,
 } from '@/utils/randomMessages'
 import {useSettingStore} from '@/stores/settingStore'
-import {downloadImagesAsZip, isMcmetaFile} from '@/utils'
+import {downloadImagesAsZip, isMcmetaFile, cn} from '@/utils'
 import {Download as DownloadIcon, Loader as LoaderIcon} from 'lucide-react'
 
 export default function RepoView() {
@@ -37,6 +37,7 @@ export default function RepoView() {
   const columnCount = useSettingStore(state => state.filledColumnCount)
   const pixelated = useSettingStore(state => state.pixelated)
   const animationEnabled = useSettingStore(state => state.animationEnabled)
+  const gridBackground = useSettingStore(state => state.gridBackground)
 
   const filters = useMemo(() => filter.split(' ').filter(Boolean), [filter])
 
@@ -114,8 +115,14 @@ export default function RepoView() {
   return (
     <section
       aria-label="Repository image viewer"
-      className="flex w-full flex-col gap-3 sm:gap-4">
-      <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card/60 p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3">
+      className={cn(
+        'flex w-full flex-col gap-3 sm:gap-4 px-1 py-2 sm:px-2',
+        gridBackground === 'auto' && 'bg-background',
+        gridBackground === 'white' && 'bg-white',
+        gridBackground === 'black' && 'bg-black',
+        gridBackground === 'transparent' && 'bg-transparent-grid',
+      )}>
+      <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3">
         <div className="flex-1 sm:order-2">
           <FilterInput />
         </div>
@@ -134,7 +141,8 @@ export default function RepoView() {
             disabled={isDownloading || !filteredImageFiles?.length}
             onClick={downloadAll}
             size="sm"
-            className="text-[0.7rem] font-semibold sm:text-xs bg-background text-forground border border-inputa hover:bg-background/90">
+            variant="outline"
+            className="text-[0.7rem] font-semibold sm:text-xs">
             {isDownloading ? (
               <>
                 <LoaderIcon className="size-4 animate-spin" />

@@ -78,8 +78,10 @@ const ImageCell = memo(function ImageCell({
       ) : (
         <>
           <div
-            className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md"
-            style={{display: loading ? 'block' : 'none'}}
+            className={cn(
+              'size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md',
+              loading ? 'block' : 'hidden',
+            )}
             aria-hidden="true">
             <LoaderCircleIcon
               className="size-full object-contain text-muted animate-spin duration-[3s]"
@@ -90,9 +92,11 @@ const ImageCell = memo(function ImageCell({
             ref={handleImageRef}
             src={imageUrl}
             alt={`Image from ${path}`}
-            className="size-full object-contain peer"
+            className={cn(
+              'size-full object-contain peer',
+              loading ? 'hidden' : 'block',
+            )}
             onLoad={handleLoad}
-            style={{display: loading ? 'none' : 'block'}}
           />
         </>
       )}
@@ -100,10 +104,11 @@ const ImageCell = memo(function ImageCell({
         className={cn(
           'absolute inset-0 overflow-hidden',
           'flex flex-wrap justify-start items-end',
-          'text-white text-xs break-all',
-          'bg-black/50 backdrop-blur-xs backdrop-opacity-60',
+          'text-xs break-all',
+          'backdrop-blur-xs backdrop-opacity-60',
           'size-full px-1 py-0.5 cursor-pointer select-none',
           'opacity-0 hover:opacity-100 transition-all',
+          'overlay-bg',
         )}>
         <span>
           {

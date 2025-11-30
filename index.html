@@ -14,7 +14,14 @@
       name="description"
       content="A single-page web app for previewing image files from a github repository URL" />
     <meta name="author" content="PresentKim" />
-    <meta name="theme-color" content="#202020" />
+    <meta
+      name="theme-color"
+      content="#ffffff"
+      media="(prefers-color-scheme: light)" />
+    <meta
+      name="theme-color"
+      content="#0f0f0f"
+      media="(prefers-color-scheme: dark)" />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="https://gitresource.com/thumbnail.png" />
     <link rel="icon" href="/favicon.ico" sizes="32x32" />
@@ -34,10 +41,14 @@
       /* Set the body background color to match the theme color */
       html,
       body {
-        background-color: #1d1d1d;
+        background-color: #ffffff;
         width: 100%;
         height: 100%;
         margin: 0;
+      }
+      html.dark,
+      html.dark body {
+        background-color: #0f0f0f;
       }
 
       /* Set the show scrollbar always to prevent the layout shift */
@@ -59,9 +70,12 @@
         height: 100%;
         justify-content: center;
         align-items: center;
-        background-color: rgba(0, 0, 0, 0.15);
+        background-color: rgba(255, 255, 255, 0.9);
         pointer-events: none;
         z-index: 9999;
+      }
+      html.dark #loading-spinner-wrapper {
+        background-color: rgba(0, 0, 0, 0.9);
       }
 
       #loading-spinner {
@@ -71,6 +85,10 @@
         height: 4rem;
         transform: rotate(45deg);
         transform-origin: center;
+        color: #1a1a1a;
+      }
+      html.dark #loading-spinner {
+        color: #f5f5f5;
       }
 
       #loading-spinner::before {
@@ -93,8 +111,8 @@
         top: 0;
         width: 2rem;
         height: 2rem;
-        background: rgba(255, 255, 255, 0.85);
-        box-shadow: 0 0 0.75rem rgba(0, 0, 0, 0.15);
+        background: rgba(0, 0, 0, 0.85);
+        box-shadow: 0 0 0.75rem rgba(255, 255, 255, 0.15);
         animation: spinner-spin2 2s ease infinite;
         z-index: 9999;
       }
@@ -109,52 +127,52 @@
         }
         12% {
           box-shadow:
-            0 2rem white,
+            0 2rem currentColor,
             2rem 2rem transparent,
             2rem 4rem transparent,
             0 4rem transparent;
         }
         25% {
           box-shadow:
-            0 2rem white,
-            2rem 2rem white,
+            0 2rem currentColor,
+            2rem 2rem currentColor,
             2rem 4rem transparent,
             0 4rem transparent;
         }
         37% {
           box-shadow:
-            0 2rem white,
-            2rem 2rem white,
-            2rem 4rem white,
+            0 2rem currentColor,
+            2rem 2rem currentColor,
+            2rem 4rem currentColor,
             0 4rem transparent;
         }
         50% {
           box-shadow:
-            0 2rem white,
-            2rem 2rem white,
-            2rem 4rem white,
-            0 4rem white;
+            0 2rem currentColor,
+            2rem 2rem currentColor,
+            2rem 4rem currentColor,
+            0 4rem currentColor;
         }
         62% {
           box-shadow:
             0 2rem transparent,
-            2rem 2rem white,
-            2rem 4rem white,
-            0 4rem white;
+            2rem 2rem currentColor,
+            2rem 4rem currentColor,
+            0 4rem currentColor;
         }
         75% {
           box-shadow:
             0 2rem transparent,
             2rem 2rem transparent,
-            2rem 4rem white,
-            0 4rem white;
+            2rem 4rem currentColor,
+            0 4rem currentColor;
         }
         87% {
           box-shadow:
             0 2rem transparent,
             2rem 2rem transparent,
             2rem 4rem transparent,
-            0 4rem white;
+            0 4rem currentColor;
         }
         100% {
           box-shadow:
