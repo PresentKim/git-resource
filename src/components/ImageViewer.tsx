@@ -16,6 +16,13 @@ import {cn, createRawImageUrl, getMcmetaPath} from '@/utils'
 import {saveAs} from 'file-saver'
 import type {GithubRepo} from '@/utils'
 import {useSettingStore} from '@/stores/settingStore'
+
+// Format file size to human-readable format
+function formatFileSize(bytes: number): string {
+  if (bytes < 1024) return `${bytes} B`
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+}
 import {AnimatedSprite} from './AnimatedSprite'
 
 interface ImageViewerProps {
@@ -40,6 +47,12 @@ export function ImageViewer({
 }: ImageViewerProps) {
   const [loading, setLoading] = useState(true)
   const [imageError, setImageError] = useState(false)
+  const [imageMetadata, setImageMetadata] = useState<{
+    width: number
+    height: number
+    fileSize: number | null
+    format: string
+  } | null>(null)
   const pixelated = useSettingStore(state => state.pixelated)
   const animationEnabled = useSettingStore(state => state.animationEnabled)
   const gridBackground = useSettingStore(state => state.gridBackground)
@@ -99,13 +112,96 @@ export function ImageViewer({
     }
   }, [currentIndex, hasNext, onIndexChange])
 
-  const handleImageLoad = useCallback(() => {
+  const handleImageLoad = useCallback(async () => {
     setLoading(false)
-  }, [])
+
+    // Get image metadata
+    const url = createRawImageUrl(repo, currentImage)
+    let width = 0
+    let height = 0
+
+    if (imgRef.current) {
+      width = imgRef.current.naturalWidth
+      height = imgRef.current.naturalHeight
+    }
+
+    // Get file size and format
+    try {
+      const response = await fetch(url, {method: 'HEAD'})
+      const contentLength = response.headers.get('Content-Length')
+      const contentType = response.headers.get('Content-Type') || ''
+
+      const fileSize = contentLength ? parseInt(contentLength, 10) : null
+      const format =
+        contentType.split('/')[1]?.toUpperCase() ||
+        currentImage.split('.').pop()?.toUpperCase() ||
+        'UNKNOWN'
+
+      // If width/height not available from img element, load image to get dimensions
+      if (width === 0 || height === 0) {
+        const img = new Image()
+        img.src = url
+        await new Promise<void>((resolve, reject) => {
+          const timeout = setTimeout(() => reject(new Error('Timeout')), 5000)
+          img.onload = () => {
+            clearTimeout(timeout)
+            width = img.naturalWidth
+            height = img.naturalHeight
+            resolve()
+          }
+          img.onerror = () => {
+            clearTimeout(timeout)
+            reject(new Error('Failed to load'))
+          }
+        })
+      }
+
+      setImageMetadata({
+        width,
+        height,
+        fileSize,
+        format,
+      })
+    } catch {
+      // Fallback: try to get format from extension
+      const format = currentImage.split('.').pop()?.toUpperCase() || 'UNKNOWN'
+
+      // Try to get dimensions from image if not already available
+      if (width === 0 || height === 0) {
+        try {
+          const img = new Image()
+          img.src = url
+          await new Promise<void>((resolve, reject) => {
+            const timeout = setTimeout(() => reject(new Error('Timeout')), 5000)
+            img.onload = () => {
+              clearTimeout(timeout)
+              width = img.naturalWidth
+              height = img.naturalHeight
+              resolve()
+            }
+            img.onerror = () => {
+              clearTimeout(timeout)
+              reject(new Error('Failed to load'))
+            }
+          })
+        } catch {
+          // Ignore errors, use 0 dimensions
+        }
+      }
+
+      setImageMetadata({
+        width,
+        height,
+        fileSize: null,
+        format,
+      })
+    }
+  }, [currentImage, repo])
 
   const handleImageError = useCallback(() => {
     setLoading(false)
     setImageError(true)
+    setImageMetadata(null)
   }, [])
 
   const handleImageRef = useCallback(
@@ -115,6 +211,7 @@ export function ImageViewer({
         currentImageRef.current = currentImage
         setLoading(true)
         setImageError(false)
+        setImageMetadata(null)
         // Reset zoom when image changes
         setScale(1)
         setTranslateX(0)
@@ -139,22 +236,21 @@ export function ImageViewer({
     (delta: number, centerX?: number, centerY?: number) => {
       setScale(prevScale => {
         const newScale = Math.max(0.5, Math.min(5, prevScale + delta))
-        
+
         // Zoom towards center point if provided
-        if (centerX !== undefined && centerY !== undefined && imageContainerRef.current) {
-          const container = imageContainerRef.current
-          const rect = container.getBoundingClientRect()
-          const containerCenterX = rect.width / 2
-          const containerCenterY = rect.height / 2
-          
+        if (
+          centerX !== undefined &&
+          centerY !== undefined &&
+          imageContainerRef.current
+        ) {
           const scaleChange = newScale / prevScale
           const newTranslateX = centerX - (centerX - translateX) * scaleChange
           const newTranslateY = centerY - (centerY - translateY) * scaleChange
-          
+
           setTranslateX(newTranslateX)
           setTranslateY(newTranslateY)
         }
-        
+
         return newScale
       })
     },
@@ -165,15 +261,15 @@ export function ImageViewer({
   const handleWheelZoom = useCallback(
     (e: WheelEvent) => {
       if (!(e.ctrlKey || e.metaKey)) return
-      
+
       e.preventDefault()
       const container = imageContainerRef.current
       if (!container) return
-      
+
       const rect = container.getBoundingClientRect()
       const centerX = e.clientX - rect.left - rect.width / 2
       const centerY = e.clientY - rect.top - rect.height / 2
-      
+
       const delta = -e.deltaY * 0.001
       handleZoom(delta, centerX, centerY)
     },
@@ -412,7 +508,7 @@ export function ImageViewer({
             </DialogClose>
 
             <div className="absolute top-4 left-0 right-0 flex justify-center z-50 px-4">
-              <div className="px-4 py-3 rounded-md max-w-[90%] wrap-break-word text-center overlay-bg">
+              <div className="px-4 py-3 rounded-md max-w-[90%] wrap-break-word text-center">
                 <div
                   id={imageTitleId}
                   className="text-base sm:text-lg font-semibold mb-1">
@@ -457,7 +553,7 @@ export function ImageViewer({
               )}
               {imageError ? (
                 <div
-                  className="flex flex-col items-center justify-center overlay-bg"
+                  className="flex flex-col items-center justify-center"
                   role="alert">
                   <p className="text-lg mb-2">Failed to load image</p>
                   <p className="text-sm opacity-70">{currentImage}</p>
@@ -529,9 +625,30 @@ export function ImageViewer({
               </Button>
             )}
 
-            <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-50">
+            <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-50 px-4">
+              <div className="hidden sm:flex items-center justify-center gap-2 rounded-md px-4 py-2 text-[0.65rem] min-h-[1.5rem]">
+                {imageMetadata ? (
+                  <>
+                    <span className="opacity-80">
+                      {imageMetadata.width} × {imageMetadata.height}px
+                    </span>
+                    {imageMetadata.fileSize && (
+                      <span className="opacity-80">
+                        · {formatFileSize(imageMetadata.fileSize)}
+                      </span>
+                    )}
+                    {imageMetadata.format && (
+                      <span className="opacity-80">
+                        · {imageMetadata.format}
+                      </span>
+                    )}
+                  </>
+                ) : (
+                  <span className="invisible opacity-0">0 × 0px</span>
+                )}
+              </div>
               <div
-                className="hidden items-center gap-3 rounded-md px-4 py-2 text-xs sm:flex overlay-bg"
+                className="hidden items-center gap-3 rounded-md px-4 py-2 text-xs sm:flex"
                 aria-live="polite"
                 aria-atomic="true">
                 <span>
@@ -584,81 +701,106 @@ export function ImageViewer({
                   DOWNLOAD
                 </Button>
               </div>
-                <div className="flex items-center gap-4 sm:hidden">
+              <div className="flex flex-col items-center gap-2 sm:hidden w-full">
+                <div className="flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-[0.65rem] min-h-[1.75rem] w-full">
+                  {imageMetadata ? (
+                    <>
+                      <span className="opacity-80">
+                        {imageMetadata.width}×{imageMetadata.height}px
+                      </span>
+                      {imageMetadata.fileSize && (
+                        <span className="opacity-80">
+                          · {formatFileSize(imageMetadata.fileSize)}
+                        </span>
+                      )}
+                      {imageMetadata.format && (
+                        <span className="opacity-80">
+                          · {imageMetadata.format}
+                        </span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="invisible opacity-0">0×0px</span>
+                  )}
+                </div>
+                <div className="flex items-center gap-4 w-full">
                   {hasPrevious && (
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="size-14 min-w-14 overlay-button"
+                      className="size-14 min-w-14 overlay-button flex-shrink-0"
                       onClick={handlePrevious}
                       aria-label="Previous image">
                       <ChevronLeft className="size-10" />
                     </Button>
                   )}
                   <div
-                    className="flex items-center gap-2 rounded-md px-4 py-2 text-xs overlay-bg"
+                    className="flex-1 flex items-center justify-center gap-2 rounded-md px-3 py-2 text-xs min-w-0"
                     aria-live="polite"
                     aria-atomic="true">
-                    <span>
+                    <span className="whitespace-nowrap">
                       Image {currentIndex + 1} of {images.length}
                     </span>
-                    <div className="flex items-center gap-1">
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
-                        onClick={() => handleZoom(-0.2)}
-                        aria-label="Zoom out"
-                        disabled={scale <= 0.5}>
-                        <ZoomOut className="h-3 w-3" />
-                      </Button>
-                      <span className="px-1 text-[0.65rem] min-w-[2.5rem] text-center">
-                        {Math.round(scale * 100)}%
-                      </span>
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
-                        onClick={() => handleZoom(0.2)}
-                        aria-label="Zoom in"
-                        disabled={scale >= 5}>
-                        <ZoomIn className="h-3 w-3" />
-                      </Button>
-                      {scale !== 1 && (
-                        <Button
-                          type="button"
-                          size="sm"
-                          variant="outline"
-                          className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
-                          onClick={handleResetZoom}
-                          aria-label="Reset zoom">
-                          <RotateCcw className="h-3 w-3" />
-                        </Button>
-                      )}
-                    </div>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
-                      onClick={handleDownloadCurrent}
-                      aria-label="Download current image">
-                      <Download className="h-3 w-3" />
-                    </Button>
                   </div>
                   {hasNext && (
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="size-14 min-w-14 overlay-button"
+                      className="size-14 min-w-14 overlay-button flex-shrink-0"
                       onClick={handleNext}
                       aria-label="Next image">
                       <ChevronRight className="size-10" />
                     </Button>
                   )}
                 </div>
+                <div className="flex items-center gap-2 w-full">
+                  <div className="flex-1 flex items-center justify-center gap-1 rounded-md px-3 py-2">
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
+                      onClick={() => handleZoom(-0.2)}
+                      aria-label="Zoom out"
+                      disabled={scale <= 0.5}>
+                      <ZoomOut className="h-3 w-3" />
+                    </Button>
+                    <span className="px-1 text-[0.65rem] min-w-[2.5rem] text-center">
+                      {Math.round(scale * 100)}%
+                    </span>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
+                      onClick={() => handleZoom(0.2)}
+                      aria-label="Zoom in"
+                      disabled={scale >= 5}>
+                      <ZoomIn className="h-3 w-3" />
+                    </Button>
+                    {scale !== 1 && (
+                      <Button
+                        type="button"
+                        size="sm"
+                        variant="outline"
+                        className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
+                        onClick={handleResetZoom}
+                        aria-label="Reset zoom">
+                        <RotateCcw className="h-3 w-3" />
+                      </Button>
+                    )}
+                  </div>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="h-8 px-3 py-1 text-[0.65rem] font-semibold overlay-button-outline flex-shrink-0"
+                    onClick={handleDownloadCurrent}
+                    aria-label="Download current image">
+                    <Download className="h-3 w-3" />
+                  </Button>
+                </div>
+              </div>
             </div>
           </div>
         </DialogPrimitive.Content>
