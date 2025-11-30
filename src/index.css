@@ -151,11 +151,6 @@ a:not(:disabled) {
     background-color: var(--overlay-weak);
   }
 
-  .overlay-bg {
-    background-color: var(--overlay);
-    color: var(--overlay-text);
-  }
-
   .overlay-button-outline {
     border-color: var(--overlay-text);
     background-color: var(--overlay-weak);

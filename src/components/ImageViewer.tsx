@@ -481,7 +481,10 @@ export function ImageViewer({
             'p-0 border-0 rounded-none',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
-            'bg-overlay-strong',
+            'bg-background font-bold',
+            'text-foreground',
+            gridBackground === 'white' && 'text-black',
+            gridBackground === 'black' && 'text-white',
           )}
           aria-labelledby={imageTitleId}
           aria-describedby={undefined}
@@ -508,7 +511,7 @@ export function ImageViewer({
             </DialogClose>
 
             <div className="absolute top-4 left-0 right-0 flex justify-center z-50 px-4">
-              <div className="px-4 py-3 rounded-md max-w-[90%] wrap-break-word text-center">
+              <div className="px-4 py-3 rounded-md max-w-10/9 wrap-break-word text-center">
                 <div
                   id={imageTitleId}
                   className="text-base sm:text-lg font-semibold mb-1">
@@ -545,7 +548,7 @@ export function ImageViewer({
                     className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md"
                     aria-hidden="true">
                     <LoaderCircleIcon
-                      className="size-full object-contain text-muted animate-spin duration-[3s]"
+                      className="size-full object-contain text-muted animate-spin duration-3000"
                       aria-hidden="true"
                     />
                   </div>
@@ -626,7 +629,7 @@ export function ImageViewer({
             )}
 
             <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-50 px-4">
-              <div className="hidden sm:flex items-center justify-center gap-2 rounded-md px-4 py-2 text-[0.65rem] min-h-[1.5rem]">
+              <div className="hidden sm:flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm min-h-[1.5rem]">
                 {imageMetadata ? (
                   <>
                     <span className="opacity-80">
@@ -659,20 +662,20 @@ export function ImageViewer({
                     type="button"
                     size="sm"
                     variant="outline"
-                    className="px-2 py-1 text-[0.7rem] font-semibold overlay-button-outline"
+                    className="px-2 py-1 text-sm font-semibold"
                     onClick={() => handleZoom(-0.2)}
                     aria-label="Zoom out"
                     disabled={scale <= 0.5}>
                     <ZoomOut className="h-3.5 w-3.5" />
                   </Button>
-                  <span className="px-2 text-[0.7rem] min-w-[3rem] text-center">
+                  <span className="px-2 text-sm min-w-12 text-center">
                     {Math.round(scale * 100)}%
                   </span>
                   <Button
                     type="button"
                     size="sm"
                     variant="outline"
-                    className="px-2 py-1 text-[0.7rem] font-semibold overlay-button-outline"
+                    className="px-2 py-1 text-sm font-semibold"
                     onClick={() => handleZoom(0.2)}
                     aria-label="Zoom in"
                     disabled={scale >= 5}>
@@ -683,7 +686,7 @@ export function ImageViewer({
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="px-2 py-1 text-[0.7rem] font-semibold overlay-button-outline"
+                      className="px-2 py-1 text-sm font-semibold"
                       onClick={handleResetZoom}
                       aria-label="Reset zoom">
                       <RotateCcw className="h-3.5 w-3.5" />
@@ -694,7 +697,7 @@ export function ImageViewer({
                   type="button"
                   size="sm"
                   variant="outline"
-                  className="px-2 py-1 text-[0.7rem] font-semibold overlay-button-outline"
+                  className="px-2 py-1 text-sm font-semibold"
                   onClick={handleDownloadCurrent}
                   aria-label="Download current image">
                   <Download className="mr-1 h-3.5 w-3.5" />
@@ -702,7 +705,7 @@ export function ImageViewer({
                 </Button>
               </div>
               <div className="flex flex-col items-center gap-2 sm:hidden w-full">
-                <div className="flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-[0.65rem] min-h-[1.75rem] w-full">
+                <div className="flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-md min-h-[1.75rem] w-full">
                   {imageMetadata ? (
                     <>
                       <span className="opacity-80">
@@ -726,9 +729,9 @@ export function ImageViewer({
                 <div className="flex items-center gap-4 w-full">
                   {hasPrevious && (
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="icon"
-                      className="size-14 min-w-14 overlay-button flex-shrink-0"
+                      className="size-14 min-w-14 flex-shrink-0"
                       onClick={handlePrevious}
                       aria-label="Previous image">
                       <ChevronLeft className="size-10" />
@@ -753,40 +756,40 @@ export function ImageViewer({
                     </Button>
                   )}
                 </div>
-                <div className="flex items-center gap-2 w-full">
+                <div className="flex items-center gap-2 px-2 w-full">
                   <div className="flex-1 flex items-center justify-center gap-1 rounded-md px-3 py-2">
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
+                      className="h-8 px-2 py-1 text-sm font-semibold"
                       onClick={() => handleZoom(-0.2)}
                       aria-label="Zoom out"
                       disabled={scale <= 0.5}>
-                      <ZoomOut className="h-3 w-3" />
+                      <ZoomOut className="size-4" />
                     </Button>
-                    <span className="px-1 text-[0.65rem] min-w-[2.5rem] text-center">
+                    <span className="px-1 text-sm min-w-10 text-center">
                       {Math.round(scale * 100)}%
                     </span>
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
+                      className="h-8 px-2 py-1 text-sm font-semibold"
                       onClick={() => handleZoom(0.2)}
                       aria-label="Zoom in"
                       disabled={scale >= 5}>
-                      <ZoomIn className="h-3 w-3" />
+                      <ZoomIn className="size-4" />
                     </Button>
                     {scale !== 1 && (
                       <Button
                         type="button"
                         size="sm"
                         variant="outline"
-                        className="h-8 px-2 py-1 text-[0.65rem] font-semibold overlay-button-outline"
+                        className="h-8 px-2 py-1 text-sm font-semibold"
                         onClick={handleResetZoom}
                         aria-label="Reset zoom">
-                        <RotateCcw className="h-3 w-3" />
+                        <RotateCcw className="size-4" />
                       </Button>
                     )}
                   </div>
@@ -794,10 +797,10 @@ export function ImageViewer({
                     type="button"
                     size="sm"
                     variant="outline"
-                    className="h-8 px-3 py-1 text-[0.65rem] font-semibold overlay-button-outline flex-shrink-0"
+                    className="h-8 px-3 py-1 text-sm font-semibold flex-shrink-0"
                     onClick={handleDownloadCurrent}
                     aria-label="Download current image">
-                    <Download className="h-3 w-3" />
+                    <Download className="size-4" />
                   </Button>
                 </div>
               </div>
