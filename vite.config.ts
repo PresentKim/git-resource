@@ -51,8 +51,6 @@ export default defineConfig(({mode}) => {
               return 'vendor'
             }
           },
-          // Optimize chunk size
-          chunkSizeWarningLimit: 1000,
         },
       },
       // Enable source maps for production debugging (optional)
