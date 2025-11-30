@@ -1,11 +1,19 @@
-import JSZip from 'jszip'
-import {saveAs} from 'file-saver'
 import {GithubRepo, createRawImageUrl} from './github'
 
+/**
+ * Dynamically import jszip and file-saver only when needed
+ * This reduces initial bundle size significantly
+ */
 export const downloadImagesAsZip = async (
   repo: GithubRepo,
   imagePaths: string[],
 ): Promise<void> => {
+  // Dynamic import - only load when download is triggered
+  const [{default: JSZip}, {saveAs}] = await Promise.all([
+    import('jszip'),
+    import('file-saver'),
+  ])
+
   const zip = new JSZip()
 
   // Create an array of promises for fetching images
