@@ -127,20 +127,6 @@ export function isMcmetaFile(path: string): boolean {
   return path.toLowerCase().endsWith('.mcmeta')
 }
 
-/**
- * Get the image path from an mcmeta path
- */
-export function getImagePathFromMcmeta(mcmetaPath: string): string {
-  return mcmetaPath.replace(/\.mcmeta$/i, '')
-}
-
-/**
- * Linear interpolation between two values
- */
-export function lerp(a: number, b: number, t: number): number {
-  return a + (b - a) * t
-}
-
 const PROXY_URL = 'https://corsproxy.io/?url='
 
 // In-memory cache for mcmeta data

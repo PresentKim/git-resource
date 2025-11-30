@@ -10,14 +10,7 @@ export {
   calculateFrameCount,
   getMcmetaPath,
   isMcmetaFile,
-  getImagePathFromMcmeta,
   fetchMcmetaData,
   TICK_MS,
-  DEFAULT_FRAME_TIME,
 } from './mcmeta'
-export type {
-  McmetaAnimation,
-  McmetaData,
-  McmetaFrame,
-  ParsedMcmetaAnimation,
-} from './mcmeta'
+export type {McmetaData, McmetaFrame, ParsedMcmetaAnimation} from './mcmeta'
