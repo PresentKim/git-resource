@@ -629,7 +629,7 @@ export function ImageViewer({
             )}
 
             <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-50 px-4">
-              <div className="hidden sm:flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm min-h-[1.5rem]">
+              <div className="hidden sm:flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm min-h-6">
                 {imageMetadata ? (
                   <>
                     <span className="opacity-80">
@@ -705,7 +705,7 @@ export function ImageViewer({
                 </Button>
               </div>
               <div className="flex flex-col items-center gap-2 sm:hidden w-full">
-                <div className="flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-md min-h-[1.75rem] w-full">
+                <div className="flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-base min-h-7 w-full">
                   {imageMetadata ? (
                     <>
                       <span className="opacity-80">

@@ -81,13 +81,13 @@ export default function Home() {
           </div>
           <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
             Example:{' '}
-            <span className="font-mono text-[0.7rem] text-accent sm:text-xs">
+            <span className="font-mono text-xs text-accent">
               https://github.com/owner/repo
             </span>
           </p>
         </div>
 
-        <div className="flex items-center gap-3 text-[0.65rem] uppercase tracking-[0.2em] text-muted-foreground">
+        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
           <div className="h-px flex-1 bg-border/60" />
           <span>OR</span>
           <div className="h-px flex-1 bg-border/60" />
@@ -125,7 +125,7 @@ export default function Home() {
                 role="listitem"
                 variant="outline"
                 size="sm"
-                className="flex h-9 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap border-border/60 bg-background/40 text-[0.7rem] font-normal text-muted-foreground hover:bg-accent/20 hover:text-foreground sm:text-xs"
+                className="flex h-9 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap border-border/60 bg-background/40 text-xs font-normal text-muted-foreground hover:bg-accent/20 hover:text-foreground"
                 onClick={() => setTargetRepository(owner, name, ref)}
                 aria-label={`Open example repository ${owner}/${name}`}>
                 <span className="font-mono">

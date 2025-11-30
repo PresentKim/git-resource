@@ -163,7 +163,7 @@ export default function RepoView() {
           <FilterInput />
         </div>
 
-        <div className="mt-1 flex items-center justify-between gap-2 text-[0.7rem] text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start sm:text-xs">
+        <div className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start">
           <span className="rounded-full bg-background/70 px-2 py-1">
             Showing{' '}
             <span className="font-semibold text-accent">
@@ -178,7 +178,7 @@ export default function RepoView() {
             onClick={downloadAll}
             size="sm"
             variant="outline"
-            className="text-[0.7rem] font-semibold sm:text-xs">
+            className="text-xs font-semibold">
             {isDownloading ? (
               <>
                 <LoaderIcon className="size-4 animate-spin" />

@@ -139,7 +139,7 @@ export function SettingButton() {
                   </a>
                 </Label>
                 {rateLimit.limit ? (
-                  <div className="text-[0.65rem] text-accent">
+                  <div className="text-xs text-accent">
                     rate limit:&nbsp;
                     <span className="font-mono">
                       {rateLimit.remaining || '-'} / {rateLimit.limit || '-'}
@@ -154,7 +154,7 @@ export function SettingButton() {
                 placeholder="github_pat_1234567890"
                 className="h-9 text-xs"
               />
-              <p className="text-[0.7rem] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Used to increase GitHub API rate limits and access private
                 repositories.
               </p>
@@ -167,7 +167,7 @@ export function SettingButton() {
                 <Label className="text-xs font-medium uppercase tracking-[0.14em] text-foreground">
                   Columns in grid
                 </Label>
-                <span className="text-[0.7rem] text-accent">
+                <span className="text-xs text-accent">
                   {columnCount ? `${columnCount} columns` : 'auto'}
                 </span>
               </div>
@@ -179,7 +179,7 @@ export function SettingButton() {
                 value={[columnCount]}
                 onValueChange={value => setColumnCount(value[0])}
               />
-              <p className="text-[0.7rem] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Set to <span className="font-mono text-accent">0</span> to
                 automatically fit the screen width.
               </p>
@@ -209,7 +209,7 @@ export function SettingButton() {
                   <span className="text-xs whitespace-nowrap">Dark</span>
                 </Button>
               </div>
-              <p className="text-[0.7rem] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Choose your preferred color theme.
               </p>
             </div>
@@ -225,7 +225,7 @@ export function SettingButton() {
                   size="sm"
                   className="gap-1.5 justify-start"
                   onClick={() => setGridBackground('auto')}>
-                  <div className="h-4 w-4 rounded border border-border shrink-0 flex items-center justify-center text-[0.65rem] font-semibold">
+                  <div className="h-4 w-4 rounded border border-border shrink-0 flex items-center justify-center text-xs font-semibold">
                     A
                   </div>
                   <span className="text-xs">Auto</span>
@@ -260,7 +260,7 @@ export function SettingButton() {
                   <span className="text-xs">Black</span>
                 </Button>
               </div>
-              <p className="text-[0.7rem] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Background color for the image grid.
               </p>
             </div>
@@ -278,7 +278,7 @@ export function SettingButton() {
                   onCheckedChange={setPixelated}
                 />
               </div>
-              <p className="text-[0.7rem] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Render images with crisp pixels, ideal for pixel-art textures.
               </p>
             </div>
@@ -298,14 +298,14 @@ export function SettingButton() {
                   onCheckedChange={setAnimationEnabled}
                 />
               </div>
-              <p className="text-[0.7rem] text-muted-foreground">
+              <p className="text-xs text-muted-foreground">
                 Play Minecraft-style animations for textures that include a
                 corresponding{' '}
                 <span className="font-mono text-accent">.mcmeta</span> file.
               </p>
             </div>
 
-            <p className="pt-1 text-[0.65rem] text-muted-foreground/80">
+            <p className="pt-1 text-xs text-muted-foreground/80">
               Changes are applied per browser and do not affect the underlying
               repositories.
             </p>
