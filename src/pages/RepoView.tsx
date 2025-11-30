@@ -47,7 +47,7 @@ export default function RepoView() {
     }
     const mcmeta = new Set<string>()
     const images: string[] = []
-    
+
     for (const path of imageFiles) {
       if (isMcmetaFile(path)) {
         mcmeta.add(path)
@@ -55,7 +55,7 @@ export default function RepoView() {
         images.push(path)
       }
     }
-    
+
     return {imageOnlyFiles: images, mcmetaPaths: mcmeta}
   }, [imageFiles])
 
@@ -89,13 +89,10 @@ export default function RepoView() {
     return result
   }, [imageOnlyFiles, filters])
 
-  const handleImageClick = useCallback(
-    (index: number) => {
-      setViewerIndex(index)
-      setViewerOpen(true)
-    },
-    [],
-  )
+  const handleImageClick = useCallback((index: number) => {
+    setViewerIndex(index)
+    setViewerOpen(true)
+  }, [])
 
   const itemRenderer = useCallback(
     ({index, item}: RenderData<string>) => (
@@ -210,10 +207,7 @@ export default function RepoView() {
         </div>
       ) : (
         <>
-          <div
-            role="region"
-            aria-label="Image gallery"
-            aria-live="polite">
+          <div role="region" aria-label="Image gallery" aria-live="polite">
             <VirtualizedFlexGrid
               items={filteredImageFiles}
               columnCount={columnCount}

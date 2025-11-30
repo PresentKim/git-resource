@@ -42,10 +42,7 @@ export function FilterInput({
 
   return (
     <div
-      className={cn(
-        'flex w-full items-center justify-end gap-1.5',
-        className,
-      )}
+      className={cn('flex w-full items-center justify-end gap-1.5', className)}
       {...props}>
       <div className="relative flex-1 max-w-lg">
         <Input
@@ -59,7 +56,8 @@ export function FilterInput({
           aria-describedby="filter-description"
         />
         <span id="filter-description" className="sr-only">
-          Enter keywords to include or exclude images. Use '-keyword' to exclude.
+          Enter keywords to include or exclude images. Use '-keyword' to
+          exclude.
         </span>
         <Button
           aria-label="Clear filter"

@@ -65,7 +65,10 @@ export function RepoInput({className, ...props}: React.ComponentProps<'div'>) {
           <XIcon className="size-4" />
         </Button>
       </div>
-      <Button onClick={handleApplyRepo} className="w-full sm:w-fit gap-2" aria-label="Open repository">
+      <Button
+        onClick={handleApplyRepo}
+        className="w-full sm:w-fit gap-2"
+        aria-label="Open repository">
         <SearchIcon strokeWidth={3} className="size-4" />
         <p className="">Open Repo</p>
       </Button>

@@ -33,16 +33,19 @@ const ImageCell = memo(function ImageCell({
     setLoading(false)
   }, [])
 
-  const handleImageRef = useCallback((img: HTMLImageElement | null) => {
-    imgRef.current = img
-    if (currentPathRef.current !== path) {
-      currentPathRef.current = path
-      setLoading(true)
-    }
-    if (img && img.complete) {
-      setLoading(false)
-    }
-  }, [path])
+  const handleImageRef = useCallback(
+    (img: HTMLImageElement | null) => {
+      imgRef.current = img
+      if (currentPathRef.current !== path) {
+        currentPathRef.current = path
+        setLoading(true)
+      }
+      if (img && img.complete) {
+        setLoading(false)
+      }
+    },
+    [path],
+  )
 
   const handleKeyDown = useCallback(
     (e: React.KeyboardEvent<HTMLDivElement>) => {
@@ -78,7 +81,10 @@ const ImageCell = memo(function ImageCell({
             className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md"
             style={{display: loading ? 'block' : 'none'}}
             aria-hidden="true">
-            <LoaderCircleIcon className="size-full object-contain text-muted animate-spin duration-[3s]" aria-hidden="true" />
+            <LoaderCircleIcon
+              className="size-full object-contain text-muted animate-spin duration-[3s]"
+              aria-hidden="true"
+            />
           </div>
           <img
             ref={handleImageRef}

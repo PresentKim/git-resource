@@ -61,7 +61,8 @@ export function SettingButton() {
             <span>Viewer settings</span>
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Tune how images are loaded and rendered. These settings are stored in your browser only.
+            Tune how images are loaded and rendered. These settings are stored
+            in your browser only.
           </DialogDescription>
         </DialogHeader>
 
@@ -99,7 +100,8 @@ export function SettingButton() {
                 className="h-9 text-xs"
               />
               <p className="text-[0.7rem] text-muted-foreground">
-                Used to increase GitHub API rate limits and access private repositories.
+                Used to increase GitHub API rate limits and access private
+                repositories.
               </p>
             </div>
 
@@ -123,7 +125,8 @@ export function SettingButton() {
                 onValueChange={value => setColumnCount(value[0])}
               />
               <p className="text-[0.7rem] text-muted-foreground">
-                Set to <span className="font-mono text-accent">0</span> to automatically fit the screen width.
+                Set to <span className="font-mono text-accent">0</span> to
+                automatically fit the screen width.
               </p>
             </div>
           </div>
@@ -149,7 +152,9 @@ export function SettingButton() {
               data-slot="animation-toggle"
               className="space-y-1.5 border-t border-border/50 pt-3">
               <div className="flex items-center justify-between gap-2">
-                <Label htmlFor="animationEnabled" className="text-sm font-medium">
+                <Label
+                  htmlFor="animationEnabled"
+                  className="text-sm font-medium">
                   Animate .mcmeta textures
                 </Label>
                 <Switch
@@ -160,12 +165,14 @@ export function SettingButton() {
               </div>
               <p className="text-[0.7rem] text-muted-foreground">
                 Play Minecraft-style animations for textures that include a
-                corresponding <span className="font-mono text-accent">.mcmeta</span> file.
+                corresponding{' '}
+                <span className="font-mono text-accent">.mcmeta</span> file.
               </p>
             </div>
 
             <p className="pt-1 text-[0.65rem] text-muted-foreground/80">
-              Changes are applied per browser and do not affect the underlying repositories.
+              Changes are applied per browser and do not affect the underlying
+              repositories.
             </p>
           </div>
         </div>
@@ -177,7 +184,11 @@ export function SettingButton() {
             </Button>
           </DialogClose>
           <DialogClose asChild>
-            <Button type="button" size="sm" className="font-bold" onClick={handleSave}>
+            <Button
+              type="button"
+              size="sm"
+              className="font-bold"
+              onClick={handleSave}>
               Apply settings
             </Button>
           </DialogClose>

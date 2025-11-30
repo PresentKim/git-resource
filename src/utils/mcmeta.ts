@@ -20,7 +20,7 @@ export interface McmetaAnimation {
   /** Default frame time in ticks */
   frametime?: number
   /** Frame order and timing - can be numbers or {index, time} objects */
-  frames?: Array<number | { index: number; time?: number }>
+  frames?: Array<number | {index: number; time?: number}>
 }
 
 export interface McmetaData {
@@ -43,7 +43,10 @@ export const TICK_MS = 50 // 1 Minecraft tick = 50ms
 /**
  * Parse raw mcmeta JSON data into a structured animation object
  */
-export function parseMcmeta(data: McmetaData, frameCount?: number): ParsedMcmetaAnimation | null {
+export function parseMcmeta(
+  data: McmetaData,
+  frameCount?: number,
+): ParsedMcmetaAnimation | null {
   if (!data.animation) {
     return null
   }
@@ -59,7 +62,7 @@ export function parseMcmeta(data: McmetaData, frameCount?: number): ParsedMcmeta
     // Parse explicit frame order
     frames = animation.frames.map(frame => {
       if (typeof frame === 'number') {
-        return { index: frame, time: defaultFrameTime }
+        return {index: frame, time: defaultFrameTime}
       }
       return {
         index: frame.index,
@@ -68,7 +71,7 @@ export function parseMcmeta(data: McmetaData, frameCount?: number): ParsedMcmeta
     })
   } else if (frameCount !== undefined && frameCount > 0) {
     // Generate sequential frames based on sprite sheet
-    frames = Array.from({ length: frameCount }, (_, i) => ({
+    frames = Array.from({length: frameCount}, (_, i) => ({
       index: i,
       time: defaultFrameTime,
     }))
@@ -95,17 +98,17 @@ export function calculateFrameCount(
 ): number {
   const effectiveFrameWidth = frameWidth ?? imageWidth
   const effectiveFrameHeight = frameHeight ?? effectiveFrameWidth
-  
+
   // For vertical sprite sheets (most common in Minecraft)
   if (imageHeight > imageWidth) {
     return Math.floor(imageHeight / effectiveFrameHeight)
   }
-  
+
   // For horizontal sprite sheets
   if (imageWidth > imageHeight) {
     return Math.floor(imageWidth / effectiveFrameWidth)
   }
-  
+
   // Square image - single frame
   return 1
 }
@@ -151,15 +154,15 @@ export async function fetchMcmetaData(url: string): Promise<McmetaData | null> {
   if (mcmetaCache.has(url)) {
     return mcmetaCache.get(url) ?? null
   }
-  
+
   try {
     const proxyUrl = PROXY_URL + encodeURIComponent(url)
-    const response = await fetch(proxyUrl, { cache: 'no-store' })
+    const response = await fetch(proxyUrl, {cache: 'no-store'})
     if (!response.ok) {
       mcmetaCache.set(url, null)
       return null
     }
-    const data = await response.json() as McmetaData
+    const data = (await response.json()) as McmetaData
     mcmetaCache.set(url, data)
     return data
   } catch {
@@ -174,4 +177,3 @@ export async function fetchMcmetaData(url: string): Promise<McmetaData | null> {
 export function clearMcmetaCache(): void {
   mcmetaCache.clear()
 }
-

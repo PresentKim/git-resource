@@ -51,7 +51,7 @@ class ImageFileTreeWorker extends BaseGithubWorker<
           file =>
             !zipData.files[file].dir && // Not a directory
             (imageExtensions.some(ext => file.toLowerCase().endsWith(ext)) || // Image file
-             file.toLowerCase().endsWith('.mcmeta')), // Or mcmeta file
+              file.toLowerCase().endsWith('.mcmeta')), // Or mcmeta file
         )
         .map(file => file.replace(`${rootFolder}/`, '')) // Remove root folder
     }
@@ -104,7 +104,11 @@ class ImageFileTreeWorker extends BaseGithubWorker<
     response: ImageFileTreeResponse,
   ): GithubImageFileTree {
     return response.tree.reduce((acc, {path, type}) => {
-      if (type === 'blob' && (IMAGE_FILE_EXTENSIONS_REGEX.test(path) || MCMETA_FILE_EXTENSIONS_REGEX.test(path))) {
+      if (
+        type === 'blob' &&
+        (IMAGE_FILE_EXTENSIONS_REGEX.test(path) ||
+          MCMETA_FILE_EXTENSIONS_REGEX.test(path))
+      ) {
         acc.push(path)
       }
       return acc
