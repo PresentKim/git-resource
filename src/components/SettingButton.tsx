@@ -22,10 +22,12 @@ import {
 } from '@/stores/settingStore'
 import {useGithubRateLimitStore} from '@/stores/githubApiStore'
 import {useState, useMemo} from 'react'
+import {useScrollLock} from '@/hooks/useScrollLock'
 
 export function SettingButton() {
   const settings = useSettingStore()
   const rateLimit = useGithubRateLimitStore()
+  const [isOpen, setIsOpen] = useState(false)
   const [githubToken, setGithubToken] = useState('')
   const [columnCount, setColumnCount] = useState(0)
   const [pixelated, setPixelated] = useState(true)
@@ -79,6 +81,7 @@ export function SettingButton() {
   }
 
   const handleOpenChange = (open: boolean) => {
+    setIsOpen(open)
     // Reset the values if the dialog is opened
     if (open) {
       const initial = {
@@ -99,8 +102,11 @@ export function SettingButton() {
     }
   }
 
+  // 배경 스크롤 잠금 (설정 다이얼로그 열릴 때)
+  useScrollLock(isOpen)
+
   return (
-    <Dialog onOpenChange={handleOpenChange}>
+    <Dialog onOpenChange={handleOpenChange} modal={false}>
       <DialogTrigger asChild>
         <Button
           aria-label="Settings"

@@ -16,6 +16,7 @@ import {cn, createRawImageUrl, getMcmetaPath} from '@/utils'
 import {saveAs} from 'file-saver'
 import type {GithubRepo} from '@/utils'
 import {useSettingStore} from '@/stores/settingStore'
+import {useScrollLock} from '@/hooks/useScrollLock'
 
 // Format file size to human-readable format
 function formatFileSize(bytes: number): string {
@@ -82,6 +83,8 @@ export function ImageViewer({
   const filePath = currentImage?.includes('/')
     ? currentImage.substring(0, currentImage.lastIndexOf('/'))
     : null
+
+  useScrollLock(open)
 
   const handleDownloadCurrent = useCallback(async () => {
     try {
@@ -731,7 +734,7 @@ export function ImageViewer({
                     <Button
                       variant="outline"
                       size="icon"
-                      className="size-14 min-w-14 flex-shrink-0"
+                      className="size-14 min-w-14 shrink-0"
                       onClick={handlePrevious}
                       aria-label="Previous image">
                       <ChevronLeft className="size-10" />
@@ -749,7 +752,7 @@ export function ImageViewer({
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="size-14 min-w-14 overlay-button flex-shrink-0"
+                      className="size-14 min-w-14 overlay-button shrink-0"
                       onClick={handleNext}
                       aria-label="Next image">
                       <ChevronRight className="size-10" />
@@ -797,7 +800,7 @@ export function ImageViewer({
                     type="button"
                     size="sm"
                     variant="outline"
-                    className="h-8 px-3 py-1 text-sm font-semibold flex-shrink-0"
+                    className="h-8 px-3 py-1 text-sm font-semibold shrink-0"
                     onClick={handleDownloadCurrent}
                     aria-label="Download current image">
                     <Download className="size-4" />
