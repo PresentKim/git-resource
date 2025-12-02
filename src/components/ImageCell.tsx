@@ -92,7 +92,6 @@ const ImageCell = memo(function ImageCell({
             ref={handleImageRef}
             src={imageUrl}
             alt={`Image from ${path}`}
-            decoding="async"
             className={cn(
               'size-full object-contain peer',
               loading ? 'hidden' : 'block',

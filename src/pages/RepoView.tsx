@@ -144,9 +144,11 @@ export default function RepoView() {
     ),
     [repo, handleImageClick, mcmetaPaths, animationEnabled],
   )
-  const [isDownloading, downloadAll] = usePromise(
-    downloadImagesAsZip.bind(null, repo, imageOnlyFiles || []),
+  const downloadVisibleImages = useCallback(
+    () => downloadImagesAsZip(repo, filteredImageFiles || []),
+    [repo, filteredImageFiles],
   )
+  const [isDownloading, downloadAll] = usePromise(downloadVisibleImages)
 
   return (
     <section
