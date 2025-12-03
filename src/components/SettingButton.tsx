@@ -102,7 +102,7 @@ export function SettingButton() {
     }
   }
 
-  // 배경 스크롤 잠금 (설정 다이얼로그 열릴 때)
+  // Lock background scroll while the settings dialog is open
   useScrollLock(isOpen)
 
   return (

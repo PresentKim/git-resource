@@ -43,17 +43,40 @@ class ImageFileTreeWorker extends BaseGithubWorker<
       files: string[],
       zipData: JSZip,
     ): GithubImageFileTree {
-      const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp']
-      const rootFolder = files[0].split('/')[0]
+      if (!files.length) {
+        return []
+      }
 
-      return files
-        .filter(
-          file =>
-            !zipData.files[file].dir && // Not a directory
-            (imageExtensions.some(ext => file.toLowerCase().endsWith(ext)) || // Image file
-              file.toLowerCase().endsWith('.mcmeta')), // Or mcmeta file
-        )
-        .map(file => file.replace(`${rootFolder}/`, '')) // Remove root folder
+      const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.webp']
+
+      // Safely filter out directories and unknown entries
+      const fileEntries = files.filter(file => {
+        const entry = zipData.files[file]
+        return entry && !entry.dir
+      })
+
+      if (!fileEntries.length) {
+        return []
+      }
+
+      // Try to detect a common root folder (e.g. "repo-main/")
+      const firstPath = fileEntries[0]
+      const hasFolder = firstPath.includes('/')
+      const rootFolder = hasFolder ? firstPath.split('/')[0] : ''
+
+      return fileEntries
+        .filter(file => {
+          const lower = file.toLowerCase()
+          return (
+            imageExtensions.some(ext => lower.endsWith(ext)) ||
+            lower.endsWith('.mcmeta')
+          )
+        })
+        .map(file => {
+          if (!rootFolder) return file
+          const prefix = `${rootFolder}/`
+          return file.startsWith(prefix) ? file.slice(prefix.length) : file
+        })
     }
 
     const response = await fetch(

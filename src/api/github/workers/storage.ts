@@ -25,11 +25,21 @@ const CACHE_EXPIRY = 1000 * 60 * 60 // 1 hour
 
 class WorkerStorage {
   async getCache<T>(key: string): Promise<GithubApiCacheData<T> | null> {
-    const data = await compactedStorage.getItem(key)
-    if (!data) return null
+    try {
+      const data = await compactedStorage.getItem(key)
+      if (!data) return null
 
-    const cache = JSON.parse(data) as GithubApiCacheData<T>
-    return cache
+      const cache = JSON.parse(data) as GithubApiCacheData<T>
+      return cache
+    } catch {
+      // If cache data is corrupted or parsing fails, clear the key and treat as a cache miss
+      try {
+        await compactedStorage.removeItem(key)
+      } catch {
+        // Ignore storage removal errors and still treat as a cache miss
+      }
+      return null
+    }
   }
 
   async setCache<T>(key: string, etag: string, value: T): Promise<void> {
