@@ -59,6 +59,7 @@ export default function RepoView() {
   }, [imageFiles])
 
   const totalCount = imageOnlyFiles?.length ?? 0
+  const [downloadProgress, setDownloadProgress] = useState<number | null>(null)
 
   // Optimize filter parsing: separate include and exclude filters
   const {includeFilters, excludeFilters} = useMemo(() => {
@@ -144,10 +145,22 @@ export default function RepoView() {
     ),
     [repo, handleImageClick, mcmetaPaths, animationEnabled],
   )
-  const downloadVisibleImages = useCallback(
-    () => downloadImagesAsZip(repo, filteredImageFiles || []),
-    [repo, filteredImageFiles],
-  )
+  const downloadVisibleImages = useCallback(async () => {
+    const paths = filteredImageFiles || []
+    if (!paths.length) return
+
+    setDownloadProgress(0)
+    try {
+      await downloadImagesAsZip(repo, paths, (completed, total) => {
+        const percent = Math.round((completed / total) * 100)
+        setDownloadProgress(percent)
+      })
+    } finally {
+      setDownloadProgress(100)
+      // Briefly show 100%, then reset
+      setTimeout(() => setDownloadProgress(null), 500)
+    }
+  }, [repo, filteredImageFiles])
   const [isDownloading, downloadAll] = usePromise(downloadVisibleImages)
 
   return (
@@ -180,17 +193,33 @@ export default function RepoView() {
             onClick={downloadAll}
             size="sm"
             variant="outline"
-            className="text-xs font-semibold">
+            className="text-xs font-semibold flex flex-col items-center gap-0.5 min-w-[190px]">
             {isDownloading ? (
               <>
-                <LoaderIcon className="size-4 animate-spin" />
-                <span>DOWNLOADING VISIBLE...</span>
+                <div className="flex items-center gap-1">
+                  <LoaderIcon className="size-4 animate-spin" />
+                  <span>
+                    {downloadProgress !== null
+                      ? `DOWNLOADING ${downloadProgress}%`
+                      : 'DOWNLOADING VISIBLE...'}
+                  </span>
+                </div>
+                {downloadProgress !== null && (
+                  <div
+                    className="mt-0.5 h-1 w-full rounded-full bg-muted overflow-hidden"
+                    aria-hidden="true">
+                    <div
+                      className="h-full bg-accent transition-[width] duration-150 ease-out"
+                      style={{width: `${downloadProgress}%`}}
+                    />
+                  </div>
+                )}
               </>
             ) : (
-              <>
+              <div className="flex items-center gap-1">
                 <DownloadIcon className="size-4" />
                 <span>DOWNLOAD VISIBLE</span>
-              </>
+              </div>
             )}
           </Button>
         </div>

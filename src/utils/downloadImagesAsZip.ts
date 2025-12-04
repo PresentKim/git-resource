@@ -7,6 +7,7 @@ import {GithubRepo, createRawImageUrl} from './github'
 export const downloadImagesAsZip = async (
   repo: GithubRepo,
   imagePaths: string[],
+  onProgress?: (completed: number, total: number) => void,
 ): Promise<void> => {
   if (!imagePaths.length) return
 
@@ -33,6 +34,13 @@ export const downloadImagesAsZip = async (
 
   // Limit concurrent fetches to avoid overwhelming network/CPU
   const BATCH_SIZE = 50
+  const total = imagePaths.length
+  let completed = 0
+
+  const reportProgress = () => {
+    completed += 1
+    onProgress?.(completed, total)
+  }
 
   for (let i = 0; i < imagePaths.length; i += BATCH_SIZE) {
     const batch = imagePaths.slice(i, i + BATCH_SIZE)
@@ -45,6 +53,8 @@ export const downloadImagesAsZip = async (
           zip.file(imagePath, blob)
         } catch (error) {
           console.error(`Failed to download ${imagePath}:`, error)
+        } finally {
+          reportProgress()
         }
       }),
     )
