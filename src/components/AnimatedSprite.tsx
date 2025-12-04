@@ -25,8 +25,8 @@ interface AnimatedSpriteProps {
   pixelated?: boolean
   /** Whether the animation is paused */
   paused?: boolean
-  /** Callback when image loads */
-  onLoad?: () => void
+  /** Callback when image loads (provides sprite frame dimensions) */
+  onLoad?: (dimensions: {width: number; height: number}) => void
   /** Callback when image fails to load */
   onError?: () => void
   /** Animation speed multiplier (default: 1) */
@@ -249,7 +249,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
       imageRef.current = image
       setLoading(false)
       initAnimation(image)
-      onLoad?.()
+      onLoad?.({width: image.width, height: image.width})
     }
 
     image.onerror = () => {

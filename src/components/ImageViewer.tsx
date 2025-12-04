@@ -115,82 +115,13 @@ export function ImageViewer({
     }
   }, [currentIndex, hasNext, onIndexChange])
 
-  const handleImageLoad = useCallback(async () => {
-    setLoading(false)
+  const handleImageLoad = useCallback(
+    (dimensions?: {width: number; height: number}) => {
+      setLoading(false)
 
-    // Get image metadata
-    const url = createRawImageUrl(repo, currentImage)
-    let width = 0
-    let height = 0
-
-    if (imgRef.current) {
-      width = imgRef.current.naturalWidth
-      height = imgRef.current.naturalHeight
-    }
-
-    // Get file size and format
-    try {
-      const response = await fetch(url, {method: 'HEAD'})
-      const contentLength = response.headers.get('Content-Length')
-      const contentType = response.headers.get('Content-Type') || ''
-
-      const fileSize = contentLength ? parseInt(contentLength, 10) : null
-      const format =
-        contentType.split('/')[1]?.toUpperCase() ||
-        currentImage.split('.').pop()?.toUpperCase() ||
-        'UNKNOWN'
-
-      // If width/height not available from img element, load image to get dimensions
-      if (width === 0 || height === 0) {
-        const img = new Image()
-        img.src = url
-        await new Promise<void>((resolve, reject) => {
-          const timeout = setTimeout(() => reject(new Error('Timeout')), 5000)
-          img.onload = () => {
-            clearTimeout(timeout)
-            width = img.naturalWidth
-            height = img.naturalHeight
-            resolve()
-          }
-          img.onerror = () => {
-            clearTimeout(timeout)
-            reject(new Error('Failed to load'))
-          }
-        })
-      }
-
-      setImageMetadata({
-        width,
-        height,
-        fileSize,
-        format,
-      })
-    } catch {
-      // Fallback: try to get format from extension
+      const width = dimensions?.width ?? 0
+      const height = dimensions?.height ?? 0
       const format = currentImage.split('.').pop()?.toUpperCase() || 'UNKNOWN'
-
-      // Try to get dimensions from image if not already available
-      if (width === 0 || height === 0) {
-        try {
-          const img = new Image()
-          img.src = url
-          await new Promise<void>((resolve, reject) => {
-            const timeout = setTimeout(() => reject(new Error('Timeout')), 5000)
-            img.onload = () => {
-              clearTimeout(timeout)
-              width = img.naturalWidth
-              height = img.naturalHeight
-              resolve()
-            }
-            img.onerror = () => {
-              clearTimeout(timeout)
-              reject(new Error('Failed to load'))
-            }
-          })
-        } catch {
-          // Ignore errors, use 0 dimensions
-        }
-      }
 
       setImageMetadata({
         width,
@@ -198,8 +129,9 @@ export function ImageViewer({
         fileSize: null,
         format,
       })
-    }
-  }, [currentImage, repo])
+    },
+    [currentImage],
+  )
 
   const handleImageError = useCallback(() => {
     setLoading(false)
@@ -221,10 +153,13 @@ export function ImageViewer({
         setTranslateY(0)
       }
       if (img && img.complete) {
-        setLoading(false)
+        // When the image is already cached, use its natural size directly
+        const width = img.naturalWidth
+        const height = img.naturalHeight
+        void handleImageLoad({width, height})
       }
     },
-    [currentImage],
+    [currentImage, handleImageLoad],
   )
 
   // Reset zoom
@@ -580,7 +515,9 @@ export function ImageViewer({
                       loading && 'opacity-0',
                     )}
                     pixelated={pixelated}
-                    onLoad={handleImageLoad}
+                    onLoad={dimensions => {
+                      void handleImageLoad(dimensions)
+                    }}
                     onError={handleImageError}
                   />
                 </div>
@@ -601,7 +538,12 @@ export function ImageViewer({
                       pixelated && 'pixelated',
                       loading && 'opacity-0',
                     )}
-                    onLoad={handleImageLoad}
+                    onLoad={() => {
+                      const img = imgRef.current
+                      const width = img?.naturalWidth ?? 0
+                      const height = img?.naturalHeight ?? 0
+                      void handleImageLoad({width, height})
+                    }}
                     onError={handleImageError}
                     draggable={false}
                   />
