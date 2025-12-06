@@ -3,7 +3,6 @@ import {GithubRepo, createRawImageUrl} from './github'
 // Constants
 const LARGE_DOWNLOAD_THRESHOLD = 2000
 const BATCH_SIZE = 50
-const PROGRESS_RESET_DELAY_MS = 500
 
 /**
  * Download a single image and add it to the zip
