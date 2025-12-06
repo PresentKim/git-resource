@@ -9,6 +9,7 @@ import {
   TICK_MS,
 } from '@/utils/mcmeta'
 import {cn} from '@/utils'
+import {useSettingStore} from '@/stores/settingStore'
 
 interface AnimatedSpriteProps {
   /** Source URL of the sprite sheet image */
@@ -62,6 +63,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
+  const githubToken = useSettingStore(state => state.githubToken)
 
   // Calculate mcmeta URL
   const mcmetaUrl = mcmetaSrc ?? `${src}.mcmeta`
@@ -190,7 +192,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
       // Fetch or use preloaded mcmeta data
       let mcmetaData: McmetaData | undefined = preloadedMcmetaData
       if (!mcmetaData) {
-        const fetched = await fetchMcmetaData(mcmetaUrl)
+        const fetched = await fetchMcmetaData(mcmetaUrl, githubToken)
         mcmetaData = fetched ?? undefined
       }
 
@@ -239,7 +241,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
         animationFrameRef.current = requestAnimationFrame(animateRef.current)
       }
     },
-    [mcmetaUrl, preloadedMcmetaData],
+    [mcmetaUrl, preloadedMcmetaData, githubToken],
   )
 
   // Load image
