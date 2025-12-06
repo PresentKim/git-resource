@@ -1,4 +1,5 @@
 import {GithubRepo, createRawImageUrl} from './github'
+import type JSZip from 'jszip'
 
 // Constants
 const LARGE_DOWNLOAD_THRESHOLD = 2000
@@ -39,9 +40,9 @@ async function processBatch(
   zip: JSZip,
   repo: GithubRepo,
   batch: string[],
-  onProgress?: (completed: number, total: number) => void,
   currentCompleted: number,
   total: number,
+  onProgress?: (completed: number, total: number) => void,
 ): Promise<number> {
   const results = await Promise.allSettled(
     batch.map(imagePath => downloadImageToZip(zip, repo, imagePath)),
@@ -89,14 +90,16 @@ export const downloadImagesAsZip = async (
   }
 
   // Dynamic import - only load when download is triggered
-  let JSZip: typeof import('jszip').default
+  let JSZipClass: typeof JSZip
   let saveAs: typeof import('file-saver').saveAs
 
   try {
-    ;[{default: JSZip}, {saveAs}] = await Promise.all([
+    const [jszipModule, fileSaverModule] = await Promise.all([
       import('jszip'),
       import('file-saver'),
     ])
+    JSZipClass = jszipModule.default
+    saveAs = fileSaverModule.saveAs
   } catch (error) {
     throw new Error(
       `Failed to load required libraries: ${
@@ -105,7 +108,7 @@ export const downloadImagesAsZip = async (
     )
   }
 
-  const zip = new JSZip()
+  const zip = new JSZipClass()
   const total = imagePaths.length
   let completed = 0
 
@@ -117,9 +120,9 @@ export const downloadImagesAsZip = async (
         zip,
         repo,
         batch,
-        onProgress,
         completed,
         total,
+        onProgress,
       )
 
       // Yield back to the event loop between batches to keep the UI responsive
