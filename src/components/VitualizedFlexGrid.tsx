@@ -2,10 +2,8 @@ import {useRef, useMemo} from 'react'
 import {useVisibleHeight} from '@/hooks/useVisibleHeight'
 import {useScrollOffset} from '@/hooks/useScrollOffset'
 import {useVirtualGrid} from '@/hooks/useVirtualGrid'
-import {useAdaptiveOverscan} from '@/hooks/useAdaptiveOverscan'
 import {cn} from '@/utils'
 import {useItemSize} from '@/hooks/useItemSize'
-import {useSettingStore} from '@/stores/settingStore'
 
 export type RenderData<T> = {index: number; item: T}
 
@@ -15,13 +13,15 @@ interface VirtualizedFlexGridProps<T> {
   columnCount: number
   gap?: number
   className?: string
-  overscan?: number // Manual override for overscan (in rows). If not provided, uses adaptive overscan
+  overscan?: number // Manual override for overscan (in rows). Defaults to 5 rows
 }
 
 const DEFAULT_GAP = 10
+const DEFAULT_OVERSCAN = 5 // Simple fixed overscan for unidirectional expansion
 
 /**
  * Virtualized flex grid component for efficient rendering of large lists
+ * Uses unidirectional expansion: loaded items are never removed
  */
 function VirtualizedFlexGrid<T>({
   items,
@@ -36,20 +36,10 @@ function VirtualizedFlexGrid<T>({
   const visibleHeight = useVisibleHeight(wrapperRef)
   const scrollOffset = useScrollOffset(wrapperRef)
   const itemSize = useItemSize(containerRef, columnCount, gap)
-  const manualOverscanFromStore = useSettingStore(state => state.overscan)
 
-  // Use manual overscan from props, then store, then adaptive
-  const effectiveManualOverscan =
-    manualOverscan ?? manualOverscanFromStore ?? null
-
-  // Calculate adaptive overscan based on visible height and item size
-  // This ensures consistent rendering regardless of columnCount
-  const overscan = useAdaptiveOverscan(
-    effectiveManualOverscan,
-    visibleHeight,
-    itemSize + gap, // actualItemSize
-    columnCount,
-  )
+  // Use simple fixed overscan for unidirectional expansion
+  // Adaptive overscan is not needed since loaded items are never removed
+  const overscan = manualOverscan ?? DEFAULT_OVERSCAN
 
   const {totalHeight, offsetTop, visibleIndexs} = useVirtualGrid(
     items.length,
