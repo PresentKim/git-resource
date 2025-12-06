@@ -106,10 +106,7 @@ const ImageCell = memo(function ImageCell({
   const shouldAnimate = hasAnimation && animationEnabled
 
   // Memoize image URL to avoid recalculation
-  const imageUrl = useMemo(
-    () => createRawImageUrl(repo, path),
-    [repo.owner, repo.name, repo.ref, path],
-  )
+  const imageUrl = useMemo(() => createRawImageUrl(repo, path), [repo, path])
 
   const handleLoad = useCallback(() => {
     setLoading(false)
