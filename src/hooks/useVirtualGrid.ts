@@ -38,7 +38,8 @@ function useVirtualGrid(
   const visibleStartRow = Math.floor(scrollOffset / actualItemSize)
   // Use a minimum visible height to ensure initial render shows enough rows
   // This prevents the issue where visibleHeight is 0 on initial mount
-  const effectiveVisibleHeight = visibleHeight > 0 ? visibleHeight : window.innerHeight * 0.8
+  const effectiveVisibleHeight =
+    visibleHeight > 0 ? visibleHeight : window.innerHeight * 0.8
   const visibleRowCount = Math.ceil(effectiveVisibleHeight / actualItemSize) + 1
 
   // Calculate desired render range based on current scroll position
@@ -84,7 +85,10 @@ function useVirtualGrid(
     prevVisibleHeightRef.current = visibleHeight
 
     // On initial mount or when visibleHeight becomes available, ensure we render enough items
-    if (isInitialMountRef.current || (visibleHeightChanged && visibleHeight > 0)) {
+    if (
+      isInitialMountRef.current ||
+      (visibleHeightChanged && visibleHeight > 0)
+    ) {
       isInitialMountRef.current = false
       const timeoutId = setTimeout(() => {
         // Ensure we render at least the desired range
@@ -97,7 +101,13 @@ function useVirtualGrid(
       }, 0)
       return () => clearTimeout(timeoutId)
     }
-  }, [visibleHeight, desiredStartIndex, desiredEndIndex, minRenderedIndex, maxRenderedIndex])
+  }, [
+    visibleHeight,
+    desiredStartIndex,
+    desiredEndIndex,
+    minRenderedIndex,
+    maxRenderedIndex,
+  ])
 
   // Expand render range unidirectionally based on scroll direction
   // Use setTimeout to defer state updates and avoid React Compiler warnings
