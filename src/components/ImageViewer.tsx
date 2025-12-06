@@ -17,6 +17,7 @@ import {saveAs} from 'file-saver'
 import type {GithubRepo} from '@/utils'
 import {useSettingStore} from '@/stores/settingStore'
 import {useScrollLock} from '@/hooks/useScrollLock'
+import {AnimatedSprite} from './AnimatedSprite'
 
 // Format file size to human-readable format
 function formatFileSize(bytes: number): string {
@@ -24,7 +25,6 @@ function formatFileSize(bytes: number): string {
   if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
   return `${(bytes / (1024 * 1024)).toFixed(1)} MB`
 }
-import {AnimatedSprite} from './AnimatedSprite'
 
 interface ImageViewerProps {
   open: boolean

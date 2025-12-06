@@ -37,7 +37,7 @@ export interface ParsedMcmetaAnimation {
 /**
  * Default frame time in ticks (50ms per tick in Minecraft)
  */
-export const DEFAULT_FRAME_TIME = 1
+const DEFAULT_FRAME_TIME = 1
 export const TICK_MS = 50 // 1 Minecraft tick = 50ms
 
 /**
@@ -155,11 +155,4 @@ export async function fetchMcmetaData(url: string): Promise<McmetaData | null> {
     mcmetaCache.set(url, null)
     return null
   }
-}
-
-/**
- * Clear the mcmeta cache
- */
-export function clearMcmetaCache(): void {
-  mcmetaCache.clear()
 }

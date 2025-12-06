@@ -1,6 +1,4 @@
 export {cn} from './cn'
-export {throttle} from './throttle'
-export {debounce} from './debounce'
 export {observerResize, observeIntersection} from './observe'
 export {downloadImagesAsZip} from './downloadImagesAsZip'
 export {createGithubRepo, parseGithubUrl, createRawImageUrl} from './github'

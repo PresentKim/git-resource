@@ -1,3 +1,5 @@
+import {useMemo, useState, useEffect, useRef} from 'react'
+
 interface VirtualGridResult {
   totalHeight: number
   offsetTop: number
@@ -18,7 +20,6 @@ interface VirtualGridResult {
  * @param overscan Number of additional rows to render beyond visible area
  * @returns Virtual grid calculation results
  */
-import {useMemo, useState, useEffect, useRef} from 'react'
 
 function useVirtualGrid(
   itemCount: number,
