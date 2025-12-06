@@ -15,6 +15,8 @@ export default function Home() {
   >([])
   const [shuffledExampleRepositories, setShuffledExampleRepositories] =
     useState<[string, string, string][]>([])
+  const [isRerolling, setIsRerolling] = useState(false)
+  const [rerollKey, setRerollKey] = useState(0)
 
   const pickRandomExamples = (
     list: [string, string, string][],
@@ -34,7 +36,14 @@ export default function Home() {
 
   const handleRerollExamples = () => {
     if (!exampleRepositories.length) return
-    setShuffledExampleRepositories(pickRandomExamples(exampleRepositories))
+    setIsRerolling(true)
+    setRerollKey(prev => prev + 1)
+    
+    // 페이드 아웃 후 새 리스트 설정
+    setTimeout(() => {
+      setShuffledExampleRepositories(pickRandomExamples(exampleRepositories))
+      setIsRerolling(false)
+    }, 200)
   }
 
   return (
@@ -107,25 +116,37 @@ export default function Home() {
               type="button"
               variant="outline"
               size="sm"
-              className="flex items-center gap-1 text-xs"
+              className="flex items-center gap-1 text-xs transition-transform duration-300 hover:scale-105"
               onClick={handleRerollExamples}
+              disabled={isRerolling}
               aria-label="Shuffle example repositories">
-              <Shuffle className="h-3.5 w-3.5" />
+              <Shuffle
+                className={`h-3.5 w-3.5 transition-transform duration-500 ${
+                  isRerolling ? 'animate-spin' : ''
+                }`}
+              />
               <span>Shuffle examples</span>
             </Button>
           </div>
 
           <div
-            className="grid w-full grid-cols-1 gap-2"
+            key={rerollKey}
+            className={`grid w-full grid-cols-1 gap-2 transition-opacity duration-200 ${
+              isRerolling ? 'opacity-0' : 'opacity-100'
+            }`}
             role="list"
             aria-label="Example repositories">
             {shuffledExampleRepositories.map(([owner, name, ref], index) => (
               <Button
-                key={index}
+                key={`${rerollKey}-${index}`}
                 role="listitem"
                 variant="outline"
                 size="sm"
-                className="flex h-9 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap border-border/60 bg-background/40 text-xs font-normal text-muted-foreground hover:bg-accent/20 hover:text-foreground"
+                className="flex h-9 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap border-border/60 bg-background/40 text-xs font-normal text-muted-foreground transition-all duration-300 hover:bg-accent/20 hover:text-foreground hover:scale-[1.02] animate-fade-in-slide"
+                style={{
+                  animationDelay: `${index * 50}ms`,
+                  opacity: 0,
+                }}
                 onClick={() => setTargetRepository(owner, name, ref)}
                 aria-label={`Open example repository ${owner}/${name}`}>
                 <span className="font-mono">
