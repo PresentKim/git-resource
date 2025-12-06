@@ -93,7 +93,7 @@ export default function Home() {
               id="hero-title"
               className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
               Explore GitHub images
-              <span className="block bg-gradient-to-r from-chart-1 via-chart-4 to-chart-2 bg-clip-text text-transparent">
+              <span className="block bg-linear-to-r from-chart-1 via-chart-4 to-chart-2 bg-clip-text text-transparent">
                 filter, preview, and download in one place
               </span>
             </h1>

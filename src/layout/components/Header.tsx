@@ -50,7 +50,7 @@ export default function Header(
         data-slot="header"
         className={cn(
           'flex flex-col',
-          'w-full max-w-screen-xl group-[wide]:max-w-full h-full mx-auto py-2 px-4 sm:px-6',
+          'w-full max-w-7xl group-[wide]:max-w-full h-full mx-auto py-2 px-4 sm:px-6',
         )}>
         <div className="flex items-center justify-between min-h-10">
           <div data-slot="header-title" className="flex-1 items-center">
