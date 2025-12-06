@@ -1,4 +1,4 @@
-import {Suspense, lazy, useEffect} from 'react'
+import {Suspense, lazy, useEffect, useMemo} from 'react'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
 import {useSettingStore} from '@/stores/settingStore'
 
@@ -6,21 +6,29 @@ const BaseLayout = lazy(() => import('@/layout/BaseLayout'))
 const Home = lazy(() => import('@/pages/Home'))
 const RepoView = lazy(() => import('@/pages/RepoView'))
 
+/**
+ * Apply theme to document root
+ */
+function applyTheme(theme: 'light' | 'dark'): void {
+  const root = document.documentElement
+  root.classList.remove('light', 'dark')
+  root.classList.add(theme)
+}
+
 function App() {
   const theme = useSettingStore(state => state.theme)
 
   useEffect(() => {
-    const applyTheme = (currentTheme: typeof theme) => {
-      const root = document.documentElement
-      root.classList.remove('light', 'dark')
-      root.classList.add(currentTheme)
-    }
-
     applyTheme(theme)
   }, [theme])
 
+  const loadingFallback = useMemo(
+    () => <div className="loading" aria-label="Loading application" />,
+    [],
+  )
+
   return (
-    <Suspense fallback={<div className="loading"></div>}>
+    <Suspense fallback={loadingFallback}>
       <Router>
         <Routes>
           <Route element={<BaseLayout />}>

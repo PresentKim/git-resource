@@ -21,6 +21,97 @@ import {useSettingStore} from '@/stores/settingStore'
 import {downloadImagesAsZip, isMcmetaFile, cn} from '@/utils'
 import {Download as DownloadIcon, Loader as LoaderIcon} from 'lucide-react'
 
+/**
+ * Parse filter string into include and exclude filters
+ */
+function parseFilters(filter: string): {
+  includeFilters: string[]
+  excludeFilters: string[]
+} {
+  const rawFilters = filter.trim().split(/\s+/).filter(Boolean)
+  const include: string[] = []
+  const exclude: string[] = []
+
+  for (const term of rawFilters) {
+    if (term.startsWith('-')) {
+      const excludeTerm = term.slice(1).trim()
+      if (excludeTerm) {
+        exclude.push(excludeTerm)
+      }
+    } else {
+      include.push(term)
+    }
+  }
+
+  return {includeFilters: include, excludeFilters: exclude}
+}
+
+/**
+ * Filter image paths based on include and exclude filters
+ */
+function filterImagePaths(
+  paths: string[],
+  includeFilters: string[],
+  excludeFilters: string[],
+): string[] {
+  if (includeFilters.length === 0 && excludeFilters.length === 0) {
+    return paths
+  }
+
+  return paths.filter(path => {
+    const lowerPath = path.toLowerCase()
+
+    // All include filters must match (AND logic)
+    if (includeFilters.length > 0) {
+      const allIncludeMatch = includeFilters.every(term =>
+        lowerPath.includes(term.toLowerCase()),
+      )
+      if (!allIncludeMatch) {
+        return false
+      }
+    }
+
+    // Path must not match any exclude filter
+    if (excludeFilters.length > 0) {
+      const matchesExclude = excludeFilters.some(term =>
+        lowerPath.includes(term.toLowerCase()),
+      )
+      if (matchesExclude) {
+        return false
+      }
+    }
+
+    return true
+  })
+}
+
+/**
+ * Separate image files and mcmeta files
+ */
+function separateImageFiles(
+  imageFiles: GithubImageFileTree | null,
+): {
+  imageOnlyFiles: string[] | null
+  mcmetaPaths: Set<string>
+} {
+  if (!imageFiles) {
+    return {imageOnlyFiles: null, mcmetaPaths: new Set<string>()}
+  }
+
+  const mcmeta = new Set<string>()
+  const images: string[] = []
+
+  for (const path of imageFiles) {
+    if (isMcmetaFile(path)) {
+      mcmeta.add(path)
+    } else {
+      images.push(path)
+    }
+  }
+
+  return {imageOnlyFiles: images, mcmetaPaths: mcmeta}
+}
+
 export default function RepoView() {
   const [filter] = useFilterQuery()
   const [repo, setTargetRepository] = useTargetRepository()
@@ -36,95 +127,46 @@ export default function RepoView() {
   const gridBackground = useSettingStore(state => state.gridBackground)
 
   // Separate image files and mcmeta files
-  const {imageOnlyFiles, mcmetaPaths} = useMemo(() => {
-    if (!imageFiles) {
-      return {imageOnlyFiles: null, mcmetaPaths: new Set<string>()}
-    }
-    const mcmeta = new Set<string>()
-    const images: string[] = []
-
-    for (const path of imageFiles) {
-      if (isMcmetaFile(path)) {
-        mcmeta.add(path)
-      } else {
-        images.push(path)
-      }
-    }
-
-    return {imageOnlyFiles: images, mcmetaPaths: mcmeta}
-  }, [imageFiles])
+  const {imageOnlyFiles, mcmetaPaths} = useMemo(
+    () => separateImageFiles(imageFiles),
+    [imageFiles],
+  )
 
   const totalCount = imageOnlyFiles?.length ?? 0
   const [downloadProgress, setDownloadProgress] = useState<number | null>(null)
 
-  // Optimize filter parsing: separate include and exclude filters
-  const {includeFilters, excludeFilters} = useMemo(() => {
-    const rawFilters = filter.split(' ').filter(Boolean)
-    const include: string[] = []
-    const exclude: string[] = []
-
-    for (const f of rawFilters) {
-      if (f.startsWith('-')) {
-        const excludeTerm = f.slice(1)
-        if (excludeTerm) {
-          exclude.push(excludeTerm)
-        }
-      } else {
-        include.push(f)
-      }
-    }
-
-    return {includeFilters: include, excludeFilters: exclude}
-  }, [filter])
+  // Parse filters
+  const {includeFilters, excludeFilters} = useMemo(
+    () => parseFilters(filter),
+    [filter],
+  )
 
   useEffect(() => {
     if (!repo.ref) {
       getDefaultBranch(repo)
-        .then(defaultBranch =>
-          setTargetRepository(repo.owner, repo.name, defaultBranch),
-        )
-        .catch(setError)
+        .then(defaultBranch => {
+          setError(null)
+          setTargetRepository(repo.owner, repo.name, defaultBranch)
+        })
+        .catch(err => {
+          setError(err instanceof Error ? err : new Error(String(err)))
+        })
     } else {
       getImagePaths(repo)
-        .then(imageFileTree => setImageFiles(imageFileTree))
-        .catch(setError)
+        .then(imageFileTree => {
+          setError(null)
+          setImageFiles(imageFileTree)
+        })
+        .catch(err => {
+          setError(err instanceof Error ? err : new Error(String(err)))
+        })
     }
   }, [repo, getDefaultBranch, getImagePaths, setTargetRepository])
 
-  // Optimized filtering algorithm
+  // Filter image files
   const filteredImageFiles = useMemo(() => {
     if (!imageOnlyFiles) return null
-
-    // Early return if no filters
-    if (includeFilters.length === 0 && excludeFilters.length === 0) {
-      return imageOnlyFiles
-    }
-
-    return imageOnlyFiles.filter(path => {
-      const lowerPath = path.toLowerCase()
-
-      // All include filters must match (AND logic)
-      if (includeFilters.length > 0) {
-        const allIncludeMatch = includeFilters.every(term =>
-          lowerPath.includes(term.toLowerCase()),
-        )
-        if (!allIncludeMatch) {
-          return false
-        }
-      }
-
-      // Path must not match any exclude filter
-      if (excludeFilters.length > 0) {
-        const matchesExclude = excludeFilters.some(term =>
-          lowerPath.includes(term.toLowerCase()),
-        )
-        if (matchesExclude) {
-          return false
-        }
-      }
-
-      return true
-    })
+    return filterImagePaths(imageOnlyFiles, includeFilters, excludeFilters)
   }, [imageOnlyFiles, includeFilters, excludeFilters])
 
   const handleImageClick = useCallback((index: number) => {
@@ -155,10 +197,13 @@ export default function RepoView() {
         const percent = Math.round((completed / total) * 100)
         setDownloadProgress(percent)
       })
-    } finally {
       setDownloadProgress(100)
       // Briefly show 100%, then reset
       setTimeout(() => setDownloadProgress(null), 500)
+    } catch (error) {
+      console.error('Failed to download images:', error)
+      setDownloadProgress(null)
+      // Optionally show error to user
     }
   }, [repo, filteredImageFiles])
   const [isDownloading, downloadAll] = usePromise(downloadFilteredImages)

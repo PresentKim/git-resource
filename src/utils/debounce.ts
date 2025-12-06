@@ -1,15 +1,33 @@
+/**
+ * Creates a debounced function that delays invoking the provided function
+ * until after the specified delay has elapsed since the last time it was invoked.
+ *
+ * @param fn The function to debounce
+ * @param delay The delay in milliseconds
+ * @returns A debounced version of the function with a cancel method
+ */
 export function debounce<T extends unknown[]>(
   fn: (...args: T) => void,
   delay: number,
-) {
-  let timeout: NodeJS.Timeout | null = null
+): ((...args: T) => void) & {cancel: () => void} {
+  let timeoutId: ReturnType<typeof setTimeout> | null = null
 
-  return (...args: T) => {
-    if (timeout) {
-      clearTimeout(timeout)
+  const debouncedFn = (...args: T) => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId)
     }
-    timeout = setTimeout(() => {
+    timeoutId = setTimeout(() => {
       fn(...args)
+      timeoutId = null
     }, delay)
   }
+
+  debouncedFn.cancel = () => {
+    if (timeoutId !== null) {
+      clearTimeout(timeoutId)
+      timeoutId = null
+    }
+  }
+
+  return debouncedFn
 }

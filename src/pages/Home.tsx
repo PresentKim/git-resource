@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import {Shuffle} from 'lucide-react'
 
 import {Button} from '@/components/ui/button'
@@ -7,44 +7,76 @@ import {RepoInput} from '@/components/RepoInput'
 import {useTargetRepository} from '@/hooks/useTargetRepository'
 
 const EXAMPLE_REPO_COUNT = 5
+const REROLL_ANIMATION_DURATION_MS = 200
+
+type ExampleRepository = [string, string, string]
+
+/**
+ * Fisher-Yates shuffle algorithm for better randomness
+ */
+function shuffleArray<T>(array: T[]): T[] {
+  const shuffled = [...array]
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
+  }
+  return shuffled
+}
+
+/**
+ * Pick random examples from a list
+ */
+function pickRandomExamples(
+  list: ExampleRepository[],
+  count: number,
+): ExampleRepository[] {
+  if (list.length <= count) {
+    return shuffleArray(list)
+  }
+  return shuffleArray(list).slice(0, count) as ExampleRepository[]
+}
 
 export default function Home() {
   const [, setTargetRepository] = useTargetRepository()
   const [exampleRepositories, setExampleRepositories] = useState<
-    [string, string, string][]
+    ExampleRepository[]
   >([])
   const [shuffledExampleRepositories, setShuffledExampleRepositories] =
-    useState<[string, string, string][]>([])
+    useState<ExampleRepository[]>([])
   const [isRerolling, setIsRerolling] = useState(false)
   const [rerollKey, setRerollKey] = useState(0)
 
-  const pickRandomExamples = (
-    list: [string, string, string][],
-  ): [string, string, string][] => {
-    return [...list]
-      .sort(() => Math.random() - 0.5)
-      .slice(0, EXAMPLE_REPO_COUNT) as [string, string, string][]
-  }
-
   useEffect(() => {
-    import('@/utils/example-repositories.json').then(module => {
-      const loaded = module.default as [string, string, string][]
-      setExampleRepositories(loaded)
-      setShuffledExampleRepositories(pickRandomExamples(loaded))
-    })
+    const loadExampleRepositories = async () => {
+      try {
+        const module = await import('@/utils/example-repositories.json')
+        const loaded = module.default as ExampleRepository[]
+        setExampleRepositories(loaded)
+        setShuffledExampleRepositories(
+          pickRandomExamples(loaded, EXAMPLE_REPO_COUNT),
+        )
+      } catch (error) {
+        console.error('Failed to load example repositories:', error)
+      }
+    }
+
+    loadExampleRepositories()
   }, [])
 
-  const handleRerollExamples = () => {
+  const handleRerollExamples = useCallback(() => {
     if (!exampleRepositories.length) return
+
     setIsRerolling(true)
     setRerollKey(prev => prev + 1)
-    
+
     // 페이드 아웃 후 새 리스트 설정
     setTimeout(() => {
-      setShuffledExampleRepositories(pickRandomExamples(exampleRepositories))
+      setShuffledExampleRepositories(
+        pickRandomExamples(exampleRepositories, EXAMPLE_REPO_COUNT),
+      )
       setIsRerolling(false)
-    }, 200)
-  }
+    }, REROLL_ANIMATION_DURATION_MS)
+  }, [exampleRepositories])
 
   return (
     <section
@@ -136,24 +168,27 @@ export default function Home() {
             }`}
             role="list"
             aria-label="Example repositories">
-            {shuffledExampleRepositories.map(([owner, name, ref], index) => (
-              <Button
-                key={`${rerollKey}-${index}`}
-                role="listitem"
-                variant="outline"
-                size="sm"
-                className="flex h-9 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap border-border/60 bg-background/40 text-xs font-normal text-muted-foreground transition-all duration-300 hover:bg-accent/20 hover:text-foreground hover:scale-[1.02] animate-fade-in-slide"
-                style={{
-                  animationDelay: `${index * 50}ms`,
-                  opacity: 0,
-                }}
-                onClick={() => setTargetRepository(owner, name, ref)}
-                aria-label={`Open example repository ${owner}/${name}`}>
-                <span className="font-mono">
-                  {owner}/{name}
-                </span>
-              </Button>
-            ))}
+            {shuffledExampleRepositories.map(([owner, name, ref], index) => {
+              const handleClick = () => setTargetRepository(owner, name, ref)
+              const displayName = `${owner}/${name}`
+
+              return (
+                <Button
+                  key={`${rerollKey}-${index}`}
+                  role="listitem"
+                  variant="outline"
+                  size="sm"
+                  className="flex h-9 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap border-border/60 bg-background/40 text-xs font-normal text-muted-foreground transition-all duration-300 hover:bg-accent/20 hover:text-foreground hover:scale-[1.02] animate-fade-in-slide"
+                  style={{
+                    animationDelay: `${index * 50}ms`,
+                    opacity: 0,
+                  }}
+                  onClick={handleClick}
+                  aria-label={`Open example repository ${displayName}`}>
+                  <span className="font-mono">{displayName}</span>
+                </Button>
+              )
+            })}
           </div>
         </div>
       </div>

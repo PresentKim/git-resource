@@ -38,38 +38,55 @@ export function createGithubRepo(
 }
 
 /**
+ * Clean GitHub URL input by removing protocol, domain, and trailing characters
+ */
+function cleanGithubUrlInput(url: string): string {
+  return url
+    .trim()
+    .replace(/^(?:https?:\/\/)?(?:www\.)?(git@|github\.com)?[/:]?/i, '')
+    .replace(/(\/|\?.+|\.git)$/i, '')
+    .trim()
+}
+
+/**
+ * GitHub URL patterns supported:
+ * - owner/repo
+ * - owner/repo@ref
+ * - owner/repo/@ref
+ * - owner/repo/ref
+ * - owner/repo/tree/ref
+ * - owner/repo/commit/ref
+ */
+const GITHUB_URL_REGEX =
+  /^(?<owner>[a-z0-9_-]+)\/(?<repo>[a-z0-9_-]+)(?:\/tree\/|\/commit\/|\/?@|\/)?(?<ref>[a-z0-9/_.-]+)?$/i
+
+/**
  * Parse a GitHub URL into a GithubRepo object
  *
  * @param url The GitHub URL to parse
  * @returns The parsed GithubRepo object, or null if the URL is invalid
  */
 export function parseGithubUrl(url: string): GithubRepo | null {
-  // Remove http://github.com or https://github.com or git@github.com: from the input, and remove .git or / on end
-  const cleanInput = url
-    .trim()
-    .replace(/^(?:https?:\/\/)?(?:www\.)?(git@|github\.com)?[/:]?/i, '')
-    .replace(/(\/|\?.+|\.git)$/i, '')
-    .trim()
+  if (!url || typeof url !== 'string') {
+    return null
+  }
 
-  /**
-   * Validate the input field is in the correct format
-   *
-   * Supports the following formats:
-   * - owner/repo
-   * - owner/repo@ref
-   * - owner/repo/@ref
-   * - owner/repo/ref
-   * - owner/repo/tree/ref
-   * - owner/repo/commit/ref
-   */
-  const regexMatch = cleanInput.match(
-    /^(?<owner>[a-z0-9_-]+)\/(?<repo>[a-z0-9_-]+)(?:\/tree\/|\/commit\/|\/?@|\/)?(?<ref>[a-z0-9/_.-]+)?$/i,
-  )
-  if (!regexMatch || !regexMatch.groups) {
+  const cleanInput = cleanGithubUrlInput(url)
+  if (!cleanInput) {
+    return null
+  }
+
+  const regexMatch = cleanInput.match(GITHUB_URL_REGEX)
+  if (!regexMatch?.groups) {
     return null
   }
 
   const {owner, repo, ref} = regexMatch.groups
+
+  // Validate owner and repo are present
+  if (!owner || !repo) {
+    return null
+  }
 
   return createGithubRepo(owner, repo, ref || '')
 }

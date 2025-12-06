@@ -26,70 +26,103 @@ interface SettingsStore {
   setGridBackground: (background: GridBackground) => void
 }
 
-const getColumnCount = () => {
-  return Number(localStorage.getItem(COLUMN_COUNT_KEY) || 0)
+// LocalStorage keys
+const STORAGE_KEYS = {
+  GITHUB_TOKEN: 'settings.token',
+  COLUMN_COUNT: 'settings.columnCount',
+  PIXELATED: 'settings.pixelated',
+  ANIMATION_ENABLED: 'settings.animationEnabled',
+  THEME: 'settings.theme',
+  GRID_BACKGROUND: 'settings.gridBackground',
+} as const
+
+// Constants
+const ASPECT_ITEM_SIZE = 64
+const MIN_COLUMN_COUNT = 1
+
+/**
+ * Get column count from localStorage
+ */
+const getColumnCount = (): number => {
+  const stored = localStorage.getItem(STORAGE_KEYS.COLUMN_COUNT)
+  return Number(stored || 0)
 }
 
-const calcColumnCount = () => {
-  const ASPECT_ITEM_SIZE = 64
+/**
+ * Calculate column count based on window width
+ */
+const calculateColumnCount = (): number => {
   const calculatedColumns = Math.floor(window.innerWidth / ASPECT_ITEM_SIZE)
-  return Math.max(1, calculatedColumns)
+  return Math.max(MIN_COLUMN_COUNT, calculatedColumns)
+}
+/**
+ * Get initial theme from localStorage with migration support
+ */
+const getInitialTheme = (): Theme => {
+  const stored = localStorage.getItem(STORAGE_KEYS.THEME) as Theme | 'system' | null
+  // Migrate 'system' to 'dark'
+  if (stored === 'system' || !stored) {
+    return 'dark'
+  }
+  return stored
 }
 
-const GITHUB_TOKEN_KEY = 'settings.token'
-const COLUMN_COUNT_KEY = 'settings.columnCount'
-const PIXELATED_KEY = 'settings.pixelated'
-const ANIMATION_ENABLED_KEY = 'settings.animationEnabled'
-const THEME_KEY = 'settings.theme'
-const GRID_BACKGROUND_KEY = 'settings.gridBackground'
+/**
+ * Get boolean value from localStorage
+ */
+const getBooleanFromStorage = (key: string, defaultValue: boolean): boolean => {
+  const stored = localStorage.getItem(key)
+  if (stored === null) return defaultValue
+  return stored !== 'false'
+}
+
 export const useSettingStore = create<SettingsStore>((set, get) => ({
-  githubToken: localStorage.getItem(GITHUB_TOKEN_KEY) || '',
-  setGithubToken: githubToken => {
+  githubToken: localStorage.getItem(STORAGE_KEYS.GITHUB_TOKEN) || '',
+  setGithubToken: (githubToken: string) => {
     set({githubToken})
-    localStorage.setItem(GITHUB_TOKEN_KEY, githubToken)
+    localStorage.setItem(STORAGE_KEYS.GITHUB_TOKEN, githubToken)
   },
 
   columnCount: getColumnCount(),
-  setColumnCount: columnCount => {
+  setColumnCount: (columnCount: number) => {
     set({columnCount})
     get().updateFilledColumnCount()
-    localStorage.setItem(COLUMN_COUNT_KEY, columnCount.toString())
+    localStorage.setItem(STORAGE_KEYS.COLUMN_COUNT, columnCount.toString())
   },
-  filledColumnCount: getColumnCount() || calcColumnCount(),
+  filledColumnCount: getColumnCount() || calculateColumnCount(),
   updateFilledColumnCount: () => {
-    set({filledColumnCount: get().columnCount || calcColumnCount()})
+    set({
+      filledColumnCount: get().columnCount || calculateColumnCount(),
+    })
   },
 
-  pixelated: localStorage.getItem(PIXELATED_KEY) !== 'false',
+  pixelated: getBooleanFromStorage(STORAGE_KEYS.PIXELATED, true),
   setPixelated: (pixelated: boolean) => {
     set({pixelated})
-    localStorage.setItem(PIXELATED_KEY, pixelated.toString())
+    localStorage.setItem(STORAGE_KEYS.PIXELATED, pixelated.toString())
   },
 
-  animationEnabled: localStorage.getItem(ANIMATION_ENABLED_KEY) !== 'false',
+  animationEnabled: getBooleanFromStorage(STORAGE_KEYS.ANIMATION_ENABLED, true),
   setAnimationEnabled: (animationEnabled: boolean) => {
     set({animationEnabled})
-    localStorage.setItem(ANIMATION_ENABLED_KEY, animationEnabled.toString())
+    localStorage.setItem(
+      STORAGE_KEYS.ANIMATION_ENABLED,
+      animationEnabled.toString(),
+    )
   },
 
-  theme: (() => {
-    const stored = localStorage.getItem(THEME_KEY) as Theme | 'system' | null
-    // Migrate 'system' to 'dark'
-    if (stored === 'system' || !stored) {
-      return 'dark'
-    }
-    return stored
-  })(),
+  theme: getInitialTheme(),
   setTheme: (theme: Theme) => {
     set({theme})
-    localStorage.setItem(THEME_KEY, theme)
+    localStorage.setItem(STORAGE_KEYS.THEME, theme)
   },
 
   gridBackground:
-    (localStorage.getItem(GRID_BACKGROUND_KEY) as GridBackground) || 'auto',
+    (localStorage.getItem(STORAGE_KEYS.GRID_BACKGROUND) as GridBackground) ||
+    'auto',
   setGridBackground: (background: GridBackground) => {
     set({gridBackground: background})
-    localStorage.setItem(GRID_BACKGROUND_KEY, background)
+    localStorage.setItem(STORAGE_KEYS.GRID_BACKGROUND, background)
   },
 }))
 

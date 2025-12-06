@@ -4,6 +4,18 @@ interface VirtualGridResult {
   visibleIndexs: number[]
 }
 
+/**
+ * Calculate virtual grid properties for efficient rendering
+ *
+ * @param itemCount Total number of items
+ * @param columnCount Number of columns in the grid
+ * @param visibleHeight Height of the visible viewport
+ * @param itemSize Size of each item (including gap)
+ * @param gap Gap between items
+ * @param scrollOffset Current scroll offset
+ * @param overscan Number of additional rows to render beyond visible area
+ * @returns Virtual grid calculation results
+ */
 function useVirtualGrid(
   itemCount: number,
   columnCount: number,

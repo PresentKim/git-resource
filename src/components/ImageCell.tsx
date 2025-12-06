@@ -3,6 +3,56 @@ import {LoaderCircleIcon} from 'lucide-react'
 import {type GithubRepo, createRawImageUrl, cn, getMcmetaPath} from '@/utils'
 import {AnimatedSprite} from './AnimatedSprite'
 
+/**
+ * Parse image path to extract directory and filename parts
+ */
+function parseImagePath(path: string): {directory: string; filename: string} {
+  // Remove file extension
+  const pathWithoutExt = path.replace(/\.[^/.]+$/, '')
+  const parts = pathWithoutExt.split('/')
+
+  if (parts.length < 2) {
+    return {directory: '', filename: parts[0] || path}
+  }
+
+  return {
+    directory: parts[parts.length - 2] || '',
+    filename: parts[parts.length - 1] || '',
+  }
+}
+
+/**
+ * Overlay component showing image path information
+ */
+function ImagePathOverlay({path}: {path: string}) {
+  const {directory, filename} = parseImagePath(path)
+
+  if (!directory && !filename) {
+    return null
+  }
+
+  return (
+    <div
+      className={cn(
+        'absolute inset-0 overflow-hidden',
+        'flex flex-wrap justify-start items-end',
+        'text-xs break-all',
+        'backdrop-blur-xs backdrop-opacity-60',
+        'size-full px-1 py-0.5 cursor-pointer select-none',
+        'opacity-0 hover:opacity-100 transition-all',
+        'overlay-bg',
+      )}>
+      {directory && (
+        <>
+          <span>{directory}</span>
+          <span>/</span>
+        </>
+      )}
+      <span>{filename}</span>
+    </div>
+  )
+}
+
 interface ImageCellProps {
   repo: GithubRepo
   path: string
@@ -100,34 +150,7 @@ const ImageCell = memo(function ImageCell({
           />
         </>
       )}
-      <div
-        className={cn(
-          'absolute inset-0 overflow-hidden',
-          'flex flex-wrap justify-start items-end',
-          'text-xs break-all',
-          'backdrop-blur-xs backdrop-opacity-60',
-          'size-full px-1 py-0.5 cursor-pointer select-none',
-          'opacity-0 hover:opacity-100 transition-all',
-          'overlay-bg',
-        )}>
-        <span>
-          {
-            path
-              .replace(/\.[^/.]+$/, '')
-              .split('/')
-              .slice(-2)[0]
-          }
-        </span>
-        <span>/</span>
-        <span>
-          {
-            path
-              .replace(/\.[^/.]+$/, '')
-              .split('/')
-              .slice(-2)[1]
-          }
-        </span>
-      </div>
+      <ImagePathOverlay path={path} />
     </div>
   )
 })

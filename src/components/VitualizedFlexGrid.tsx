@@ -1,11 +1,11 @@
-import {useRef} from 'react'
+import {useRef, useMemo} from 'react'
 import {useVisibleHeight} from '@/hooks/useVisibleHeight'
 import {useScrollOffset} from '@/hooks/useScrollOffset'
 import {useVirtualGrid} from '@/hooks/useVirtualGrid'
 import {cn} from '@/utils'
 import {useItemSize} from '@/hooks/useItemSize'
 
-type RenderData<T> = {index: number; item: T}
+export type RenderData<T> = {index: number; item: T}
 
 interface VirtualizedFlexGridProps<T> {
   items: T[]
@@ -16,11 +16,17 @@ interface VirtualizedFlexGridProps<T> {
   overscan?: number // Additional rows to render beyond the visible area
 }
 
+const DEFAULT_GAP = 10
+const DEFAULT_OVERSCAN = 0
+
+/**
+ * Virtualized flex grid component for efficient rendering of large lists
+ */
 function VirtualizedFlexGrid<T>({
   items,
   columnCount,
-  overscan = 0,
-  gap = 10,
+  overscan = DEFAULT_OVERSCAN,
+  gap = DEFAULT_GAP,
   render,
   className,
 }: VirtualizedFlexGridProps<T>) {
@@ -40,33 +46,47 @@ function VirtualizedFlexGrid<T>({
     overscan,
   )
 
+  const containerStyle = useMemo(
+    () => ({
+      paddingTop: offsetTop,
+      height: totalHeight,
+    }),
+    [offsetTop, totalHeight],
+  )
+
+  const flexBasisStyle = useMemo(
+    () => `calc(100% / ${columnCount} - ${gap}px)`,
+    [columnCount, gap],
+  )
+
   return (
     <div
       ref={wrapperRef}
       className={cn('relative w-full', className)}
-      style={{
-        paddingTop: offsetTop,
-        height: totalHeight,
-      }}>
+      style={containerStyle}>
       <div
         ref={containerRef}
         className="flex flex-wrap items-start"
-        style={{
-          gap: gap,
-        }}>
-        {visibleIndexs.map(originalIndex => (
-          <div
-            key={originalIndex}
-            style={{
-              flexBasis: `calc(100% / ${columnCount} - ${gap}px)`,
-            }}>
-            {render({index: originalIndex, item: items[originalIndex]})}
-          </div>
-        ))}
+        style={{gap}}>
+        {visibleIndexs.map(originalIndex => {
+          const item = items[originalIndex]
+          if (item === undefined) {
+            return null
+          }
+
+          return (
+            <div
+              key={originalIndex}
+              style={{
+                flexBasis: flexBasisStyle,
+              }}>
+              {render({index: originalIndex, item})}
+            </div>
+          )
+        })}
       </div>
     </div>
   )
 }
 
-export type {RenderData}
 export {VirtualizedFlexGrid}
