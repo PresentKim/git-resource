@@ -102,7 +102,7 @@ export default function RepoView() {
 
     return imageOnlyFiles.filter(path => {
       const lowerPath = path.toLowerCase()
-      
+
       // All include filters must match (AND logic)
       if (includeFilters.length > 0) {
         const allIncludeMatch = includeFilters.every(term =>
@@ -235,9 +235,30 @@ export default function RepoView() {
           <p className="max-w-xl text-xs text-muted-foreground">
             {error.message}
           </p>
-          <div className="flex flex-wrap items-center justify-center gap-2 text-xs text-muted-foreground">
-            <span>· Check that the repository URL is valid and public.</span>
-            <span>· You may have hit the GitHub API rate limit.</span>
+          <div className="flex flex-col items-center gap-2 text-xs text-muted-foreground">
+            {error.message.includes('403') ? (
+              <>
+                <span>· You have hit the GitHub API rate limit.</span>
+                <span>
+                  · Please wait a moment and try again, or add a GitHub Personal
+                  Access Token in settings.
+                </span>
+              </>
+            ) : error.message.includes('404') ? (
+              <>
+                <span>
+                  · Check that the repository URL is valid and public.
+                </span>
+                <span>· The repository may not exist or may be private.</span>
+              </>
+            ) : (
+              <>
+                <span>
+                  · Check that the repository URL is valid and public.
+                </span>
+                <span>· You may have hit the GitHub API rate limit.</span>
+              </>
+            )}
           </div>
           <Button
             size="sm"
@@ -276,7 +297,7 @@ export default function RepoView() {
             </div>
           </div>
         </div>
-      ) : !filteredImageFiles || !filteredImageFiles.length ? (
+      ) : !error && (!filteredImageFiles || !filteredImageFiles.length) ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border/60 bg-card/40 p-6 text-center">
           <RandomMessageLoader provider={generateNoImagesMessage} />
           <div className="space-y-2 text-xs text-muted-foreground">
@@ -287,7 +308,7 @@ export default function RepoView() {
             </ul>
           </div>
         </div>
-      ) : (
+      ) : !error && filteredImageFiles && filteredImageFiles.length > 0 ? (
         <>
           <div role="region" aria-label="Image gallery" aria-live="polite">
             <VirtualizedFlexGrid
@@ -299,19 +320,17 @@ export default function RepoView() {
               className={pixelated ? 'pixelated' : ''}
             />
           </div>
-          {filteredImageFiles && (
-            <ImageViewer
-              open={viewerOpen}
-              onOpenChange={setViewerOpen}
-              images={filteredImageFiles}
-              currentIndex={viewerIndex}
-              repo={repo}
-              onIndexChange={setViewerIndex}
-              mcmetaPaths={mcmetaPaths}
-            />
-          )}
+          <ImageViewer
+            open={viewerOpen}
+            onOpenChange={setViewerOpen}
+            images={filteredImageFiles}
+            currentIndex={viewerIndex}
+            repo={repo}
+            onIndexChange={setViewerIndex}
+            mcmetaPaths={mcmetaPaths}
+          />
         </>
-      )}
+      ) : null}
     </section>
   )
 }
