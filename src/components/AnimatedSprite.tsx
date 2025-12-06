@@ -52,6 +52,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
   speed = 1,
 }: AnimatedSpriteProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
+  const containerRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement | null>(null)
   const animationStateRef = useRef<AnimationState | null>(null)
   const animationFrameRef = useRef<number>(0)
@@ -60,6 +61,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
+  const [isVisible, setIsVisible] = useState(true)
 
   // Calculate mcmeta URL
   const mcmetaUrl = mcmetaSrc ?? `${src}.mcmeta`
@@ -118,7 +120,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
         : 0
       lastTimeRef.current = currentTime
 
-      if (!paused && state.animation.frames.length > 1) {
+      if (!paused && isVisible && state.animation.frames.length > 1) {
         // Update tick accumulator
         state.tickAccumulator += (deltaTime / TICK_MS) * speed
 
@@ -163,7 +165,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
         animationFrameRef.current = requestAnimationFrame(animateRef.current)
       }
     },
-    [paused, speed, drawFrame],
+    [paused, isVisible, speed, drawFrame],
   )
 
   // Store animate function in ref
@@ -270,12 +272,39 @@ const AnimatedSprite = memo(function AnimatedSprite({
     }
   }, [src, initAnimation, onLoad, onError])
 
-  // Handle pause/resume
+  // Track visibility using IntersectionObserver
   useEffect(() => {
-    if (!paused && animationStateRef.current && animateRef.current) {
+    const container = containerRef.current
+    if (!container) return
+
+    const observer = new IntersectionObserver(
+      entries => {
+        const entry = entries[0]
+        setIsVisible(entry.isIntersecting)
+      },
+      {
+        // Start pausing when element is completely out of viewport
+        threshold: 0,
+        // Add a small root margin to pause slightly before going out of view
+        rootMargin: '50px',
+      },
+    )
+
+    observer.observe(container)
+
+    return () => {
+      observer.disconnect()
+    }
+  }, [])
+
+  // Handle pause/resume (combine manual paused prop with visibility)
+  const effectivePaused = paused || !isVisible
+
+  useEffect(() => {
+    if (!effectivePaused && animationStateRef.current && animateRef.current) {
       lastTimeRef.current = 0
       animationFrameRef.current = requestAnimationFrame(animateRef.current)
-    } else if (paused && animationFrameRef.current) {
+    } else if (effectivePaused && animationFrameRef.current) {
       cancelAnimationFrame(animationFrameRef.current)
     }
 
@@ -284,7 +313,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
         cancelAnimationFrame(animationFrameRef.current)
       }
     }
-  }, [paused])
+  }, [effectivePaused])
 
   if (error) {
     return (
@@ -296,7 +325,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
   }
 
   return (
-    <div className={cn('relative', className)}>
+    <div ref={containerRef} className={cn('relative', className)}>
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center">
           <LoaderCircleIcon className="size-6 animate-spin text-muted-foreground" />
