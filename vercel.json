@@ -5,6 +5,10 @@
       "destination": "https://github.com/:path*"
     },
     {
+      "source": "/proxy/raw/:path*",
+      "destination": "https://raw.githubusercontent.com/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

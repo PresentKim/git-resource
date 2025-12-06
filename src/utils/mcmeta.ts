@@ -128,7 +128,9 @@ export function isMcmetaFile(path: string): boolean {
 }
 
 // Fallback proxy URLs (in order of preference)
+// Vercel proxy is first (self-hosted, no rate limits)
 const PROXY_URLS = [
+  '/proxy/raw/',
   'https://corsproxy.io/?url=',
   'https://api.allorigins.win/raw?url=',
   'https://cors-anywhere.herokuapp.com/',
@@ -171,11 +173,11 @@ async function fetchViaGitHubApi(
   token?: string | null,
 ): Promise<McmetaData | null> {
   const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(ref)}`
-  
+
   const headers: HeadersInit = {
     Accept: 'application/vnd.github.v3+json',
   }
-  
+
   if (token) {
     headers.Authorization = `Bearer ${token}`
   }
@@ -185,15 +187,15 @@ async function fetchViaGitHubApi(
     if (!response.ok) {
       return null
     }
-    
+
     const data = await response.json()
-    
+
     // GitHub API returns base64 encoded content
     if (data.content && data.encoding === 'base64') {
       const decodedContent = atob(data.content.replace(/\s/g, ''))
       return JSON.parse(decodedContent) as McmetaData
     }
-    
+
     return null
   } catch {
     return null
@@ -212,9 +214,26 @@ async function fetchViaProxy(
   }
 
   try {
-    const proxyUrl = PROXY_URLS[proxyIndex] + encodeURIComponent(url)
+    const proxyBase = PROXY_URLS[proxyIndex]
+    let proxyUrl: string
+
+    // Vercel proxy uses relative path, extract path from full URL
+    if (proxyBase.startsWith('/')) {
+      const parsed = parseGithubRawUrl(url)
+      if (parsed) {
+        // Build relative path: /proxy/raw/owner/repo/ref/path
+        proxyUrl = `${proxyBase}${parsed.owner}/${parsed.repo}/${parsed.ref}/${parsed.path}`
+      } else {
+        // If URL parsing fails, try next proxy
+        return fetchViaProxy(url, proxyIndex + 1)
+      }
+    } else {
+      // External proxy services use full URL encoding
+      proxyUrl = proxyBase + encodeURIComponent(url)
+    }
+
     const response = await fetch(proxyUrl, {cache: 'no-store'})
-    
+
     if (!response.ok) {
       // Try next proxy if this one fails
       if (response.status === 403 || response.status === 429) {
@@ -222,7 +241,7 @@ async function fetchViaProxy(
       }
       return null
     }
-    
+
     const data = (await response.json()) as McmetaData
     return data
   } catch {
@@ -233,7 +252,8 @@ async function fetchViaProxy(
 
 /**
  * Fetch and parse mcmeta data from a URL
- * Tries GitHub API first, then falls back to proxy services
+ * Tries proxy services first to avoid GitHub API rate limits,
+ * then falls back to GitHub API if all proxies fail
  */
 export async function fetchMcmetaData(
   url: string,
@@ -244,7 +264,18 @@ export async function fetchMcmetaData(
     return mcmetaCache.get(url) ?? null
   }
 
-  // Try GitHub API first (CORS-friendly, no proxy needed)
+  // Try proxy services first to avoid GitHub API rate limits
+  try {
+    const proxyData = await fetchViaProxy(url)
+    if (proxyData) {
+      mcmetaCache.set(url, proxyData)
+      return proxyData
+    }
+  } catch {
+    // Ignore proxy errors, will try GitHub API as fallback
+  }
+
+  // Fallback to GitHub API if all proxies failed
   const parsed = parseGithubRawUrl(url)
   if (parsed) {
     const apiData = await fetchViaGitHubApi(
@@ -258,17 +289,6 @@ export async function fetchMcmetaData(
       mcmetaCache.set(url, apiData)
       return apiData
     }
-  }
-
-  // Fallback to proxy services
-  try {
-    const proxyData = await fetchViaProxy(url)
-    if (proxyData) {
-      mcmetaCache.set(url, proxyData)
-      return proxyData
-    }
-  } catch {
-    // Ignore proxy errors
   }
 
   // Cache null result to avoid retrying immediately

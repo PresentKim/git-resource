@@ -14,6 +14,22 @@ export default defineConfig(({mode}) => {
         '@': path.resolve(__dirname, 'src'),
       },
     },
+    server: {
+      proxy: {
+        // Proxy for GitHub raw files (matches Vercel rewrites)
+        '/proxy/raw': {
+          target: 'https://raw.githubusercontent.com',
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/proxy\/raw/, ''),
+        },
+        // Proxy for GitHub pages (matches Vercel rewrites)
+        '/proxy/github': {
+          target: 'https://github.com',
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/proxy\/github/, ''),
+        },
+      },
+    },
     worker: {
       format: 'es',
     },
