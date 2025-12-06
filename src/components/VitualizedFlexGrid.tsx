@@ -2,8 +2,10 @@ import {useRef, useMemo} from 'react'
 import {useVisibleHeight} from '@/hooks/useVisibleHeight'
 import {useScrollOffset} from '@/hooks/useScrollOffset'
 import {useVirtualGrid} from '@/hooks/useVirtualGrid'
+import {useAdaptiveOverscan} from '@/hooks/useAdaptiveOverscan'
 import {cn} from '@/utils'
 import {useItemSize} from '@/hooks/useItemSize'
+import {useSettingStore} from '@/stores/settingStore'
 
 export type RenderData<T> = {index: number; item: T}
 
@@ -13,11 +15,10 @@ interface VirtualizedFlexGridProps<T> {
   columnCount: number
   gap?: number
   className?: string
-  overscan?: number // Additional rows to render beyond the visible area
+  overscan?: number // Manual override for overscan (in rows). If not provided, uses adaptive overscan
 }
 
 const DEFAULT_GAP = 10
-const DEFAULT_OVERSCAN = 0
 
 /**
  * Virtualized flex grid component for efficient rendering of large lists
@@ -25,7 +26,7 @@ const DEFAULT_OVERSCAN = 0
 function VirtualizedFlexGrid<T>({
   items,
   columnCount,
-  overscan = DEFAULT_OVERSCAN,
+  overscan: manualOverscan,
   gap = DEFAULT_GAP,
   render,
   className,
@@ -35,6 +36,20 @@ function VirtualizedFlexGrid<T>({
   const visibleHeight = useVisibleHeight(wrapperRef)
   const scrollOffset = useScrollOffset(wrapperRef)
   const itemSize = useItemSize(containerRef, columnCount, gap)
+  const manualOverscanFromStore = useSettingStore(state => state.overscan)
+
+  // Use manual overscan from props, then store, then adaptive
+  const effectiveManualOverscan =
+    manualOverscan ?? manualOverscanFromStore ?? null
+
+  // Calculate adaptive overscan based on visible height and item size
+  // This ensures consistent rendering regardless of columnCount
+  const overscan = useAdaptiveOverscan(
+    effectiveManualOverscan,
+    visibleHeight,
+    itemSize + gap, // actualItemSize
+    columnCount,
+  )
 
   const {totalHeight, offsetTop, visibleIndexs} = useVirtualGrid(
     items.length,

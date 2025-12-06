@@ -368,7 +368,6 @@ export default function RepoView() {
             <VirtualizedFlexGrid
               items={filteredImageFiles}
               columnCount={columnCount}
-              overscan={5}
               gap={8}
               render={itemRenderer}
               className={pixelated ? 'pixelated' : ''}
