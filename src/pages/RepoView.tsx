@@ -1,6 +1,5 @@
 import {useCallback, useEffect, useMemo, useState} from 'react'
 
-import {RandomMessageLoader} from '@/components/RandomMessageLoader'
 import {
   VirtualizedFlexGrid,
   type RenderData,
@@ -16,11 +15,8 @@ import type {GithubImageFileTree} from '@/api/github/types'
 import {useTargetRepository} from '@/hooks/useTargetRepository'
 import {useFilterQuery} from '@/hooks/useFilterQuery'
 import {usePromise} from '@/hooks/usePromise'
-import {
-  generateBranchFetchMessage,
-  generateImageFetchMessage,
-  generateNoImagesMessage,
-} from '@/utils/randomMessages'
+import {generateNoImagesMessage} from '@/utils/randomMessages'
+import {RandomMessageLoader} from '@/components/RandomMessageLoader'
 import {useSettingStore} from '@/stores/settingStore'
 import {downloadImagesAsZip, isMcmetaFile, cn} from '@/utils'
 import {Download as DownloadIcon, Loader as LoaderIcon} from 'lucide-react'
@@ -254,24 +250,31 @@ export default function RepoView() {
       )}
 
       {isLoadRef || isLoadImagePaths ? (
-        <div className="flex flex-1 items-center justify-center rounded-xl border border-border/60 bg-card/40 p-6 sm:p-8">
-          <RandomMessageLoader
-            provider={
-              isLoadRef ? generateBranchFetchMessage : generateImageFetchMessage
-            }>
-            <div
-              className="flex flex-col items-center gap-3 text-center"
-              aria-live="polite">
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                <LoaderIcon className="size-4 animate-spin" />
-                <span>
+        <div className="flex flex-1 items-center justify-center rounded-xl border border-border/60 bg-card/40 p-8 sm:p-12">
+          <div
+            className="flex flex-col items-center gap-4 text-center max-w-md"
+            aria-live="polite">
+            <div className="flex flex-col items-center gap-3">
+              <LoaderIcon className="size-8 animate-spin text-accent" />
+              <div className="space-y-1">
+                <h2 className="text-lg font-semibold text-foreground">
                   {isLoadRef
-                    ? 'Fetching default branch...'
-                    : 'Fetching image list...'}
-                </span>
+                    ? 'Fetching default branch'
+                    : 'Fetching image list'}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {isLoadRef
+                    ? 'Detecting the default branch for this repository...'
+                    : 'Loading all image files from the repository...'}
+                </p>
               </div>
             </div>
-          </RandomMessageLoader>
+            <div className="w-full max-w-xs">
+              <div className="h-1.5 w-full rounded-full bg-muted overflow-hidden relative">
+                <div className="absolute h-full w-[30%] bg-accent animate-[loading_1.5s_ease-in-out_infinite]" />
+              </div>
+            </div>
+          </div>
         </div>
       ) : !filteredImageFiles || !filteredImageFiles.length ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border/60 bg-card/40 p-6 text-center">
