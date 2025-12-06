@@ -48,6 +48,7 @@ function parseFilters(filter: string): {
 
 /**
  * Filter image paths based on include and exclude filters
+ * Optimized: Pre-compute lowercase filters to avoid repeated toLowerCase() calls
  */
 function filterImagePaths(
   paths: string[],
@@ -58,13 +59,17 @@ function filterImagePaths(
     return paths
   }
 
+  // Pre-compute lowercase filters once
+  const lowerIncludeFilters = includeFilters.map(f => f.toLowerCase())
+  const lowerExcludeFilters = excludeFilters.map(f => f.toLowerCase())
+
   return paths.filter(path => {
     const lowerPath = path.toLowerCase()
 
     // All include filters must match (AND logic)
-    if (includeFilters.length > 0) {
-      const allIncludeMatch = includeFilters.every(term =>
-        lowerPath.includes(term.toLowerCase()),
+    if (lowerIncludeFilters.length > 0) {
+      const allIncludeMatch = lowerIncludeFilters.every(term =>
+        lowerPath.includes(term),
       )
       if (!allIncludeMatch) {
         return false
@@ -72,9 +77,9 @@ function filterImagePaths(
     }
 
     // Path must not match any exclude filter
-    if (excludeFilters.length > 0) {
-      const matchesExclude = excludeFilters.some(term =>
-        lowerPath.includes(term.toLowerCase()),
+    if (lowerExcludeFilters.length > 0) {
+      const matchesExclude = lowerExcludeFilters.some(term =>
+        lowerPath.includes(term),
       )
       if (matchesExclude) {
         return false
@@ -88,9 +93,7 @@ function filterImagePaths(
 /**
  * Separate image files and mcmeta files
  */
-function separateImageFiles(
-  imageFiles: GithubImageFileTree | null,
-): {
+function separateImageFiles(imageFiles: GithubImageFileTree | null): {
   imageOnlyFiles: string[] | null
   mcmetaPaths: Set<string>
 } {
@@ -174,18 +177,24 @@ export default function RepoView() {
     setViewerOpen(true)
   }, [])
 
+  // Create stable click handlers for each item to avoid recreating functions
+  const createItemClickHandler = useCallback(
+    (index: number) => () => handleImageClick(index),
+    [handleImageClick],
+  )
+
   const itemRenderer = useCallback(
     ({index, item}: RenderData<string>) => (
       <ImageCell
         key={index}
         repo={repo}
         path={item}
-        onClick={() => handleImageClick(index)}
+        onClick={createItemClickHandler(index)}
         mcmetaPaths={mcmetaPaths}
         animationEnabled={animationEnabled}
       />
     ),
-    [repo, handleImageClick, mcmetaPaths, animationEnabled],
+    [repo, createItemClickHandler, mcmetaPaths, animationEnabled],
   )
   const downloadFilteredImages = useCallback(async () => {
     const paths = filteredImageFiles || []

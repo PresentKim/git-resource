@@ -59,6 +59,9 @@ function VirtualizedFlexGrid<T>({
     [columnCount, gap],
   )
 
+  // Memoize gap style object to avoid recreation
+  const gapStyle = useMemo(() => ({gap}), [gap])
+
   return (
     <div
       ref={wrapperRef}
@@ -67,7 +70,7 @@ function VirtualizedFlexGrid<T>({
       <div
         ref={containerRef}
         className="flex flex-wrap items-start"
-        style={{gap}}>
+        style={gapStyle}>
         {visibleIndexs.map(originalIndex => {
           const item = items[originalIndex]
           if (item === undefined) {

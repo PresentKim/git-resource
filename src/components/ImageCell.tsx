@@ -1,23 +1,36 @@
-import {useCallback, useState, useRef, memo} from 'react'
+import {useCallback, useState, useRef, memo, useMemo} from 'react'
 import {LoaderCircleIcon} from 'lucide-react'
 import {type GithubRepo, createRawImageUrl, cn, getMcmetaPath} from '@/utils'
 import {AnimatedSprite} from './AnimatedSprite'
 
+// Cache regex to avoid recompilation
+const FILE_EXTENSION_REGEX = /\.[^/.]+$/
+
 /**
  * Parse image path to extract directory and filename parts
+ * Optimized: Use cached regex and efficient string operations
  */
 function parseImagePath(path: string): {directory: string; filename: string} {
   // Remove file extension
-  const pathWithoutExt = path.replace(/\.[^/.]+$/, '')
-  const parts = pathWithoutExt.split('/')
+  const pathWithoutExt = path.replace(FILE_EXTENSION_REGEX, '')
+  const lastSlashIndex = pathWithoutExt.lastIndexOf('/')
 
-  if (parts.length < 2) {
-    return {directory: '', filename: parts[0] || path}
+  if (lastSlashIndex === -1) {
+    return {directory: '', filename: pathWithoutExt || path}
   }
 
+  // Extract directory (parent folder name) and filename efficiently
+  const beforeLastSlash = pathWithoutExt.slice(0, lastSlashIndex)
+  const secondLastSlashIndex = beforeLastSlash.lastIndexOf('/')
+  const directory =
+    secondLastSlashIndex === -1
+      ? beforeLastSlash
+      : beforeLastSlash.slice(secondLastSlashIndex + 1)
+  const filename = pathWithoutExt.slice(lastSlashIndex + 1)
+
   return {
-    directory: parts[parts.length - 2] || '',
-    filename: parts[parts.length - 1] || '',
+    directory: directory || '',
+    filename: filename || '',
   }
 }
 
@@ -79,6 +92,12 @@ const ImageCell = memo(function ImageCell({
   const hasAnimation = mcmetaPaths?.has(mcmetaPath) ?? false
   const shouldAnimate = hasAnimation && animationEnabled
 
+  // Memoize image URL to avoid recalculation
+  const imageUrl = useMemo(
+    () => createRawImageUrl(repo, path),
+    [repo.owner, repo.name, repo.ref, path],
+  )
+
   const handleLoad = useCallback(() => {
     setLoading(false)
   }, [])
@@ -106,8 +125,6 @@ const ImageCell = memo(function ImageCell({
     },
     [onClick],
   )
-
-  const imageUrl = createRawImageUrl(repo, path)
 
   return (
     <div
@@ -146,6 +163,7 @@ const ImageCell = memo(function ImageCell({
               'size-full object-contain peer',
               loading ? 'hidden' : 'block',
             )}
+            decoding="async"
             onLoad={handleLoad}
           />
         </>
