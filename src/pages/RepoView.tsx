@@ -105,10 +105,12 @@ export default function RepoView() {
     }
 
     return imageOnlyFiles.filter(path => {
+      const lowerPath = path.toLowerCase()
+      
       // All include filters must match (AND logic)
       if (includeFilters.length > 0) {
         const allIncludeMatch = includeFilters.every(term =>
-          path.includes(term),
+          lowerPath.includes(term.toLowerCase()),
         )
         if (!allIncludeMatch) {
           return false
@@ -117,7 +119,9 @@ export default function RepoView() {
 
       // Path must not match any exclude filter
       if (excludeFilters.length > 0) {
-        const matchesExclude = excludeFilters.some(term => path.includes(term))
+        const matchesExclude = excludeFilters.some(term =>
+          lowerPath.includes(term.toLowerCase()),
+        )
         if (matchesExclude) {
           return false
         }
