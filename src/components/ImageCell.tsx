@@ -36,6 +36,7 @@ function parseImagePath(path: string): {directory: string; filename: string} {
 
 /**
  * Overlay component showing image path information
+ * Improved UX: Tooltip-style display at bottom with better readability
  */
 function ImagePathOverlay({path}: {path: string}) {
   const {directory, filename} = parseImagePath(path)
@@ -44,24 +45,36 @@ function ImagePathOverlay({path}: {path: string}) {
     return null
   }
 
+  // Get full path for tooltip/title
+  const fullPath = path
+
   return (
     <div
       className={cn(
-        'absolute inset-0 overflow-hidden',
-        'flex flex-wrap justify-start items-end',
-        'text-xs break-all',
-        'backdrop-blur-xs backdrop-opacity-60',
-        'size-full px-1 py-0.5 cursor-pointer select-none',
-        'opacity-0 hover:opacity-100 transition-all',
-        'overlay-bg',
-      )}>
-      {directory && (
-        <>
-          <span>{directory}</span>
-          <span>/</span>
-        </>
+        'absolute inset-x-0 bottom-0',
+        'bg-linear-to-t from-black/90 via-black/80 to-transparent',
+        'dark:from-black/95 dark:via-black/85',
+        'px-2 py-1.5',
+        'opacity-0 group-hover:opacity-100',
+        'transition-all duration-200 ease-out',
+        'transform translate-y-1 group-hover:translate-y-0',
+        'pointer-events-none',
       )}
-      <span>{filename}</span>
+      title={fullPath}>
+      <div className="flex flex-col gap-0.5 min-w-0">
+        {directory && (
+          <div
+            className="text-[10px] text-white/80 dark:text-white/70 truncate font-medium"
+            title={directory}>
+            {directory}
+          </div>
+        )}
+        <div
+          className="text-xs text-white dark:text-white font-semibold truncate leading-tight"
+          title={filename}>
+          {filename}
+        </div>
+      </div>
     </div>
   )
 }
@@ -130,7 +143,7 @@ const ImageCell = memo(function ImageCell({
     <div
       role="button"
       tabIndex={0}
-      className="relative aspect-square size-full ring-foreground transition-all duration-200 ease-out active:ring-2 active:rounded-xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-ring hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40"
+      className="group relative aspect-square size-full ring-foreground transition-all duration-200 ease-out active:ring-2 active:rounded-xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-ring hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40"
       onClick={onClick}
       onKeyDown={handleKeyDown}
       aria-label={`View image: ${path}`}
