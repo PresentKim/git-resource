@@ -23,7 +23,7 @@ export function FloatingHeader({
     return () => {
       window.removeEventListener('scroll', handleScroll)
     }
-  }, [setIsVisible, height])
+  }, [height])
 
   return (
     <>

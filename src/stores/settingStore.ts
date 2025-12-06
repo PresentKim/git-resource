@@ -24,9 +24,6 @@ interface SettingsStore {
 
   gridBackground: GridBackground
   setGridBackground: (background: GridBackground) => void
-
-  overscan: number | null // null = auto, number = manual override
-  setOverscan: (overscan: number | null) => void
 }
 
 // LocalStorage keys
@@ -37,7 +34,6 @@ const STORAGE_KEYS = {
   ANIMATION_ENABLED: 'settings.animationEnabled',
   THEME: 'settings.theme',
   GRID_BACKGROUND: 'settings.gridBackground',
-  OVERSCAN: 'settings.overscan',
 } as const
 
 // Constants
@@ -127,21 +123,6 @@ export const useSettingStore = create<SettingsStore>((set, get) => ({
   setGridBackground: (background: GridBackground) => {
     set({gridBackground: background})
     localStorage.setItem(STORAGE_KEYS.GRID_BACKGROUND, background)
-  },
-
-  overscan: (() => {
-    const stored = localStorage.getItem(STORAGE_KEYS.OVERSCAN)
-    if (stored === null) return null // Auto mode
-    const parsed = Number(stored)
-    return isNaN(parsed) ? null : parsed
-  })(),
-  setOverscan: (overscan: number | null) => {
-    set({overscan})
-    if (overscan === null) {
-      localStorage.removeItem(STORAGE_KEYS.OVERSCAN)
-    } else {
-      localStorage.setItem(STORAGE_KEYS.OVERSCAN, overscan.toString())
-    }
   },
 }))
 
