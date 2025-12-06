@@ -36,7 +36,10 @@ function useVirtualGrid(
 
   // Determine which row is first visible based on scrollTop
   const visibleStartRow = Math.floor(scrollOffset / actualItemSize)
-  const visibleRowCount = Math.ceil(visibleHeight / actualItemSize) + 1
+  // Use a minimum visible height to ensure initial render shows enough rows
+  // This prevents the issue where visibleHeight is 0 on initial mount
+  const effectiveVisibleHeight = visibleHeight > 0 ? visibleHeight : window.innerHeight * 0.8
+  const visibleRowCount = Math.ceil(effectiveVisibleHeight / actualItemSize) + 1
 
   // Calculate desired render range based on current scroll position
   const desiredRenderStartRow = Math.max(0, visibleStartRow - overscan)
@@ -55,6 +58,8 @@ function useVirtualGrid(
   const prevScrollOffsetRef = useRef<number>(scrollOffset)
   const prevItemCountRef = useRef<number>(itemCount)
   const prevColumnCountRef = useRef<number>(columnCount)
+  const prevVisibleHeightRef = useRef<number>(visibleHeight)
+  const isInitialMountRef = useRef<boolean>(true)
 
   // Reset when itemCount or columnCount changes
   useEffect(() => {
@@ -72,6 +77,27 @@ function useVirtualGrid(
       return () => clearTimeout(timeoutId)
     }
   }, [itemCount, columnCount, desiredStartIndex, desiredEndIndex])
+
+  // Update render range when visibleHeight changes (especially on initial mount)
+  useEffect(() => {
+    const visibleHeightChanged = prevVisibleHeightRef.current !== visibleHeight
+    prevVisibleHeightRef.current = visibleHeight
+
+    // On initial mount or when visibleHeight becomes available, ensure we render enough items
+    if (isInitialMountRef.current || (visibleHeightChanged && visibleHeight > 0)) {
+      isInitialMountRef.current = false
+      const timeoutId = setTimeout(() => {
+        // Ensure we render at least the desired range
+        if (desiredStartIndex < minRenderedIndex) {
+          setMinRenderedIndex(desiredStartIndex)
+        }
+        if (desiredEndIndex > maxRenderedIndex) {
+          setMaxRenderedIndex(desiredEndIndex)
+        }
+      }, 0)
+      return () => clearTimeout(timeoutId)
+    }
+  }, [visibleHeight, desiredStartIndex, desiredEndIndex, minRenderedIndex, maxRenderedIndex])
 
   // Expand render range unidirectionally based on scroll direction
   // Use setTimeout to defer state updates and avoid React Compiler warnings
