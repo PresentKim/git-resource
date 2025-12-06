@@ -1,4 +1,4 @@
-import {useState, useEffect} from 'react'
+import {useState, useEffect, useRef} from 'react'
 import {observerResize} from '@/utils'
 
 function useItemSize(
@@ -7,13 +7,19 @@ function useItemSize(
   gap: number,
 ) {
   const [itemSize, setItemSize] = useState(0)
+  const lastItemSizeRef = useRef<number>(0)
 
   // Calculate item size using ResizeObserver
   useEffect(() => {
     return observerResize(targetRef.current, entry => {
       const {width} = entry.contentRect
       const itemWidth = (width - gap * (columnCount - 1)) / columnCount
-      setItemSize(itemWidth)
+      // Only update if size changed significantly (threshold: 1px)
+      // This reduces unnecessary re-renders during resize
+      if (Math.abs(itemWidth - lastItemSizeRef.current) >= 1) {
+        lastItemSizeRef.current = itemWidth
+        setItemSize(itemWidth)
+      }
     })
   }, [targetRef, columnCount, gap])
 

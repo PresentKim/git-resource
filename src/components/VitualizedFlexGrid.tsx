@@ -67,6 +67,26 @@ function VirtualizedFlexGrid<T>({
   // Memoize gap style object to avoid recreation
   const gapStyle = useMemo(() => ({gap}), [gap])
 
+  // Memoize rendered items to avoid unnecessary re-renders
+  const renderedItems = useMemo(() => {
+    return visibleIndexs.map(originalIndex => {
+      const item = items[originalIndex]
+      if (item === undefined) {
+        return null
+      }
+
+      return (
+        <div
+          key={originalIndex}
+          style={{
+            flexBasis: flexBasisStyle,
+          }}>
+          {render({index: originalIndex, item})}
+        </div>
+      )
+    })
+  }, [visibleIndexs, items, flexBasisStyle, render])
+
   return (
     <div
       ref={wrapperRef}
@@ -76,22 +96,7 @@ function VirtualizedFlexGrid<T>({
         ref={containerRef}
         className="flex flex-wrap items-start"
         style={gapStyle}>
-        {visibleIndexs.map(originalIndex => {
-          const item = items[originalIndex]
-          if (item === undefined) {
-            return null
-          }
-
-          return (
-            <div
-              key={originalIndex}
-              style={{
-                flexBasis: flexBasisStyle,
-              }}>
-              {render({index: originalIndex, item})}
-            </div>
-          )
-        })}
+        {renderedItems}
       </div>
     </div>
   )
