@@ -145,7 +145,7 @@ export default function RepoView() {
     ),
     [repo, handleImageClick, mcmetaPaths, animationEnabled],
   )
-  const downloadVisibleImages = useCallback(async () => {
+  const downloadFilteredImages = useCallback(async () => {
     const paths = filteredImageFiles || []
     if (!paths.length) return
 
@@ -161,7 +161,7 @@ export default function RepoView() {
       setTimeout(() => setDownloadProgress(null), 500)
     }
   }, [repo, filteredImageFiles])
-  const [isDownloading, downloadAll] = usePromise(downloadVisibleImages)
+  const [isDownloading, downloadAll] = usePromise(downloadFilteredImages)
 
   return (
     <section
@@ -188,7 +188,7 @@ export default function RepoView() {
             {totalCount.toLocaleString()} images
           </span>
           <Button
-            aria-label="Download all currently visible images as ZIP"
+            aria-label="Download all filtered images as ZIP"
             disabled={isDownloading || !filteredImageFiles?.length}
             onClick={downloadAll}
             size="sm"
@@ -201,7 +201,7 @@ export default function RepoView() {
                   <span>
                     {downloadProgress !== null
                       ? `DOWNLOADING ${downloadProgress}%`
-                      : 'DOWNLOADING VISIBLE...'}
+                      : 'DOWNLOADING...'}
                   </span>
                 </div>
                 {downloadProgress !== null && (
@@ -218,7 +218,7 @@ export default function RepoView() {
             ) : (
               <div className="flex items-center gap-1">
                 <DownloadIcon className="size-4" />
-                <span>DOWNLOAD VISIBLE</span>
+                <span>DOWNLOAD FILTERED</span>
               </div>
             )}
           </Button>

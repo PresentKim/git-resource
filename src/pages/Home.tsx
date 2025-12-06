@@ -69,7 +69,7 @@ export default function Home() {
               Paste any public GitHub repository URL and
               <span className="font-semibold text-accent">
                 {' '}
-                browse all image assets with powerful filtering and download
+                browse all image assets with powerful filtering and download capabilities
               </span>
               .
             </p>

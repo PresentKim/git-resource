@@ -124,7 +124,7 @@ export function SettingButton() {
             <span>Viewer settings</span>
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Tune how images are loaded and rendered. These settings are stored
+            Configure how images are loaded and rendered. These settings are stored
             in your browser only.
           </DialogDescription>
         </DialogHeader>
@@ -148,7 +148,7 @@ export function SettingButton() {
                 </Label>
                 {rateLimit.limit ? (
                   <div className="text-xs text-accent">
-                    rate limit:&nbsp;
+                    Rate limit:&nbsp;
                     <span className="font-mono">
                       {rateLimit.remaining || '-'} / {rateLimit.limit || '-'}
                     </span>

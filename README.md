@@ -13,7 +13,7 @@ A single-page web app for previewing image files from a GitHub repository URL
   Filter images by including or excluding specific keywords (e.g., `keyword -exclude` format).
 
 - **Image ZIP Download**  
-  Download all currently displayed images as a ZIP file in bulk.
+  Download all filtered images as a ZIP file in bulk.
 
 - **Image Viewer**  
   Click any image to view it in full-screen. Navigate with arrow keys or mouse wheel, and download individual images.
@@ -47,7 +47,7 @@ A single-page web app for previewing image files from a GitHub repository URL
 4. Use the filter input to include/exclude images by keywords.
 5. Click on any image to view it in full-screen viewer.
 6. Use arrow keys or mouse wheel to navigate between images in the viewer.
-7. Click "Download Visible" to download all currently displayed images as a ZIP file.
+7. Click "Download Filtered" to download all filtered images as a ZIP file.
 8. Adjust settings (gear icon) to customize your experience (grid columns, pixelated rendering, animations).
 
 ## Technologies

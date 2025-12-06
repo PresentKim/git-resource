@@ -14,10 +14,10 @@ It is deployed via Vercel and utilizes **custom virtual scrolling** and **Web Wo
   Routing is implemented using React Router's BrowserRouter, and filter settings are stored in query parameters through the nuqs library, allowing the same view to be recreated when sharing a URL.
 
 - **Image Filtering**  
-  Users can filter displayed images by including or excluding specific keywords. (Example: `keyword -exclude` format)
+  Users can filter images by including or excluding specific keywords (case-insensitive). (Example: `keyword -exclude` format)
 
 - **Image ZIP Download**  
-  All currently displayed images can be downloaded as a ZIP file in bulk.
+  All filtered images can be downloaded as a ZIP file in bulk.
 
 - **Image Viewer**  
   Click on any image to view it in a full-screen viewer. Navigate between images using keyboard arrow keys or mouse wheel, and download individual images.
