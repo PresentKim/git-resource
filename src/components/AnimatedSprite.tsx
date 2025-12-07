@@ -60,6 +60,18 @@ const AnimatedSprite = memo(function AnimatedSprite({
   const [error, setError] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const githubToken = useSettingStore(state => state.githubToken)
+  const onLoadRef = useRef(onLoad)
+  const onErrorRef = useRef(onError)
+  const pausedRef = useRef(paused)
+  const isVisibleRef = useRef(isVisible)
+
+  // Update refs when values change
+  useEffect(() => {
+    onLoadRef.current = onLoad
+    onErrorRef.current = onError
+    pausedRef.current = paused
+    isVisibleRef.current = isVisible
+  }, [onLoad, onError, paused, isVisible])
 
   const mcmetaUrl = mcmetaSrc ?? `${src}.mcmeta`
 
@@ -263,6 +275,28 @@ const AnimatedSprite = memo(function AnimatedSprite({
         frameHeightPx,
         originalImageData,
       }
+
+      // Draw initial frame
+      const ctx = canvas.getContext('2d', {willReadFrequently: true})
+      if (ctx) {
+        const frame = parsedAnimation.frames[0]
+        if (frame) {
+          drawFrame(
+            ctx,
+            image,
+            frame.index,
+            frameWidthPx,
+            frameHeightPx,
+            parsedAnimation.interpolate,
+            0,
+            frame.time,
+            originalImageData,
+          )
+        }
+      }
+
+      // Don't start interval here - let useEffect handle it based on paused/isVisible
+      // This prevents re-initialization when paused/isVisible changes
     },
     [mcmetaUrl, preloadedMcmetaData, githubToken, drawFrame],
   )
@@ -272,17 +306,26 @@ const AnimatedSprite = memo(function AnimatedSprite({
     const image = new Image()
     image.crossOrigin = 'anonymous'
 
-    image.onload = () => {
+    image.onload = async () => {
       imageRef.current = image
       setLoading(false)
-      initAnimation(image)
-      onLoad?.({width: image.width, height: image.width})
+      await initAnimation(image)
+      // Start interval after animation is initialized
+      // Check current paused/visible state using refs
+      const shouldStart = !pausedRef.current && isVisibleRef.current
+      if (shouldStart && animationStateRef.current) {
+        if (intervalRef.current) {
+          clearInterval(intervalRef.current)
+        }
+        intervalRef.current = window.setInterval(handleAnimationTick, 50)
+      }
+      onLoadRef.current?.({width: image.width, height: image.width})
     }
 
     image.onerror = () => {
       setLoading(false)
       setError(true)
-      onError?.()
+      onErrorRef.current?.()
     }
 
     image.src = src
@@ -294,12 +337,18 @@ const AnimatedSprite = memo(function AnimatedSprite({
       }
       image.onload = null
       image.onerror = null
+      imageRef.current = null
+      animationStateRef.current = null
     }
-  }, [src, initAnimation, onLoad, onError])
+  }, [src, initAnimation, handleAnimationTick])
 
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
+
+    // For ImageViewer (Dialog), assume visible initially
+    // IntersectionObserver will update if needed
+    setIsVisible(true)
 
     const observer = new IntersectionObserver(
       entries => setIsVisible(entries[0].isIntersecting),
@@ -310,15 +359,17 @@ const AnimatedSprite = memo(function AnimatedSprite({
     return () => observer.disconnect()
   }, [])
 
+  // Manage animation interval when paused/visible state changes
   useEffect(() => {
+    // Clear existing interval
     if (intervalRef.current) {
       clearInterval(intervalRef.current)
       intervalRef.current = null
     }
 
+    // Restart interval if conditions are met
     if (animationStateRef.current && !paused && isVisible) {
       intervalRef.current = window.setInterval(handleAnimationTick, 50)
-      handleAnimationTick()
     }
 
     return () => {
