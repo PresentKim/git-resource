@@ -9,7 +9,7 @@ import {
   ZoomOut,
   RotateCcw,
 } from 'lucide-react'
-import {Dialog, DialogClose, DialogPortal} from '@/components/ui/dialog'
+import {Dialog, DialogPortal} from '@/components/ui/dialog'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {Button} from '@/components/ui/button'
 import {cn, createRawImageUrl, getMcmetaPath} from '@/utils'

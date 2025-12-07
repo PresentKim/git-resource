@@ -1,4 +1,4 @@
-import {memo, useCallback, useEffect, useRef, useState} from 'react'
+import {memo, useCallback, useLayoutEffect, useRef, useState} from 'react'
 
 import {Filter as FilterIcon, HelpCircle, X as XIcon} from 'lucide-react'
 import {Input} from '@/components/ui/input'
@@ -63,12 +63,17 @@ const FilterInputField = memo(
   }: FilterInputFieldProps) {
     const [localValue, setLocalValue] = useState(initialValue)
 
-    useEffect(() => {
-      setLocalValue(initialValue)
-      if (inputRef.current) {
-        inputRef.current.value = initialValue
+    // Sync localValue with initialValue when it changes
+    // Note: This pattern is necessary to sync external prop changes to internal state
+    useLayoutEffect(() => {
+      if (localValue !== initialValue) {
+        setLocalValue(initialValue)
+        if (inputRef.current) {
+          inputRef.current.value = initialValue
+        }
       }
-    }, [initialValue, inputRef])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [initialValue])
 
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLInputElement>) => {
