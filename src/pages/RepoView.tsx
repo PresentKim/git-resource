@@ -32,9 +32,11 @@ export default function RepoView() {
 
   // Get state from repoStore
   const repo = useRepoStore(state => state.repo)
+  const imageFiles = useRepoStore(state => state.imageFiles)
   const filteredImageFiles = useRepoStore(state => state.filteredImageFiles)
   const error = useRepoStore(state => state.error)
   const viewerState = useRepoStore(state => state.viewerState)
+  const isFiltering = useRepoStore(state => state.isFiltering)
   const setRepo = useRepoStore(state => state.setRepo)
   const setImageFiles = useRepoStore(state => state.setImageFiles)
   const setError = useRepoStore(state => state.setError)
@@ -179,7 +181,10 @@ export default function RepoView() {
         </div>
       )}
 
-      {isLoadRef || isLoadImagePaths ? (
+      {isLoadRef ||
+      isLoadImagePaths ||
+      isFiltering ||
+      (!error && imageFiles === null && repo.owner && repo.name) ? (
         <div className="flex flex-1 items-center justify-center rounded-xl border border-border/60 bg-card/40 p-8 sm:p-12">
           <div
             className="flex flex-col items-center gap-4 text-center max-w-md"
@@ -190,12 +195,20 @@ export default function RepoView() {
                 <h2 className="text-lg font-semibold text-foreground">
                   {isLoadRef
                     ? 'Fetching default branch'
-                    : 'Fetching image list'}
+                    : isLoadImagePaths
+                      ? 'Fetching image list'
+                      : isFiltering
+                        ? 'Filtering images'
+                        : 'Loading images'}
                 </h2>
                 <p className="text-sm text-muted-foreground">
                   {isLoadRef
                     ? 'Detecting the default branch for this repository...'
-                    : 'Loading all image files from the repository...'}
+                    : isLoadImagePaths
+                      ? 'Loading all image files from the repository...'
+                      : isFiltering
+                        ? 'Applying filters to image list...'
+                        : 'Please wait while images are being loaded...'}
                 </p>
               </div>
             </div>
@@ -206,7 +219,9 @@ export default function RepoView() {
             </div>
           </div>
         </div>
-      ) : !error && (!filteredImageFiles || !filteredImageFiles.length) ? (
+      ) : !error &&
+        imageFiles !== null &&
+        (!filteredImageFiles || !filteredImageFiles.length) ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border/60 bg-card/40 p-6 text-center">
           <RandomMessageLoader provider={generateNoImagesMessage} />
           <div className="space-y-2 text-xs text-muted-foreground">

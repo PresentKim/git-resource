@@ -104,6 +104,7 @@ interface RepoStore {
   mcmetaPaths: Set<string>
   error: Error | null
   viewerState: {open: boolean; currentIndex: number}
+  isFiltering: boolean
 
   // Actions
   setRepo: (repo: GithubRepo) => void
@@ -129,6 +130,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   mcmetaPaths: new Set<string>(),
   error: null,
   viewerState: {open: false, currentIndex: 0},
+  isFiltering: false,
 
   setRepo: (repo: GithubRepo) => {
     set({repo})
@@ -155,24 +157,42 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   updateFilteredImages: (filter: string) => {
     const {imageFiles} = get()
     if (!imageFiles) {
+      // Don't set isFiltering to false if images haven't loaded yet
+      // This allows the loading screen to remain visible
       set({filteredImageFiles: null})
       return
     }
 
-    const {imageOnlyFiles} = separateImageFiles(imageFiles)
-    if (!imageOnlyFiles) {
-      set({filteredImageFiles: null})
-      return
-    }
+    // Set loading state
+    set({isFiltering: true})
 
-    const {includeFilters, excludeFilters} = parseFilters(filter)
-    const filtered = filterImagePaths(
-      imageOnlyFiles,
-      includeFilters,
-      excludeFilters,
-    )
+    // Use requestAnimationFrame to allow UI to update before filtering
+    // This ensures the loading state is visible
+    requestAnimationFrame(() => {
+      const {imageFiles: currentImageFiles} = get()
+      if (!currentImageFiles) {
+        set({filteredImageFiles: null, isFiltering: false})
+        return
+      }
 
-    set({filteredImageFiles: filtered})
+      const {imageOnlyFiles} = separateImageFiles(currentImageFiles)
+      if (!imageOnlyFiles) {
+        set({filteredImageFiles: null, isFiltering: false})
+        return
+      }
+
+      const {includeFilters, excludeFilters} = parseFilters(filter)
+      const filtered = filterImagePaths(
+        imageOnlyFiles,
+        includeFilters,
+        excludeFilters,
+      )
+
+      // Use setTimeout to ensure loading state is visible for at least a brief moment
+      setTimeout(() => {
+        set({filteredImageFiles: filtered, isFiltering: false})
+      }, 50)
+    })
   },
 
   setError: (error: Error | null) => {
@@ -190,6 +210,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
       mcmetaPaths: new Set<string>(),
       error: null,
       viewerState: {open: false, currentIndex: 0},
+      isFiltering: false,
     })
   },
 }))
