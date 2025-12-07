@@ -61,6 +61,7 @@ export function ImageViewer({
   const imgRef = useRef<HTMLImageElement>(null)
   const currentImageRef = useRef<string | undefined>(undefined)
   const imageContainerRef = useRef<HTMLDivElement>(null)
+  const isClosingViaPopStateRef = useRef(false)
 
   // Zoom state
   const [scale, setScale] = useState(1)
@@ -327,7 +328,11 @@ export function ImageViewer({
 
   // Handle browser back button to close viewer
   useEffect(() => {
-    if (!open) return
+    if (!open) {
+      // Reset flag when viewer is closed
+      isClosingViaPopStateRef.current = false
+      return
+    }
 
     // Push state when viewer opens
     const state = {viewer: true, index: currentIndex}
@@ -335,6 +340,8 @@ export function ImageViewer({
 
     // Handle popstate (back button)
     const handlePopState = () => {
+      // Mark that we're closing via popstate
+      isClosingViaPopStateRef.current = true
       // Close the viewer when back button is pressed
       onOpenChange(false)
     }
@@ -345,6 +352,16 @@ export function ImageViewer({
       window.removeEventListener('popstate', handlePopState)
     }
   }, [open, currentIndex, onOpenChange])
+
+  // Handle manual close (X button, Escape key) - remove history entry
+  const handleClose = useCallback(() => {
+    // Only remove history if we're not closing via popstate
+    if (!isClosingViaPopStateRef.current && window.history.state?.viewer) {
+      window.history.back()
+    } else {
+      onOpenChange(false)
+    }
+  }, [onOpenChange])
 
   const handleOpenAutoFocus = useCallback((e: Event) => {
     e.preventDefault()
@@ -367,7 +384,7 @@ export function ImageViewer({
       } else if (e.key === 'ArrowRight') {
         handleNext()
       } else if (e.key === 'Escape') {
-        onOpenChange(false)
+        handleClose()
       }
     }
 
@@ -403,7 +420,7 @@ export function ImageViewer({
       window.removeEventListener('keydown', handleKeyDown)
       window.removeEventListener('wheel', handleWheel, {capture: true})
     }
-  }, [open, handlePrevious, handleNext, onOpenChange, handleWheelZoom])
+  }, [open, handlePrevious, handleNext, handleClose, handleWheelZoom])
 
   if (!currentImage) return null
 
@@ -430,7 +447,7 @@ export function ImageViewer({
           onPointerDownOutside={e => e.preventDefault()}
           onEscapeKeyDown={e => {
             e.preventDefault()
-            onOpenChange(false)
+            handleClose()
           }}>
           <div
             ref={dialogContentRef}
@@ -438,15 +455,14 @@ export function ImageViewer({
             <DialogPrimitive.Title className="sr-only">
               {fileName} - Image {currentIndex + 1} of {images.length}
             </DialogPrimitive.Title>
-            <DialogClose asChild>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="absolute top-4 right-4 z-60 overlay-button"
-                aria-label="Close">
-                <X className="size-6" />
-              </Button>
-            </DialogClose>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-4 right-4 z-60 overlay-button"
+              aria-label="Close"
+              onClick={handleClose}>
+              <X className="size-6" />
+            </Button>
 
             <div className="absolute top-4 left-0 right-0 flex justify-center z-50 px-4">
               <div className="px-4 py-3 rounded-md max-w-10/9 wrap-break-word text-center">
