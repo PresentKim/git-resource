@@ -4,9 +4,7 @@ import {
   type ParsedMcmetaAnimation,
   type McmetaData,
   parseMcmeta,
-  calculateFrameCount,
   fetchMcmetaData,
-  TICK_MS,
 } from '@/utils/mcmeta'
 import {cn} from '@/utils'
 import {useSettingStore} from '@/stores/settingStore'
@@ -30,14 +28,15 @@ interface AnimatedSpriteProps {
   onLoad?: (dimensions: {width: number; height: number}) => void
   /** Callback when image fails to load */
   onError?: () => void
-  /** Animation speed multiplier (default: 1) */
-  speed?: number
 }
 
 interface AnimationState {
   animation: ParsedMcmetaAnimation
   currentFrameIndex: number
-  tickAccumulator: number
+  timeOnFrame: number // Ticks elapsed on current frame (0-based, increments each tick)
+  frameWidthPx: number
+  frameHeightPx: number
+  originalImageData?: ImageData // For interpolation
 }
 
 const AnimatedSprite = memo(function AnimatedSprite({
@@ -50,31 +49,22 @@ const AnimatedSprite = memo(function AnimatedSprite({
   paused = false,
   onLoad,
   onError,
-  speed = 1,
 }: AnimatedSpriteProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const imageRef = useRef<HTMLImageElement | null>(null)
   const animationStateRef = useRef<AnimationState | null>(null)
-  const animationFrameRef = useRef<number>(0)
-  const lastTimeRef = useRef<number>(0)
-  const animateRef = useRef<((currentTime: number) => void) | null>(null)
-  const onLoadRef = useRef(onLoad)
-  const onErrorRef = useRef(onError)
+  const intervalRef = useRef<number | null>(null)
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const githubToken = useSettingStore(state => state.githubToken)
 
-  // Keep refs in sync with props
-  useEffect(() => {
-    onLoadRef.current = onLoad
-    onErrorRef.current = onError
-  }, [onLoad, onError])
-
-  // Calculate mcmeta URL
   const mcmetaUrl = mcmetaSrc ?? `${src}.mcmeta`
+
+  const lerp = (delta: number, from: number, to: number): number =>
+    delta * (to - from) + from
 
   // Draw a specific frame on the canvas
   const drawFrame = useCallback(
@@ -82,120 +72,131 @@ const AnimatedSprite = memo(function AnimatedSprite({
       ctx: CanvasRenderingContext2D,
       image: HTMLImageElement,
       frameIndex: number,
+      frameWidthPx: number,
+      frameHeightPx: number,
+      interpolate: boolean,
+      timeOnFrame: number,
+      frameTime: number,
+      originalImageData?: ImageData,
     ) => {
       const canvas = ctx.canvas
-      const frameWidth = image.width
-      const frameHeight = image.width // Square frames in Minecraft
 
       // Clear canvas
       ctx.clearRect(0, 0, canvas.width, canvas.height)
 
       // For vertical sprite sheets
-      const sourceY = frameIndex * frameHeight
+      const sourceY = frameIndex * frameHeightPx
 
-      // Draw the frame
+      // Draw the current frame
       ctx.drawImage(
         image,
         0,
         sourceY,
-        frameWidth,
-        frameHeight,
+        frameWidthPx,
+        frameHeightPx,
         0,
         0,
         canvas.width,
         canvas.height,
       )
+
+      // Apply interpolation if enabled
+      if (
+        interpolate &&
+        originalImageData &&
+        frameTime > 1 &&
+        animationStateRef.current
+      ) {
+        const delta = timeOnFrame / frameTime
+        const state = animationStateRef.current
+        const nextFrameIndex =
+          (state.currentFrameIndex + 1) % state.animation.frames.length
+        const nextFrame = state.animation.frames[nextFrameIndex]
+
+        if (nextFrame) {
+          const frameDataSize = frameWidthPx * frameHeightPx * 4
+          const nextFrameDataOffset = frameDataSize * nextFrame.index
+          const frameImageData = ctx.getImageData(
+            0,
+            0,
+            frameWidthPx,
+            frameHeightPx,
+          )
+
+          for (let i = 0; i < frameImageData.data.length; i++) {
+            frameImageData.data[i] = lerp(
+              delta,
+              frameImageData.data[i],
+              originalImageData.data[nextFrameDataOffset + i],
+            )
+          }
+          ctx.putImageData(frameImageData, 0, 0)
+        }
+      }
     },
     [],
   )
 
-  // Animation loop
-  const animate = useCallback(
-    (currentTime: number) => {
-      if (
-        !animationStateRef.current ||
-        !imageRef.current ||
-        !canvasRef.current
-      ) {
-        return
+  const handleAnimationTick = useCallback(() => {
+    const state = animationStateRef.current
+    const image = imageRef.current
+    const canvas = canvasRef.current
+    if (!state || !image || !canvas) return
+
+    const ctx = canvas.getContext('2d', {willReadFrequently: true})
+    if (!ctx) return
+
+    if (paused || !isVisible || state.animation.frames.length <= 1) {
+      const frame = state.animation.frames[state.currentFrameIndex]
+      if (frame) {
+        drawFrame(
+          ctx,
+          image,
+          frame.index,
+          state.frameWidthPx,
+          state.frameHeightPx,
+          state.animation.interpolate,
+          0,
+          frame.time,
+          state.originalImageData,
+        )
       }
+      return
+    }
 
-      const state = animationStateRef.current
-      const ctx = canvasRef.current.getContext('2d')
-      if (!ctx) return
+    const currentFrame = state.animation.frames[state.currentFrameIndex]
+    if (!currentFrame) {
+      state.currentFrameIndex = 0
+      state.timeOnFrame = 0
+      return
+    }
 
-      // Calculate delta time
-      const deltaTime = lastTimeRef.current
-        ? currentTime - lastTimeRef.current
-        : 0
-      lastTimeRef.current = currentTime
+    if (state.timeOnFrame++ >= currentFrame.time) {
+      state.timeOnFrame = 0
+      state.currentFrameIndex =
+        (state.currentFrameIndex + 1) % state.animation.frames.length
+    }
 
-      if (!paused && isVisible && state.animation.frames.length > 1) {
-        // Update tick accumulator
-        state.tickAccumulator += (deltaTime / TICK_MS) * speed
-
-        const currentFrame = state.animation.frames[state.currentFrameIndex]
-        if (!currentFrame) {
-          // Invalid frame index, reset to 0
-          state.currentFrameIndex = 0
-          state.tickAccumulator = 0
-          return
-        }
-
-        // Ensure minimum frame time to prevent infinite loop (0 or negative values)
-        const frameTime = Math.max(currentFrame.time, 0.001)
-
-        // Check if we should advance to the next frame
-        // Add safety limit to prevent infinite loops when frameTime is very small
-        let loopCount = 0
-        const maxLoops = state.animation.frames.length * 10
-
-        while (state.tickAccumulator >= frameTime && loopCount < maxLoops) {
-          state.tickAccumulator -= frameTime
-          state.currentFrameIndex =
-            (state.currentFrameIndex + 1) % state.animation.frames.length
-          loopCount++
-        }
-
-        // If we hit the safety limit, reset to prevent infinite loop
-        if (loopCount >= maxLoops) {
-          state.tickAccumulator = 0
-          state.currentFrameIndex = 0
-        }
-      }
-
-      // Draw the current frame
-      const frameIndex =
-        state.animation.frames[state.currentFrameIndex]?.index ?? 0
-
-      drawFrame(ctx, imageRef.current, frameIndex)
-
-      // Continue animation loop
-      if (animateRef.current) {
-        animationFrameRef.current = requestAnimationFrame(animateRef.current)
-      }
-    },
-    [paused, isVisible, speed, drawFrame],
-  )
-
-  // Store animate function in ref
-  useEffect(() => {
-    animateRef.current = animate
-  }, [animate])
+    const frame =
+      state.animation.frames[state.currentFrameIndex] ?? currentFrame
+    drawFrame(
+      ctx,
+      image,
+      frame.index,
+      state.frameWidthPx,
+      state.frameHeightPx,
+      state.animation.interpolate,
+      state.timeOnFrame,
+      frame.time,
+      state.originalImageData,
+    )
+  }, [paused, isVisible, drawFrame])
 
   // Initialize animation
   const initAnimation = useCallback(
     async (image: HTMLImageElement) => {
       const canvas = canvasRef.current
       if (!canvas) return
-
-      // Determine frame dimensions
-      const frameWidth = image.width
-      const frameHeight = image.width // Square frames
-
-      // Set canvas size
-      canvas.width = frameWidth
-      canvas.height = frameHeight
 
       // Fetch or use preloaded mcmeta data
       let mcmetaData: McmetaData | undefined = preloadedMcmetaData
@@ -204,52 +205,66 @@ const AnimatedSprite = memo(function AnimatedSprite({
         mcmetaData = fetched ?? undefined
       }
 
-      // Calculate frame count
-      const calculatedFrameCount = calculateFrameCount(
-        image.width,
-        image.height,
-        mcmetaData?.animation?.width,
-        mcmetaData?.animation?.height,
-      )
+      const frameWidthRatio = mcmetaData?.animation?.width
+      const frameSize = frameWidthRatio
+        ? Math.floor(image.width / frameWidthRatio)
+        : image.width
+      const frameWidthPx = frameSize
+      const frameHeightPx = frameSize
 
-      // Parse animation data
+      canvas.width = frameWidthPx
+      canvas.height = frameHeightPx
+
       const parsedAnimation = mcmetaData
-        ? parseMcmeta(mcmetaData, calculatedFrameCount)
+        ? parseMcmeta(mcmetaData, image.width, image.height)
         : null
 
-      // If no animation data or single frame, just draw the image
+      let originalImageData: ImageData | undefined
+      if (parsedAnimation?.interpolate) {
+        const tempCanvas = document.createElement('canvas')
+        tempCanvas.width = image.width
+        tempCanvas.height = image.height
+        const tempCtx = tempCanvas.getContext('2d', {willReadFrequently: true})
+        if (tempCtx) {
+          tempCtx.imageSmoothingEnabled = false
+          tempCtx.drawImage(image, 0, 0)
+          originalImageData = tempCtx.getImageData(
+            0,
+            0,
+            image.width,
+            image.height,
+          )
+        }
+      }
+
       if (!parsedAnimation || parsedAnimation.frames.length <= 1) {
         const ctx = canvas.getContext('2d')
         if (ctx) {
-          ctx.drawImage(
+          drawFrame(
+            ctx,
             image,
             0,
+            frameWidthPx,
+            frameHeightPx,
+            false,
             0,
-            frameWidth,
-            frameHeight,
-            0,
-            0,
-            frameWidth,
-            frameHeight,
+            1,
+            undefined,
           )
         }
         return
       }
 
-      // Set up animation state
       animationStateRef.current = {
         animation: parsedAnimation,
         currentFrameIndex: 0,
-        tickAccumulator: 0,
-      }
-
-      // Start animation
-      lastTimeRef.current = 0
-      if (animateRef.current) {
-        animationFrameRef.current = requestAnimationFrame(animateRef.current)
+        timeOnFrame: 0,
+        frameWidthPx,
+        frameHeightPx,
+        originalImageData,
       }
     },
-    [mcmetaUrl, preloadedMcmetaData, githubToken],
+    [mcmetaUrl, preloadedMcmetaData, githubToken, drawFrame],
   )
 
   // Load image
@@ -261,69 +276,58 @@ const AnimatedSprite = memo(function AnimatedSprite({
       imageRef.current = image
       setLoading(false)
       initAnimation(image)
-      onLoadRef.current?.({width: image.width, height: image.width})
+      onLoad?.({width: image.width, height: image.width})
     }
 
     image.onerror = () => {
       setLoading(false)
       setError(true)
-      onErrorRef.current?.()
+      onError?.()
     }
 
     image.src = src
 
     return () => {
-      // Cleanup
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
       }
       image.onload = null
       image.onerror = null
     }
-  }, [src, initAnimation])
+  }, [src, initAnimation, onLoad, onError])
 
-  // Track visibility using IntersectionObserver
   useEffect(() => {
     const container = containerRef.current
     if (!container) return
 
     const observer = new IntersectionObserver(
-      entries => {
-        const entry = entries[0]
-        setIsVisible(entry.isIntersecting)
-      },
-      {
-        // Start pausing when element is completely out of viewport
-        threshold: 0,
-        // Add a small root margin to pause slightly before going out of view
-        rootMargin: '50px',
-      },
+      entries => setIsVisible(entries[0].isIntersecting),
+      {threshold: 0, rootMargin: '50px'},
     )
 
     observer.observe(container)
-
-    return () => {
-      observer.disconnect()
-    }
+    return () => observer.disconnect()
   }, [])
 
-  // Handle pause/resume (combine manual paused prop with visibility)
-  const effectivePaused = paused || !isVisible
-
   useEffect(() => {
-    if (!effectivePaused && animationStateRef.current && animateRef.current) {
-      lastTimeRef.current = 0
-      animationFrameRef.current = requestAnimationFrame(animateRef.current)
-    } else if (effectivePaused && animationFrameRef.current) {
-      cancelAnimationFrame(animationFrameRef.current)
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current)
+      intervalRef.current = null
+    }
+
+    if (animationStateRef.current && !paused && isVisible) {
+      intervalRef.current = window.setInterval(handleAnimationTick, 50)
+      handleAnimationTick()
     }
 
     return () => {
-      if (animationFrameRef.current) {
-        cancelAnimationFrame(animationFrameRef.current)
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current)
+        intervalRef.current = null
       }
     }
-  }, [effectivePaused])
+  }, [paused, isVisible, handleAnimationTick])
 
   if (error) {
     return (

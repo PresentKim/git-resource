@@ -6,18 +6,18 @@
 export interface McmetaFrame {
   /** Frame index in the sprite sheet */
   index: number
-  /** Frame duration in ticks (1 tick = 50ms in Minecraft, but we use 1 tick = 1 frame time) */
+  /** Frame duration in ticks (1 tick = 50ms = 0.05 seconds in Minecraft) */
   time: number
 }
 
 export interface McmetaAnimation {
-  /** Whether to interpolate between frames */
+  /** Whether to interpolate between frames (Minecraft generates additional frames) */
   interpolate?: boolean
-  /** Width of the frame (defaults to texture width) */
+  /** Width of the frame as a ratio (e.g., 2 means texture width / 2) */
   width?: number
-  /** Height of the frame (defaults to texture width for square frames) */
+  /** Height of the frame as a ratio (e.g., 2 means texture height / 2) */
   height?: number
-  /** Default frame time in ticks */
+  /** Default frame time in ticks (defaults to 1) */
   frametime?: number
   /** Frame order and timing - can be numbers or {index, time} objects */
   frames?: Array<number | {index: number; time?: number}>
@@ -28,10 +28,11 @@ export interface McmetaData {
 }
 
 export interface ParsedMcmetaAnimation {
-  frameWidth: number | null
-  frameHeight: number | null
+  frameWidth: number | null // Ratio (e.g., 2 means texture width / 2)
+  frameHeight: number | null // Ratio (e.g., 2 means texture height / 2)
   defaultFrameTime: number
   frames: McmetaFrame[]
+  interpolate: boolean // Whether to interpolate between frames (not currently implemented)
 }
 
 /**
@@ -42,17 +43,26 @@ export const TICK_MS = 50 // 1 Minecraft tick = 50ms
 
 /**
  * Parse raw mcmeta JSON data into a structured animation object
+ *
+ * Handles Minecraft .mcmeta animation format:
+ * - interpolate: Whether to interpolate between frames (parsed but not currently implemented)
+ * - width/height: Frame dimensions as ratios (e.g., 2 means texture size / 2)
+ * - frametime: Default frame time in ticks (defaults to 1)
+ * - frames: Array of frame indices (numbers) or frame objects with {index, time}
  */
 export function parseMcmeta(
   data: McmetaData,
-  frameCount?: number,
+  imageWidth?: number,
+  imageHeight?: number,
 ): ParsedMcmetaAnimation | null {
   if (!data.animation) {
     return null
   }
 
   const animation = data.animation
+  // frametime defaults to 1 tick per Minecraft spec
   const defaultFrameTime = animation.frametime ?? DEFAULT_FRAME_TIME
+  // width/height are ratios, not pixels
   const frameWidth = animation.width ?? null
   const frameHeight = animation.height ?? null
 
@@ -60,21 +70,30 @@ export function parseMcmeta(
 
   if (animation.frames && animation.frames.length > 0) {
     // Parse explicit frame order
+    // Frames can be numbers (frame index) or objects with {index, time}
     frames = animation.frames.map(frame => {
       if (typeof frame === 'number') {
+        // Simple frame index, use default frame time
         return {index: frame, time: defaultFrameTime}
       }
+      // Frame object with optional time override
       return {
         index: frame.index,
         time: frame.time ?? defaultFrameTime,
       }
     })
-  } else if (frameCount !== undefined && frameCount > 0) {
-    // Generate sequential frames based on sprite sheet
-    frames = Array.from({length: frameCount}, (_, i) => ({
-      index: i,
-      time: defaultFrameTime,
-    }))
+  } else if (imageWidth !== undefined && imageHeight !== undefined) {
+    // No explicit frames array, generate sequential frames from top to bottom
+    // All frames are square, use image width as frame size
+    const frameSize = imageWidth
+    const baseNumberOfFrames = Math.floor(imageHeight / frameSize)
+
+    if (baseNumberOfFrames > 0) {
+      frames = Array.from({length: baseNumberOfFrames}, (_, index) => ({
+        index,
+        time: defaultFrameTime,
+      }))
+    }
   }
 
   return {
@@ -82,13 +101,19 @@ export function parseMcmeta(
     frameHeight,
     defaultFrameTime,
     frames,
+    // interpolate: Minecraft generates additional frames between frames with time > 1
+    // Currently parsed but not implemented (would require frame interpolation logic)
+    interpolate: animation.interpolate ?? false,
   }
 }
 
 /**
  * Calculate the number of frames in a sprite sheet based on dimensions
- * Minecraft textures are typically square, so an animated texture
- * will have height = width * frameCount
+ * All frames must be the same size and square
+ * Animation frames are stored in a vertical strip, with each frame directly underneath the previous one
+ *
+ * Note: width and height in mcmeta are ratios, not pixels
+ * e.g., width: 2 means the frame width is texture width / 2
  */
 export function calculateFrameCount(
   imageWidth: number,
@@ -96,21 +121,22 @@ export function calculateFrameCount(
   frameWidth?: number | null,
   frameHeight?: number | null,
 ): number {
-  const effectiveFrameWidth = frameWidth ?? imageWidth
-  const effectiveFrameHeight = frameHeight ?? effectiveFrameWidth
+  // Calculate effective frame dimensions
+  // If width/height are provided, they are ratios (divide texture by ratio)
+  // If not provided, use full texture dimensions
+  // All frames are square, so we use the width as frame size
+  const effectiveFrameWidth = frameWidth
+    ? Math.floor(imageWidth / frameWidth)
+    : imageWidth
 
-  // For vertical sprite sheets (most common in Minecraft)
-  if (imageHeight > imageWidth) {
-    return Math.floor(imageHeight / effectiveFrameHeight)
-  }
+  // Frame height defaults to frame width (square frames)
+  const effectiveFrameHeight = frameHeight
+    ? Math.floor(imageHeight / frameHeight)
+    : effectiveFrameWidth
 
-  // For horizontal sprite sheets
-  if (imageWidth > imageHeight) {
-    return Math.floor(imageWidth / effectiveFrameWidth)
-  }
-
-  // Square image - single frame
-  return 1
+  // Animation frames are stored in a vertical strip
+  // Calculate number of frames based on vertical layout
+  return Math.floor(imageHeight / effectiveFrameHeight)
 }
 
 /**
