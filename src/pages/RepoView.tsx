@@ -64,16 +64,32 @@ export default function RepoView() {
 
   // Load default branch or image files
   useEffect(() => {
-    if (!repo.ref) {
-      getDefaultBranch(repo)
-        .then(defaultBranch => {
+    // Only proceed if we have owner and name
+    if (!repo.owner || !repo.name) {
+      return
+    }
+
+    // Check if ref is provided in URL first (most reliable source)
+    // This prevents unnecessary defaultBranch lookup when branch is already in URL
+    const refFromUrl = repoFromUrl.ref?.trim()
+    const refFromStore = repo.ref?.trim()
+
+    if (refFromUrl) {
+      // Ref is provided in URL, directly fetch image files
+      // Ensure store is synced with URL
+      if (refFromUrl !== refFromStore) {
+        setRepo({...repo, ref: refFromUrl})
+      }
+      getImagePaths({...repo, ref: refFromUrl})
+        .then(imageFileTree => {
           setError(null)
-          setTargetRepository(repo.owner, repo.name, defaultBranch)
+          setImageFiles(imageFileTree)
         })
         .catch(err => {
           setError(err instanceof Error ? err : new Error(String(err)))
         })
-    } else {
+    } else if (refFromStore) {
+      // Ref is in store but not in URL, use store ref
       getImagePaths(repo)
         .then(imageFileTree => {
           setError(null)
@@ -82,14 +98,26 @@ export default function RepoView() {
         .catch(err => {
           setError(err instanceof Error ? err : new Error(String(err)))
         })
+    } else {
+      // No ref provided, need to fetch default branch
+      getDefaultBranch(repo)
+        .then(defaultBranch => {
+          setError(null)
+          setTargetRepository(repo.owner, repo.name, defaultBranch)
+        })
+        .catch(err => {
+          setError(err instanceof Error ? err : new Error(String(err)))
+        })
     }
   }, [
     repo,
+    repoFromUrl,
     getDefaultBranch,
     getImagePaths,
     setTargetRepository,
     setError,
     setImageFiles,
+    setRepo,
   ])
 
   const handleImageClick = useCallback(
