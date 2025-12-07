@@ -59,11 +59,19 @@ const AnimatedSprite = memo(function AnimatedSprite({
   const animationFrameRef = useRef<number>(0)
   const lastTimeRef = useRef<number>(0)
   const animateRef = useRef<((currentTime: number) => void) | null>(null)
+  const onLoadRef = useRef(onLoad)
+  const onErrorRef = useRef(onError)
 
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const githubToken = useSettingStore(state => state.githubToken)
+
+  // Keep refs in sync with props
+  useEffect(() => {
+    onLoadRef.current = onLoad
+    onErrorRef.current = onError
+  }, [onLoad, onError])
 
   // Calculate mcmeta URL
   const mcmetaUrl = mcmetaSrc ?? `${src}.mcmeta`
@@ -253,13 +261,13 @@ const AnimatedSprite = memo(function AnimatedSprite({
       imageRef.current = image
       setLoading(false)
       initAnimation(image)
-      onLoad?.({width: image.width, height: image.width})
+      onLoadRef.current?.({width: image.width, height: image.width})
     }
 
     image.onerror = () => {
       setLoading(false)
       setError(true)
-      onError?.()
+      onErrorRef.current?.()
     }
 
     image.src = src
@@ -272,7 +280,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
       image.onload = null
       image.onerror = null
     }
-  }, [src, initAnimation, onLoad, onError])
+  }, [src, initAnimation])
 
   // Track visibility using IntersectionObserver
   useEffect(() => {
