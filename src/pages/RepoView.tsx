@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState} from 'react'
+import {useCallback, useEffect, useMemo, useState, useRef} from 'react'
 
 import {
   VirtualizedFlexGrid,
@@ -177,24 +177,35 @@ export default function RepoView() {
     setViewerOpen(true)
   }, [])
 
-  // Create stable click handlers for each item to avoid recreating functions
-  const createItemClickHandler = useCallback(
-    (index: number) => () => handleImageClick(index),
+  // Create stable click handlers map to avoid recreating functions
+  const clickHandlersRef = useRef<Map<number, () => void>>(new Map())
+
+  const getClickHandler = useCallback(
+    (index: number) => {
+      if (!clickHandlersRef.current.has(index)) {
+        clickHandlersRef.current.set(index, () => handleImageClick(index))
+      }
+      return clickHandlersRef.current.get(index)!
+    },
     [handleImageClick],
   )
+
+  // Memoize repo to ensure stable reference
+  // useTargetRepository already memoizes, but we ensure it's stable here too
+  const stableRepo = useMemo(() => repo, [repo])
 
   const itemRenderer = useCallback(
     ({index, item}: RenderData<string>) => (
       <ImageCell
         key={index}
-        repo={repo}
+        repo={stableRepo}
         path={item}
-        onClick={createItemClickHandler(index)}
+        onClick={getClickHandler(index)}
         mcmetaPaths={mcmetaPaths}
         animationEnabled={animationEnabled}
       />
     ),
-    [repo, createItemClickHandler, mcmetaPaths, animationEnabled],
+    [stableRepo, getClickHandler, mcmetaPaths, animationEnabled],
   )
   const downloadFilteredImages = useCallback(async () => {
     const paths = filteredImageFiles || []
