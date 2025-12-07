@@ -5,6 +5,7 @@ import {
   type RenderData,
 } from '@/components/VitualizedFlexGrid'
 import {ImageCell} from '@/components/ImageCell'
+import {FilterToolbar} from '@/components/FilterToolbar'
 import {FilterInput} from '@/components/FilterInput'
 import {Button} from '@/components/ui/button'
 import {ImageViewer} from '@/components/ImageViewer'
@@ -18,8 +19,8 @@ import {usePromise} from '@/hooks/usePromise'
 import {generateNoImagesMessage} from '@/utils/randomMessages'
 import {RandomMessageLoader} from '@/components/RandomMessageLoader'
 import {useSettingStore} from '@/stores/settingStore'
-import {downloadImagesAsZip, isMcmetaFile, cn} from '@/utils'
-import {Download as DownloadIcon, Loader as LoaderIcon} from 'lucide-react'
+import {isMcmetaFile, cn} from '@/utils'
+import {Loader as LoaderIcon} from 'lucide-react'
 
 /**
  * Parse filter string into include and exclude filters
@@ -135,9 +136,6 @@ export default function RepoView() {
     [imageFiles],
   )
 
-  const totalCount = imageOnlyFiles?.length ?? 0
-  const [downloadProgress, setDownloadProgress] = useState<number | null>(null)
-
   // Parse filters
   const {includeFilters, excludeFilters} = useMemo(
     () => parseFilters(filter),
@@ -207,26 +205,6 @@ export default function RepoView() {
     ),
     [stableRepo, getClickHandler, mcmetaPaths, animationEnabled],
   )
-  const downloadFilteredImages = useCallback(async () => {
-    const paths = filteredImageFiles || []
-    if (!paths.length) return
-
-    setDownloadProgress(0)
-    try {
-      await downloadImagesAsZip(repo, paths, (completed, total) => {
-        const percent = Math.round((completed / total) * 100)
-        setDownloadProgress(percent)
-      })
-      setDownloadProgress(100)
-      // Briefly show 100%, then reset
-      setTimeout(() => setDownloadProgress(null), 500)
-    } catch (error) {
-      console.error('Failed to download images:', error)
-      setDownloadProgress(null)
-      // Optionally show error to user
-    }
-  }, [repo, filteredImageFiles])
-  const [isDownloading, downloadAll] = usePromise(downloadFilteredImages)
 
   return (
     <section
@@ -242,52 +220,11 @@ export default function RepoView() {
         <div className="flex-1 sm:order-2">
           <FilterInput />
         </div>
-
-        <div className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start">
-          <span className="rounded-full bg-background/70 px-2 py-1">
-            Showing{' '}
-            <span className="font-semibold text-accent">
-              {filteredImageFiles?.length ?? 0}
-            </span>
-            {' of '}
-            {totalCount.toLocaleString()} images
-          </span>
-          <Button
-            aria-label="Download all filtered images as ZIP"
-            disabled={isDownloading || !filteredImageFiles?.length}
-            onClick={downloadAll}
-            size="sm"
-            variant="outline"
-            className="text-xs font-semibold flex flex-col items-center gap-0.5 min-w-[190px]">
-            {isDownloading ? (
-              <>
-                <div className="flex items-center gap-1">
-                  <LoaderIcon className="size-4 animate-spin" />
-                  <span>
-                    {downloadProgress !== null
-                      ? `DOWNLOADING ${downloadProgress}%`
-                      : 'DOWNLOADING...'}
-                  </span>
-                </div>
-                {downloadProgress !== null && (
-                  <div
-                    className="mt-0.5 h-1 w-full rounded-full bg-muted overflow-hidden"
-                    aria-hidden="true">
-                    <div
-                      className="h-full bg-accent transition-[width] duration-150 ease-out"
-                      style={{width: `${downloadProgress}%`}}
-                    />
-                  </div>
-                )}
-              </>
-            ) : (
-              <div className="flex items-center gap-1">
-                <DownloadIcon className="size-4" />
-                <span>DOWNLOAD FILTERED</span>
-              </div>
-            )}
-          </Button>
-        </div>
+        <FilterToolbar
+          repo={repo}
+          filteredImageFiles={filteredImageFiles}
+          imageFiles={imageFiles}
+        />
       </div>
 
       {error && (
