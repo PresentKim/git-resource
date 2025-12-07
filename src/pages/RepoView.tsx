@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo, useState, useRef} from 'react'
+import {useCallback, useEffect, useRef} from 'react'
 
 import {
   VirtualizedFlexGrid,
@@ -12,136 +12,55 @@ import {ImageViewer} from '@/components/ImageViewer'
 
 import {useGithubDefaultBranch} from '@/api/github/hooks/useGithubDefaultBranch'
 import {useGithubImageFileTree} from '@/api/github/hooks/useGithubImageFileTree'
-import type {GithubImageFileTree} from '@/api/github/types'
 import {useTargetRepository} from '@/hooks/useTargetRepository'
 import {useFilterQuery} from '@/hooks/useFilterQuery'
 import {usePromise} from '@/hooks/usePromise'
 import {generateNoImagesMessage} from '@/utils/randomMessages'
 import {RandomMessageLoader} from '@/components/RandomMessageLoader'
-import {useSettingStore} from '@/stores/settingStore'
-import {isMcmetaFile, cn} from '@/utils'
+import {useDisplaySettings} from '@/stores/settingStore'
+import {useRepoStore} from '@/stores/repoStore'
+import {cn} from '@/utils'
 import {Loader as LoaderIcon} from 'lucide-react'
-
-/**
- * Parse filter string into include and exclude filters
- */
-function parseFilters(filter: string): {
-  includeFilters: string[]
-  excludeFilters: string[]
-} {
-  const rawFilters = filter.trim().split(/\s+/).filter(Boolean)
-  const include: string[] = []
-  const exclude: string[] = []
-
-  for (const term of rawFilters) {
-    if (term.startsWith('-')) {
-      const excludeTerm = term.slice(1).trim()
-      if (excludeTerm) {
-        exclude.push(excludeTerm)
-      }
-    } else {
-      include.push(term)
-    }
-  }
-
-  return {includeFilters: include, excludeFilters: exclude}
-}
-
-/**
- * Filter image paths based on include and exclude filters
- * Optimized: Pre-compute lowercase filters to avoid repeated toLowerCase() calls
- */
-function filterImagePaths(
-  paths: string[],
-  includeFilters: string[],
-  excludeFilters: string[],
-): string[] {
-  if (includeFilters.length === 0 && excludeFilters.length === 0) {
-    return paths
-  }
-
-  // Pre-compute lowercase filters once
-  const lowerIncludeFilters = includeFilters.map(f => f.toLowerCase())
-  const lowerExcludeFilters = excludeFilters.map(f => f.toLowerCase())
-
-  return paths.filter(path => {
-    const lowerPath = path.toLowerCase()
-
-    // All include filters must match (AND logic)
-    if (lowerIncludeFilters.length > 0) {
-      const allIncludeMatch = lowerIncludeFilters.every(term =>
-        lowerPath.includes(term),
-      )
-      if (!allIncludeMatch) {
-        return false
-      }
-    }
-
-    // Path must not match any exclude filter
-    if (lowerExcludeFilters.length > 0) {
-      const matchesExclude = lowerExcludeFilters.some(term =>
-        lowerPath.includes(term),
-      )
-      if (matchesExclude) {
-        return false
-      }
-    }
-
-    return true
-  })
-}
-
-/**
- * Separate image files and mcmeta files
- */
-function separateImageFiles(imageFiles: GithubImageFileTree | null): {
-  imageOnlyFiles: string[] | null
-  mcmetaPaths: Set<string>
-} {
-  if (!imageFiles) {
-    return {imageOnlyFiles: null, mcmetaPaths: new Set<string>()}
-  }
-
-  const mcmeta = new Set<string>()
-  const images: string[] = []
-
-  for (const path of imageFiles) {
-    if (isMcmetaFile(path)) {
-      mcmeta.add(path)
-    } else {
-      images.push(path)
-    }
-  }
-
-  return {imageOnlyFiles: images, mcmetaPaths: mcmeta}
-}
 
 export default function RepoView() {
   const [filter] = useFilterQuery()
-  const [repo, setTargetRepository] = useTargetRepository()
-  const [isLoadRef, getDefaultBranch] = usePromise(useGithubDefaultBranch())
-  const [isLoadImagePaths, getImagePaths] = usePromise(useGithubImageFileTree())
-  const [imageFiles, setImageFiles] = useState<GithubImageFileTree | null>(null)
-  const [error, setError] = useState<Error | null>(null)
-  const [viewerOpen, setViewerOpen] = useState(false)
-  const [viewerIndex, setViewerIndex] = useState(0)
-  const columnCount = useSettingStore(state => state.filledColumnCount)
-  const pixelated = useSettingStore(state => state.pixelated)
-  const animationEnabled = useSettingStore(state => state.animationEnabled)
-  const gridBackground = useSettingStore(state => state.gridBackground)
+  const [repoFromUrl, setTargetRepository] = useTargetRepository()
+  const isLoadRef = usePromise(useGithubDefaultBranch())[0]
+  const getDefaultBranch = usePromise(useGithubDefaultBranch())[1]
+  const isLoadImagePaths = usePromise(useGithubImageFileTree())[0]
+  const getImagePaths = usePromise(useGithubImageFileTree())[1]
 
-  // Separate image files and mcmeta files
-  const {imageOnlyFiles, mcmetaPaths} = useMemo(
-    () => separateImageFiles(imageFiles),
-    [imageFiles],
-  )
+  // Get state from repoStore
+  const repo = useRepoStore(state => state.repo)
+  const filteredImageFiles = useRepoStore(state => state.filteredImageFiles)
+  const error = useRepoStore(state => state.error)
+  const viewerState = useRepoStore(state => state.viewerState)
+  const setRepo = useRepoStore(state => state.setRepo)
+  const setImageFiles = useRepoStore(state => state.setImageFiles)
+  const setError = useRepoStore(state => state.setError)
+  const setViewerState = useRepoStore(state => state.setViewerState)
+  const updateFilteredImages = useRepoStore(state => state.updateFilteredImages)
 
-  // Parse filters
-  const {includeFilters, excludeFilters} = useMemo(
-    () => parseFilters(filter),
-    [filter],
-  )
+  // Get display settings in a single call
+  const {columnCount, pixelated, gridBackground} = useDisplaySettings()
 
+  // Sync repo from URL to store
+  useEffect(() => {
+    if (
+      repoFromUrl.owner !== repo.owner ||
+      repoFromUrl.name !== repo.name ||
+      repoFromUrl.ref !== repo.ref
+    ) {
+      setRepo(repoFromUrl)
+    }
+  }, [repoFromUrl, repo, setRepo])
+
+  // Update filtered images when filter changes
+  useEffect(() => {
+    updateFilteredImages(filter)
+  }, [filter, updateFilteredImages])
+
+  // Load default branch or image files
   useEffect(() => {
     if (!repo.ref) {
       getDefaultBranch(repo)
@@ -162,18 +81,21 @@ export default function RepoView() {
           setError(err instanceof Error ? err : new Error(String(err)))
         })
     }
-  }, [repo, getDefaultBranch, getImagePaths, setTargetRepository])
+  }, [
+    repo,
+    getDefaultBranch,
+    getImagePaths,
+    setTargetRepository,
+    setError,
+    setImageFiles,
+  ])
 
-  // Filter image files
-  const filteredImageFiles = useMemo(() => {
-    if (!imageOnlyFiles) return null
-    return filterImagePaths(imageOnlyFiles, includeFilters, excludeFilters)
-  }, [imageOnlyFiles, includeFilters, excludeFilters])
-
-  const handleImageClick = useCallback((index: number) => {
-    setViewerIndex(index)
-    setViewerOpen(true)
-  }, [])
+  const handleImageClick = useCallback(
+    (index: number) => {
+      setViewerState({open: true, currentIndex: index})
+    },
+    [setViewerState],
+  )
 
   // Create stable click handlers map to avoid recreating functions
   const clickHandlersRef = useRef<Map<number, () => void>>(new Map())
@@ -188,22 +110,11 @@ export default function RepoView() {
     [handleImageClick],
   )
 
-  // Memoize repo to ensure stable reference
-  // useTargetRepository already memoizes, but we ensure it's stable here too
-  const stableRepo = useMemo(() => repo, [repo])
-
   const itemRenderer = useCallback(
     ({index, item}: RenderData<string>) => (
-      <ImageCell
-        key={index}
-        repo={stableRepo}
-        path={item}
-        onClick={getClickHandler(index)}
-        mcmetaPaths={mcmetaPaths}
-        animationEnabled={animationEnabled}
-      />
+      <ImageCell key={index} path={item} onClick={getClickHandler(index)} />
     ),
-    [stableRepo, getClickHandler, mcmetaPaths, animationEnabled],
+    [getClickHandler],
   )
 
   return (
@@ -220,11 +131,7 @@ export default function RepoView() {
         <div className="flex-1 sm:order-2">
           <FilterInput />
         </div>
-        <FilterToolbar
-          repo={repo}
-          filteredImageFiles={filteredImageFiles}
-          imageFiles={imageFiles}
-        />
+        <FilterToolbar />
       </div>
 
       {error && (
@@ -322,13 +229,13 @@ export default function RepoView() {
             />
           </div>
           <ImageViewer
-            open={viewerOpen}
-            onOpenChange={setViewerOpen}
-            images={filteredImageFiles}
-            currentIndex={viewerIndex}
-            repo={repo}
-            onIndexChange={setViewerIndex}
-            mcmetaPaths={mcmetaPaths}
+            open={viewerState.open}
+            onOpenChange={open => setViewerState({...viewerState, open})}
+            images={filteredImageFiles || []}
+            currentIndex={viewerState.currentIndex}
+            onIndexChange={index =>
+              setViewerState({...viewerState, currentIndex: index})
+            }
           />
         </>
       ) : null}

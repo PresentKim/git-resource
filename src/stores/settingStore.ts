@@ -1,4 +1,5 @@
 import {create} from 'zustand'
+import {useMemo} from 'react'
 
 export type Theme = 'light' | 'dark'
 export type GridBackground = 'auto' | 'white' | 'black' | 'transparent'
@@ -59,7 +60,10 @@ const calculateColumnCount = (): number => {
  * Get initial theme from localStorage with migration support
  */
 const getInitialTheme = (): Theme => {
-  const stored = localStorage.getItem(STORAGE_KEYS.THEME) as Theme | 'system' | null
+  const stored = localStorage.getItem(STORAGE_KEYS.THEME) as
+    | Theme
+    | 'system'
+    | null
   // Migrate 'system' to 'dark'
   if (stored === 'system' || !stored) {
     return 'dark'
@@ -130,4 +134,35 @@ if (typeof window !== 'undefined') {
   window.addEventListener('resize', () => {
     useSettingStore.getState().updateFilledColumnCount()
   })
+}
+
+/**
+ * Display settings type
+ */
+export type DisplaySettings = {
+  columnCount: number
+  pixelated: boolean
+  animationEnabled: boolean
+  gridBackground: GridBackground
+}
+
+/**
+ * Hook to get display-related settings in a single call
+ * This reduces re-renders compared to multiple useSettingStore calls
+ */
+export function useDisplaySettings(): DisplaySettings {
+  const columnCount = useSettingStore(state => state.filledColumnCount)
+  const pixelated = useSettingStore(state => state.pixelated)
+  const animationEnabled = useSettingStore(state => state.animationEnabled)
+  const gridBackground = useSettingStore(state => state.gridBackground)
+
+  return useMemo(
+    () => ({
+      columnCount,
+      pixelated,
+      animationEnabled,
+      gridBackground,
+    }),
+    [columnCount, pixelated, animationEnabled, gridBackground],
+  )
 }

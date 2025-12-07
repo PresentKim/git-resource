@@ -1,7 +1,9 @@
 import {useCallback, useState, useRef, memo, useMemo} from 'react'
 import {LoaderCircleIcon} from 'lucide-react'
-import {type GithubRepo, createRawImageUrl, cn, getMcmetaPath} from '@/utils'
+import {createRawImageUrl, cn, getMcmetaPath} from '@/utils'
 import {AnimatedSprite} from './AnimatedSprite'
+import {useRepoStore} from '@/stores/repoStore'
+import {useDisplaySettings} from '@/stores/settingStore'
 
 // Cache regex to avoid recompilation
 const FILE_EXTENSION_REGEX = /\.[^/.]+$/
@@ -80,22 +82,18 @@ function ImagePathOverlay({path}: {path: string}) {
 }
 
 interface ImageCellProps {
-  repo: GithubRepo
   path: string
   onClick?: () => void
-  /** Set of mcmeta file paths for checking if this image has animation */
-  mcmetaPaths?: Set<string>
-  /** Whether animation is enabled */
-  animationEnabled?: boolean
 }
 
 const ImageCell = memo(function ImageCell({
-  repo,
   path,
   onClick,
-  mcmetaPaths,
-  animationEnabled = true,
 }: ImageCellProps) {
+  // Get state from stores
+  const repo = useRepoStore(state => state.repo)
+  const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
+  const {animationEnabled} = useDisplaySettings()
   const [loading, setLoading] = useState(true)
   const imgRef = useRef<HTMLImageElement>(null)
   const currentPathRef = useRef<string>(path)

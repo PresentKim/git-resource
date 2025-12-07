@@ -4,7 +4,7 @@ import {FloatingHeader} from '@/components/FloatingHeader'
 import {LogoIcon} from '@/components/LogoIcon'
 import {SettingButton} from '@/components/SettingButton'
 
-import {useTargetRepository} from '@/hooks/useTargetRepository'
+import {useRepoStore} from '@/stores/repoStore'
 import {cn} from '@/utils'
 
 function HomeButton() {
@@ -21,7 +21,7 @@ function HomeButton() {
 }
 
 function RepoInfo({className}: {className?: string}) {
-  const [repo] = useTargetRepository()
+  const repo = useRepoStore(state => state.repo)
 
   if (!repo.owner) return null
 

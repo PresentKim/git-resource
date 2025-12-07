@@ -14,8 +14,8 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {Button} from '@/components/ui/button'
 import {cn, createRawImageUrl, getMcmetaPath} from '@/utils'
 import {saveAs} from 'file-saver'
-import type {GithubRepo} from '@/utils'
-import {useSettingStore} from '@/stores/settingStore'
+import {useDisplaySettings} from '@/stores/settingStore'
+import {useRepoStore} from '@/stores/repoStore'
 import {useScrollLock} from '@/hooks/useScrollLock'
 import {AnimatedSprite} from './AnimatedSprite'
 
@@ -31,10 +31,7 @@ interface ImageViewerProps {
   onOpenChange: (open: boolean) => void
   images: string[]
   currentIndex: number
-  repo: GithubRepo
   onIndexChange?: (index: number) => void
-  /** Set of mcmeta file paths for checking if images have animation */
-  mcmetaPaths?: Set<string>
 }
 
 export function ImageViewer({
@@ -42,10 +39,13 @@ export function ImageViewer({
   onOpenChange,
   images,
   currentIndex,
-  repo,
   onIndexChange,
-  mcmetaPaths,
 }: ImageViewerProps) {
+  // Get state from stores
+  const repo = useRepoStore(state => state.repo)
+  const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
+  const {pixelated, animationEnabled, gridBackground} = useDisplaySettings()
+
   const [loading, setLoading] = useState(true)
   const [imageError, setImageError] = useState(false)
   const [imageMetadata, setImageMetadata] = useState<{
@@ -54,9 +54,6 @@ export function ImageViewer({
     fileSize: number | null
     format: string
   } | null>(null)
-  const pixelated = useSettingStore(state => state.pixelated)
-  const animationEnabled = useSettingStore(state => state.animationEnabled)
-  const gridBackground = useSettingStore(state => state.gridBackground)
   const dialogContentRef = useRef<HTMLDivElement>(null)
   const imgRef = useRef<HTMLImageElement>(null)
   const currentImageRef = useRef<string | undefined>(undefined)
