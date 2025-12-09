@@ -6,11 +6,7 @@ import {
   parseMcmeta,
   fetchMcmetaData,
 } from '@/utils/mcmeta'
-import {
-  cn,
-  getCachedObjectUrl,
-  setCachedImageMetadata,
-} from '@/utils'
+import {cn, getCachedObjectUrl, setCachedImageMetadata} from '@/utils'
 import {useSettingStore} from '@/stores/settingStore'
 
 interface AnimatedSpriteProps {
