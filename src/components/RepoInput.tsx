@@ -1,33 +1,27 @@
-import {useRef} from 'react'
-
 import {Search as SearchIcon, X as XIcon} from 'lucide-react'
 import {Input} from '@/components/ui/input'
 import {Button} from '@/components/ui/button'
 
-import {useTargetRepository} from '@/hooks/useTargetRepository'
+import {useInputRef} from '@/hooks/features/form/useInputRef'
+import {useRepoSetting} from '@/hooks/features/repo/useRepoSetting'
 import {cn, parseGithubUrl} from '@/utils'
 
 export function RepoInput({className, ...props}: React.ComponentProps<'div'>) {
-  const [, setRepo] = useTargetRepository()
-  const inputRef = useRef<HTMLInputElement>(null)
+  const {inputRef, clearInput, getValue} = useInputRef()
+  const {setRepo} = useRepoSetting()
 
   const handleClearRepo = () => {
-    if (inputRef.current) {
-      inputRef.current.value = ''
-    }
+    clearInput()
   }
 
   const handleApplyRepo = () => {
-    if (!inputRef.current) {
-      return
-    }
+    const url = getValue()
+    if (!url) return
 
-    const parsedRepository = parseGithubUrl(inputRef.current.value)
-    if (!parsedRepository) {
-      return
-    }
+    const parsedRepo = parseGithubUrl(url)
+    if (!parsedRepo) return
 
-    setRepo(parsedRepository.owner, parsedRepository.name, parsedRepository.ref)
+    setRepo(parsedRepo)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

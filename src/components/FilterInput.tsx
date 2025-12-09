@@ -1,11 +1,14 @@
-import {memo, useCallback, useLayoutEffect, useRef, useState} from 'react'
+import {memo, useCallback} from 'react'
 
 import {Filter as FilterIcon, HelpCircle, X as XIcon} from 'lucide-react'
 import {Input} from '@/components/ui/input'
 import {Button} from '@/components/ui/button'
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover'
 
-import {useFilterQuery} from '@/hooks/useFilterQuery'
+import {useFilterState} from '@/hooks/features/filter/useFilterState'
+import {useFilterActions} from '@/hooks/features/filter/useFilterActions'
+import {useInputSync} from '@/hooks/features/form/useInputSync'
+import {useInputRef} from '@/hooks/features/form/useInputRef'
 import {cn} from '@/utils'
 
 const FilterHelpPopover = memo(function FilterHelpPopover() {
@@ -61,19 +64,10 @@ const FilterInputField = memo(
     onApply,
     inputRef,
   }: FilterInputFieldProps) {
-    const [localValue, setLocalValue] = useState(initialValue)
-
-    // Sync localValue with initialValue when it changes
-    // Note: This pattern is necessary to sync external prop changes to internal state
-    useLayoutEffect(() => {
-      if (localValue !== initialValue) {
-        setLocalValue(initialValue)
-        if (inputRef.current) {
-          inputRef.current.value = initialValue
-        }
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [initialValue])
+    const {localValue, setLocalValue} = useInputSync({
+      externalValue: initialValue,
+      inputRef,
+    })
 
     const handleKeyDown = useCallback(
       (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -83,14 +77,14 @@ const FilterInputField = memo(
           onApply(value)
         }
       },
-      [onApply, inputRef],
+      [onApply, inputRef, setLocalValue],
     )
 
     const handleChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         setLocalValue(e.target.value)
       },
-      [],
+      [setLocalValue],
     )
 
     return (
@@ -147,31 +141,15 @@ export const FilterInput = memo(function FilterInput({
   className,
   ...props
 }: React.ComponentProps<'div'>) {
-  const [filter, setFilter] = useFilterQuery()
-  const inputRef = useRef<HTMLInputElement>(null)
+  const {filter, setFilter} = useFilterState()
+  const {inputRef} = useInputRef()
 
-  const handleClearFilter = useCallback(() => {
-    setFilter('')
-    if (inputRef.current) {
-      inputRef.current.value = ''
-    }
-  }, [setFilter])
-
-  const handleApplyFilter = useCallback(() => {
-    const value = inputRef.current?.value || ''
-    if (value !== filter) {
-      setFilter(value)
-    }
-  }, [filter, setFilter])
-
-  const handleInputApply = useCallback(
-    (value: string) => {
-      if (value !== filter) {
-        setFilter(value)
-      }
-    },
-    [filter, setFilter],
-  )
+  const {handleClearFilter, handleApplyFilter, handleInputApply} =
+    useFilterActions({
+      filter,
+      setFilter,
+      inputRef,
+    })
 
   return (
     <div

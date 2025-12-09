@@ -1,40 +1,15 @@
-import {useCallback, useState, useRef, memo, useMemo} from 'react'
+import {useCallback, memo} from 'react'
 import {LoaderCircleIcon} from 'lucide-react'
-import {createRawImageUrl, cn, getMcmetaPath} from '@/utils'
+import {cn} from '@/utils'
 import {AnimatedSprite} from './AnimatedSprite'
 import {useRepoStore} from '@/stores/repoStore'
 import {useDisplaySettings} from '@/stores/settingStore'
-
-// Cache regex to avoid recompilation
-const FILE_EXTENSION_REGEX = /\.[^/.]+$/
-
-/**
- * Parse image path to extract directory and filename parts
- * Optimized: Use cached regex and efficient string operations
- */
-function parseImagePath(path: string): {directory: string; filename: string} {
-  // Remove file extension
-  const pathWithoutExt = path.replace(FILE_EXTENSION_REGEX, '')
-  const lastSlashIndex = pathWithoutExt.lastIndexOf('/')
-
-  if (lastSlashIndex === -1) {
-    return {directory: '', filename: pathWithoutExt || path}
-  }
-
-  // Extract directory (parent folder name) and filename efficiently
-  const beforeLastSlash = pathWithoutExt.slice(0, lastSlashIndex)
-  const secondLastSlashIndex = beforeLastSlash.lastIndexOf('/')
-  const directory =
-    secondLastSlashIndex === -1
-      ? beforeLastSlash
-      : beforeLastSlash.slice(secondLastSlashIndex + 1)
-  const filename = pathWithoutExt.slice(lastSlashIndex + 1)
-
-  return {
-    directory: directory || '',
-    filename: filename || '',
-  }
-}
+import {useImageUrl} from '@/hooks/features/image/useImageUrl'
+import {useImageLoading} from '@/hooks/features/image-viewer/useImageLoading'
+import {useImageAnimation} from '@/hooks/features/image-viewer/useImageAnimation'
+import {useKeyboardAccessibility} from '@/hooks/features/accessibility/useKeyboardAccessibility'
+import {useImageRef} from '@/hooks/features/image/useImageRef'
+import {parseImagePath} from '@/utils/features/imageCell'
 
 /**
  * Overlay component showing image path information
@@ -86,53 +61,54 @@ interface ImageCellProps {
   onClick?: () => void
 }
 
-const ImageCell = memo(function ImageCell({
-  path,
-  onClick,
-}: ImageCellProps) {
+const ImageCell = memo(function ImageCell({path, onClick}: ImageCellProps) {
   // Get state from stores
   const repo = useRepoStore(state => state.repo)
   const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
   const {animationEnabled} = useDisplaySettings()
-  const [loading, setLoading] = useState(true)
-  const imgRef = useRef<HTMLImageElement>(null)
-  const currentPathRef = useRef<string>(path)
 
-  // Check if this image has an associated mcmeta file
-  const mcmetaPath = getMcmetaPath(path)
-  const hasAnimation = mcmetaPaths?.has(mcmetaPath) ?? false
-  const shouldAnimate = hasAnimation && animationEnabled
+  // Image URL
+  const {imageUrl} = useImageUrl({repo, imagePath: path})
 
-  // Memoize image URL to avoid recalculation
-  const imageUrl = useMemo(() => createRawImageUrl(repo, path), [repo, path])
+  // Image loading
+  const {
+    loading,
+    handleLoad,
+    handleError,
+    handleImageRef: handleImageRefFromHook,
+  } = useImageLoading({
+    onLoad: () => {},
+    onError: () => {},
+  })
 
-  const handleLoad = useCallback(() => {
-    setLoading(false)
-  }, [])
+  // Image animation
+  const {shouldAnimate} = useImageAnimation({
+    imagePath: path,
+    mcmetaPaths,
+    animationEnabled,
+  })
 
+  // Image ref
+  const {handleImageRef: handleImageRefFromRefHook} = useImageRef({
+    currentPath: path,
+  })
+
+  // Combine image ref handlers
   const handleImageRef = useCallback(
     (img: HTMLImageElement | null) => {
-      imgRef.current = img
-      if (currentPathRef.current !== path) {
-        currentPathRef.current = path
-        setLoading(true)
-      }
+      handleImageRefFromHook(img)
+      handleImageRefFromRefHook(img)
       if (img && img.complete) {
-        setLoading(false)
+        handleLoad()
       }
     },
-    [path],
+    [handleImageRefFromHook, handleImageRefFromRefHook, handleLoad],
   )
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLDivElement>) => {
-      if (e.key === 'Enter' || e.key === ' ') {
-        e.preventDefault()
-        onClick?.()
-      }
-    },
-    [onClick],
-  )
+  // Keyboard accessibility
+  const {handleKeyDown} = useKeyboardAccessibility({
+    onActivate: onClick,
+  })
 
   return (
     <div
@@ -172,7 +148,8 @@ const ImageCell = memo(function ImageCell({
               loading ? 'hidden' : 'block',
             )}
             decoding="async"
-            onLoad={handleLoad}
+            onLoad={() => handleLoad()}
+            onError={handleError}
           />
         </>
       )}

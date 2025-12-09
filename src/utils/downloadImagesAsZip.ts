@@ -26,8 +26,7 @@ async function downloadImageToZip(
     const blob = await response.blob()
     zip.file(imagePath, blob)
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
     console.error(`Failed to download ${imagePath}:`, errorMessage)
     throw error
   }
@@ -134,8 +133,7 @@ export const downloadImagesAsZip = async (
     const fileName = `${repo.owner}-${repo.name}.zip`
     saveAs(content, fileName)
   } catch (error) {
-    const errorMessage =
-      error instanceof Error ? error.message : String(error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
     throw new Error(`Failed to create zip file: ${errorMessage}`)
   }
 }

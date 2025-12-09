@@ -12,3 +12,5 @@ export {
   TICK_MS,
 } from './mcmeta'
 export type {McmetaData, McmetaFrame, ParsedMcmetaAnimation} from './mcmeta'
+export {formatFileSize, parseImagePath} from './features/imageViewer'
+export {parseImagePath as parseImagePathForCell} from './features/imageCell'

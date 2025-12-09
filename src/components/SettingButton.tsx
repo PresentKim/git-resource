@@ -15,95 +15,49 @@ import {Label} from '@/components/ui/label'
 import {Slider} from '@/components/ui/slider'
 import {Switch} from '@/components/ui/switch'
 
-import {
-  useSettingStore,
-  type Theme,
-  type GridBackground,
-} from '@/stores/settingStore'
 import {useGithubRateLimitStore} from '@/stores/githubApiStore'
-import {useState, useMemo} from 'react'
-import {useScrollLock} from '@/hooks/useScrollLock'
+import {useSettingsForm} from '@/hooks/features/settings/useSettingsForm'
+import {useSettingsSave} from '@/hooks/features/settings/useSettingsSave'
+import {useSettingsDialog} from '@/hooks/features/settings/useSettingsDialog'
 
 export function SettingButton() {
-  const settings = useSettingStore()
   const rateLimit = useGithubRateLimitStore()
-  const [isOpen, setIsOpen] = useState(false)
-  const [githubToken, setGithubToken] = useState('')
-  const [columnCount, setColumnCount] = useState(0)
-  const [pixelated, setPixelated] = useState(true)
-  const [animationEnabled, setAnimationEnabled] = useState(true)
-  const [theme, setTheme] = useState<Theme>('dark')
-  const [gridBackground, setGridBackground] = useState<GridBackground>('auto')
-  const [initialValues, setInitialValues] = useState({
-    githubToken: '',
-    columnCount: 0,
-    pixelated: true,
-    animationEnabled: true,
-    theme: 'dark' as Theme,
-    gridBackground: 'auto' as GridBackground,
-  })
 
-  const hasChanges = useMemo(() => {
-    return (
-      githubToken !== initialValues.githubToken ||
-      columnCount !== initialValues.columnCount ||
-      pixelated !== initialValues.pixelated ||
-      animationEnabled !== initialValues.animationEnabled ||
-      theme !== initialValues.theme ||
-      gridBackground !== initialValues.gridBackground
-    )
-  }, [
+  // Settings form
+  const {
     githubToken,
+    setGithubToken,
     columnCount,
+    setColumnCount,
     pixelated,
+    setPixelated,
     animationEnabled,
+    setAnimationEnabled,
     theme,
+    setTheme,
     gridBackground,
-    initialValues,
-  ])
+    setGridBackground,
+    loadInitialValues,
+    hasChanges,
+  } = useSettingsForm()
 
-  const handleSave = () => {
-    settings.setGithubToken(githubToken)
-    settings.setColumnCount(columnCount)
-    settings.setPixelated(pixelated)
-    settings.setAnimationEnabled(animationEnabled)
-    settings.setTheme(theme)
-    settings.setGridBackground(gridBackground)
-    // Update initial values after saving
-    setInitialValues({
+  // Settings save
+  const {handleSave} = useSettingsSave({
+    formValues: {
       githubToken,
       columnCount,
       pixelated,
       animationEnabled,
       theme,
       gridBackground,
-    })
-  }
+    },
+    setInitialValues: loadInitialValues,
+  })
 
-  const handleOpenChange = (open: boolean) => {
-    setIsOpen(open)
-    // Reset the values if the dialog is opened
-    if (open) {
-      const initial = {
-        githubToken: settings.githubToken,
-        columnCount: settings.columnCount,
-        pixelated: settings.pixelated,
-        animationEnabled: settings.animationEnabled,
-        theme: settings.theme,
-        gridBackground: settings.gridBackground,
-      }
-      setGithubToken(initial.githubToken)
-      setColumnCount(initial.columnCount)
-      setPixelated(initial.pixelated)
-      setAnimationEnabled(initial.animationEnabled)
-      setTheme(initial.theme)
-      setGridBackground(initial.gridBackground)
-      setInitialValues(initial)
-    }
-  }
-
-  // Lock background scroll while the settings dialog is open
-  useScrollLock(isOpen)
+  // Settings dialog
+  const {handleOpenChange} = useSettingsDialog({
+    onOpen: loadInitialValues,
+  })
 
   return (
     <Dialog onOpenChange={handleOpenChange} modal={false}>
@@ -124,8 +78,8 @@ export function SettingButton() {
             <span>Viewer settings</span>
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
-            Configure how images are loaded and rendered. These settings are stored
-            in your browser only.
+            Configure how images are loaded and rendered. These settings are
+            stored in your browser only.
           </DialogDescription>
         </DialogHeader>
 

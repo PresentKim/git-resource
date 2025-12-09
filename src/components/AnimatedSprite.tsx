@@ -346,10 +346,6 @@ const AnimatedSprite = memo(function AnimatedSprite({
     const container = containerRef.current
     if (!container) return
 
-    // For ImageViewer (Dialog), assume visible initially
-    // IntersectionObserver will update if needed
-    setIsVisible(true)
-
     const observer = new IntersectionObserver(
       entries => setIsVisible(entries[0].isIntersecting),
       {threshold: 0, rootMargin: '50px'},

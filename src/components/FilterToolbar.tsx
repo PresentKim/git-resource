@@ -1,9 +1,9 @@
-import {memo, useCallback, useMemo, useState} from 'react'
+import {memo} from 'react'
 import {Button} from '@/components/ui/button'
 import {Download as DownloadIcon, Loader as LoaderIcon} from 'lucide-react'
-import {downloadImagesAsZip, isMcmetaFile} from '@/utils'
-import {usePromise} from '@/hooks/usePromise'
 import {useRepoStore} from '@/stores/repoStore'
+import {useImageCount} from '@/hooks/features/filter/useImageCount'
+import {useImageDownload} from '@/hooks/features/download/useImageDownload'
 
 interface ImageCountBadgeProps {
   filteredCount: number
@@ -32,39 +32,18 @@ const ImageCountBadge = memo(
 const DownloadButton = memo(function DownloadButton() {
   const repo = useRepoStore(state => state.repo)
   const filteredImageFiles = useRepoStore(state => state.filteredImageFiles)
-  const filteredCount = useMemo(
-    () => filteredImageFiles?.length ?? 0,
-    [filteredImageFiles],
-  )
-  const [downloadProgress, setDownloadProgress] = useState<number | null>(null)
+  const {filteredCount} = useImageCount()
 
-  const downloadFilteredImages = useCallback(async () => {
-    const paths = filteredImageFiles || []
-    if (!paths.length) return
-
-    setDownloadProgress(0)
-    try {
-      await downloadImagesAsZip(repo, paths, (completed, total) => {
-        const percent = Math.round((completed / total) * 100)
-        setDownloadProgress(percent)
-      })
-      setDownloadProgress(100)
-      // Briefly show 100%, then reset
-      setTimeout(() => setDownloadProgress(null), 500)
-    } catch (error) {
-      console.error('Failed to download images:', error)
-      setDownloadProgress(null)
-      // Optionally show error to user
-    }
-  }, [repo, filteredImageFiles])
-
-  const [isDownloading, downloadAll] = usePromise(downloadFilteredImages)
+  const {isDownloading, downloadProgress, handleDownload} = useImageDownload({
+    repo,
+    imagePaths: filteredImageFiles || [],
+  })
 
   return (
     <Button
       aria-label="Download all filtered images as ZIP"
       disabled={isDownloading || !filteredCount}
-      onClick={downloadAll}
+      onClick={handleDownload}
       size="sm"
       variant="outline"
       className="text-xs font-semibold flex flex-col items-center gap-0.5 min-w-[190px]">
@@ -100,18 +79,7 @@ const DownloadButton = memo(function DownloadButton() {
 })
 
 export const FilterToolbar = memo(function FilterToolbar() {
-  const filteredImageFiles = useRepoStore(state => state.filteredImageFiles)
-  const imageFiles = useRepoStore(state => state.imageFiles)
-
-  const filteredCount = useMemo(
-    () => filteredImageFiles?.length ?? 0,
-    [filteredImageFiles],
-  )
-
-  const totalCount = useMemo(() => {
-    if (!imageFiles) return 0
-    return imageFiles.filter(path => !isMcmetaFile(path)).length
-  }, [imageFiles])
+  const {filteredCount, totalCount} = useImageCount()
 
   return (
     <div className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start">
