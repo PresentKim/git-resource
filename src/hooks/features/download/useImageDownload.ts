@@ -1,17 +1,22 @@
 import {useCallback, useState} from 'react'
 import {downloadImagesAsZip} from '@/utils'
-import type {GithubRepo} from '@/utils'
+import type {GithubRepo, FlattenMode} from '@/utils'
 
 interface UseImageDownloadProps {
   repo: GithubRepo
   imagePaths: string[]
+  flattenMode?: FlattenMode
 }
 
 /**
  * Hook for downloading images as ZIP
  * Handles download progress and state management
  */
-export function useImageDownload({repo, imagePaths}: UseImageDownloadProps) {
+export function useImageDownload({
+  repo,
+  imagePaths,
+  flattenMode = 'original',
+}: UseImageDownloadProps) {
   const [downloadProgress, setDownloadProgress] = useState<number | null>(null)
   const [isDownloading, setIsDownloading] = useState(false)
 
@@ -21,10 +26,15 @@ export function useImageDownload({repo, imagePaths}: UseImageDownloadProps) {
     setIsDownloading(true)
     setDownloadProgress(0)
     try {
-      await downloadImagesAsZip(repo, imagePaths, (completed, total) => {
-        const percent = Math.round((completed / total) * 100)
-        setDownloadProgress(percent)
-      })
+      await downloadImagesAsZip(
+        repo,
+        imagePaths,
+        (completed, total) => {
+          const percent = Math.round((completed / total) * 100)
+          setDownloadProgress(percent)
+        },
+        flattenMode,
+      )
       setDownloadProgress(100)
       // Briefly show 100%, then reset
       setTimeout(() => {
@@ -36,7 +46,7 @@ export function useImageDownload({repo, imagePaths}: UseImageDownloadProps) {
       setDownloadProgress(null)
       setIsDownloading(false)
     }
-  }, [repo, imagePaths])
+  }, [repo, imagePaths, flattenMode])
 
   return {
     isDownloading,

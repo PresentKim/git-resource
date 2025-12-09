@@ -21,3 +21,5 @@ export {
   preloadImage,
 } from './imageCache'
 export {parseImagePath as parseImagePathForCell} from './features/imageCell'
+export {resolveDuplicatePaths, transformPath} from './pathFlatten'
+export type {FlattenMode} from './pathFlatten'

@@ -1,5 +1,6 @@
 import {GithubRepo, createRawImageUrl} from './github'
 import type JSZip from 'jszip'
+import {type FlattenMode, resolveDuplicatePaths} from './pathFlatten'
 
 // Constants
 const LARGE_DOWNLOAD_THRESHOLD = 2000
@@ -7,28 +8,29 @@ const BATCH_SIZE = 50
 const MAX_CONCURRENT_DOWNLOADS = 4 // Limit concurrent downloads to reduce memory usage
 
 /**
- * Download a single image and add it to the zip
+ * Download a single image and add it to the zip with a specific path
  */
 async function downloadImageToZip(
   zip: JSZip,
   repo: GithubRepo,
-  imagePath: string,
+  originalPath: string,
+  zipPath: string,
 ): Promise<void> {
   try {
-    const url = createRawImageUrl(repo, imagePath)
+    const url = createRawImageUrl(repo, originalPath)
     const response = await fetch(url)
 
     if (!response.ok) {
       throw new Error(
-        `Failed to fetch ${imagePath}: ${response.status} ${response.statusText}`,
+        `Failed to fetch ${originalPath}: ${response.status} ${response.statusText}`,
       )
     }
 
     const blob = await response.blob()
-    zip.file(imagePath, blob)
+    zip.file(zipPath, blob)
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error)
-    console.error(`Failed to download ${imagePath}:`, errorMessage)
+    console.error(`Failed to download ${originalPath}:`, errorMessage)
     throw error
   }
 }
@@ -41,6 +43,7 @@ async function processWithConcurrencyLimit(
   zip: JSZip,
   repo: GithubRepo,
   imagePaths: string[],
+  pathMap: Map<string, string>,
   onProgress?: (completed: number, total: number) => void,
 ): Promise<void> {
   let completed = 0
@@ -48,10 +51,11 @@ async function processWithConcurrencyLimit(
   const queue: Array<() => Promise<void>> = []
 
   // Create a queue of download tasks
-  for (const imagePath of imagePaths) {
+  for (const originalPath of imagePaths) {
+    const zipPath = pathMap.get(originalPath) || originalPath
     queue.push(async () => {
       try {
-        await downloadImageToZip(zip, repo, imagePath)
+        await downloadImageToZip(zip, repo, originalPath, zipPath)
       } catch {
         // Error already logged in downloadImageToZip
         // Continue with other images
@@ -93,19 +97,15 @@ async function processBatch(
   zip: JSZip,
   repo: GithubRepo,
   batch: string[],
+  pathMap: Map<string, string>,
   currentCompleted: number,
   total: number,
   onProgress?: (completed: number, total: number) => void,
 ): Promise<number> {
-  await processWithConcurrencyLimit(
-    zip,
-    repo,
-    batch,
-    (completed) => {
-      // Adjust progress to account for current batch offset
-      onProgress?.(currentCompleted + completed, total)
-    },
-  )
+  await processWithConcurrencyLimit(zip, repo, batch, pathMap, completed => {
+    // Adjust progress to account for current batch offset
+    onProgress?.(currentCompleted + completed, total)
+  })
 
   return currentCompleted + batch.length
 }
@@ -118,6 +118,7 @@ export const downloadImagesAsZip = async (
   repo: GithubRepo,
   imagePaths: string[],
   onProgress?: (completed: number, total: number) => void,
+  flattenMode: FlattenMode = 'original',
 ): Promise<void> => {
   if (!imagePaths.length) {
     throw new Error('No images to download')
@@ -136,6 +137,9 @@ export const downloadImagesAsZip = async (
       throw new Error('Download cancelled by user')
     }
   }
+
+  // Resolve path transformations and duplicates
+  const pathMap = resolveDuplicatePaths(imagePaths, flattenMode)
 
   // Dynamic import - only load when download is triggered
   let JSZipClass: typeof JSZip
@@ -168,6 +172,7 @@ export const downloadImagesAsZip = async (
         zip,
         repo,
         batch,
+        pathMap,
         completed,
         total,
         onProgress,
