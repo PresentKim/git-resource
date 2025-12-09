@@ -4,6 +4,7 @@ import type JSZip from 'jszip'
 // Constants
 const LARGE_DOWNLOAD_THRESHOLD = 2000
 const BATCH_SIZE = 50
+const MAX_CONCURRENT_DOWNLOADS = 4 // Limit concurrent downloads to reduce memory usage
 
 /**
  * Download a single image and add it to the zip
@@ -33,7 +34,60 @@ async function downloadImageToZip(
 }
 
 /**
- * Process a batch of images
+ * Process images with concurrency limit to reduce memory usage
+ * Uses a promise pool pattern to limit simultaneous downloads
+ */
+async function processWithConcurrencyLimit(
+  zip: JSZip,
+  repo: GithubRepo,
+  imagePaths: string[],
+  onProgress?: (completed: number, total: number) => void,
+): Promise<void> {
+  let completed = 0
+  const total = imagePaths.length
+  const queue: Array<() => Promise<void>> = []
+
+  // Create a queue of download tasks
+  for (const imagePath of imagePaths) {
+    queue.push(async () => {
+      try {
+        await downloadImageToZip(zip, repo, imagePath)
+      } catch {
+        // Error already logged in downloadImageToZip
+        // Continue with other images
+      } finally {
+        completed += 1
+        onProgress?.(completed, total)
+      }
+    })
+  }
+
+  // Process queue with concurrency limit
+  const workers: Promise<void>[] = []
+  let queueIndex = 0
+
+  // Start initial workers up to the concurrency limit
+  for (let i = 0; i < Math.min(MAX_CONCURRENT_DOWNLOADS, queue.length); i++) {
+    workers.push(
+      (async () => {
+        while (queueIndex < queue.length) {
+          const task = queue[queueIndex++]
+          await task()
+          // Yield to event loop periodically to keep UI responsive
+          if (queueIndex % 10 === 0) {
+            await new Promise(resolve => requestAnimationFrame(resolve))
+          }
+        }
+      })(),
+    )
+  }
+
+  // Wait for all workers to complete
+  await Promise.all(workers)
+}
+
+/**
+ * Process a batch of images (kept for backward compatibility, but uses concurrency limit internally)
  */
 async function processBatch(
   zip: JSZip,
@@ -43,22 +97,17 @@ async function processBatch(
   total: number,
   onProgress?: (completed: number, total: number) => void,
 ): Promise<number> {
-  const results = await Promise.allSettled(
-    batch.map(imagePath => downloadImageToZip(zip, repo, imagePath)),
+  await processWithConcurrencyLimit(
+    zip,
+    repo,
+    batch,
+    (completed) => {
+      // Adjust progress to account for current batch offset
+      onProgress?.(currentCompleted + completed, total)
+    },
   )
 
-  let newCompleted = currentCompleted
-  for (const result of results) {
-    newCompleted += 1
-    onProgress?.(newCompleted, total)
-
-    if (result.status === 'rejected') {
-      // Error already logged in downloadImageToZip
-      // Continue with other images
-    }
-  }
-
-  return newCompleted
+  return currentCompleted + batch.length
 }
 
 /**
