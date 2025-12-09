@@ -101,6 +101,8 @@ interface RepoStore {
   repo: GithubRepo
   imageFiles: GithubImageFileTree | null
   filteredImageFiles: string[] | null
+  filterCache: Map<string, string[]>
+  imageFilesVersion: number
   mcmetaPaths: Set<string>
   error: Error | null
   viewerState: {open: boolean; currentIndex: number}
@@ -127,6 +129,8 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   repo: initialRepo,
   imageFiles: null,
   filteredImageFiles: null,
+  filterCache: new Map<string, string[]>(),
+  imageFilesVersion: 0,
   mcmetaPaths: new Set<string>(),
   error: null,
   viewerState: {open: false, currentIndex: 0},
@@ -144,6 +148,8 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     set({
       imageFiles: files,
       mcmetaPaths,
+      filterCache: new Map<string, string[]>(),
+      imageFilesVersion: get().imageFilesVersion + 1,
     })
 
     // Set initial filtered images (all images, filter will be applied separately)
@@ -155,11 +161,18 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   },
 
   updateFilteredImages: (filter: string) => {
-    const {imageFiles} = get()
+    const {imageFiles, filterCache, imageFilesVersion} = get()
     if (!imageFiles) {
       // Don't set isFiltering to false if images haven't loaded yet
       // This allows the loading screen to remain visible
       set({filteredImageFiles: null})
+      return
+    }
+
+    const cacheKey = `${imageFilesVersion}|${filter}`
+    const cached = filterCache.get(cacheKey)
+    if (cached) {
+      set({filteredImageFiles: cached, isFiltering: false})
       return
     }
 
@@ -190,7 +203,19 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
 
       // Use setTimeout to ensure loading state is visible for at least a brief moment
       setTimeout(() => {
-        set({filteredImageFiles: filtered, isFiltering: false})
+        const {filterCache: currentCache} = get()
+        const nextCache = new Map(currentCache)
+        const MAX_CACHE_ENTRIES = 50
+        if (nextCache.size >= MAX_CACHE_ENTRIES) {
+          const oldestKey = nextCache.keys().next().value
+          if (oldestKey) nextCache.delete(oldestKey)
+        }
+        nextCache.set(cacheKey, filtered)
+        set({
+          filteredImageFiles: filtered,
+          isFiltering: false,
+          filterCache: nextCache,
+        })
       }, 50)
     })
   },
@@ -207,6 +232,8 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     set({
       imageFiles: null,
       filteredImageFiles: null,
+      filterCache: new Map<string, string[]>(),
+      imageFilesVersion: 0,
       mcmetaPaths: new Set<string>(),
       error: null,
       viewerState: {open: false, currentIndex: 0},
