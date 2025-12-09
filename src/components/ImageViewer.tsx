@@ -1,4 +1,4 @@
-import {useRef, useEffect} from 'react'
+import {useRef, useEffect, useState, useCallback} from 'react'
 import {
   ChevronLeft,
   ChevronRight,
@@ -12,7 +12,7 @@ import {
 import {Dialog, DialogPortal} from '@/components/ui/dialog'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {Button} from '@/components/ui/button'
-import {cn, createRawImageUrl} from '@/utils'
+import {cn, createRawImageUrl, getCachedObjectUrl} from '@/utils'
 import {useScrollLock} from '@/hooks/useScrollLock'
 import {AnimatedSprite} from './AnimatedSprite'
 import {formatFileSize} from '@/utils/features/imageViewer'
@@ -52,6 +52,8 @@ export function ImageViewer({
   const {pixelated, animationEnabled, gridBackground} = useDisplaySettings()
 
   const currentImage = images[currentIndex]
+  const rawSrc = currentImage ? createRawImageUrl(repo, currentImage) : ''
+  const [resolvedSrc, setResolvedSrc] = useState(rawSrc)
 
   // Image metadata
   const {metadata, updateMetadata, clearMetadata} = useImageMetadata()
@@ -107,13 +109,6 @@ export function ImageViewer({
     onTranslateChange: setTranslate,
   })
 
-  // Image history (needs handleClose before used)
-  const {handleClose, handleOpenAutoFocus} = useImageHistory({
-    open,
-    currentIndex,
-    onOpenChange,
-  })
-
   // Image touch gestures
   const imageContainerRef = zoomContainerRef
   useImageTouch({
@@ -134,7 +129,7 @@ export function ImageViewer({
   })
 
   // Image history (needs handleClose before useImageKeyboard)
-  const {handleClose, handleOpenAutoFocus} = useImageHistory({
+  const {handleClose} = useImageHistory({
     open,
     currentIndex,
     onOpenChange,
@@ -166,6 +161,31 @@ export function ImageViewer({
   // Image path parsing
   const {filePath} = useImagePath({imagePath: currentImage})
 
+  // Resolve cached object URL to avoid redundant fetch/decoding for high-res images
+  useEffect(() => {
+    let cancelled = false
+    if (!rawSrc) {
+      queueMicrotask(() => {
+        if (!cancelled) setResolvedSrc('')
+      })
+      return () => {
+        cancelled = true
+      }
+    }
+
+    getCachedObjectUrl(rawSrc)
+      .then(url => {
+        if (!cancelled) setResolvedSrc(url || rawSrc)
+      })
+      .catch(() => {
+        if (!cancelled) setResolvedSrc(rawSrc)
+      })
+
+    return () => {
+      cancelled = true
+    }
+  }, [rawSrc])
+
   // Reset zoom when image changes
   useEffect(() => {
     if (currentImage) {
@@ -176,6 +196,22 @@ export function ImageViewer({
   useScrollLock(open)
 
   // Handle Escape key is handled by useImageKeyboard
+
+  const handleDialogOpenAutoFocus = useCallback(
+    (e: Event) => {
+      e.preventDefault()
+      const content = dialogContentRef.current
+      if (content) {
+        const firstFocusable = content.querySelector(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+        ) as HTMLElement | null
+        if (firstFocusable) {
+          firstFocusable.focus({preventScroll: true})
+        }
+      }
+    },
+    [],
+  )
 
   if (!currentImage) return null
 
@@ -198,7 +234,7 @@ export function ImageViewer({
           )}
           aria-labelledby={imageTitleId}
           aria-describedby={undefined}
-          onOpenAutoFocus={handleOpenAutoFocus(() => dialogContentRef.current)}
+          onOpenAutoFocus={handleDialogOpenAutoFocus}
           onPointerDownOutside={e => e.preventDefault()}
           onEscapeKeyDown={e => {
             e.preventDefault()
@@ -285,7 +321,7 @@ export function ImageViewer({
                     transition: isDragging ? 'none' : 'transform 0.1s ease-out',
                   }}>
                   <AnimatedSprite
-                    src={createRawImageUrl(repo, currentImage)}
+                    src={resolvedSrc || rawSrc}
                     alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
                     className={cn(
                       'w-full h-full max-w-[80vw] max-h-[60vh]',
@@ -308,7 +344,7 @@ export function ImageViewer({
                   }}>
                   <img
                     ref={handleImageRef}
-                    src={createRawImageUrl(repo, currentImage)}
+                    src={resolvedSrc || rawSrc}
                     alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
                     className={cn(
                       'w-full h-full object-contain',
