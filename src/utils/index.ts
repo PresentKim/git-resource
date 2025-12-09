@@ -13,5 +13,11 @@ export {
 } from './mcmeta'
 export type {McmetaData, McmetaFrame, ParsedMcmetaAnimation} from './mcmeta'
 export {formatFileSize, parseImagePath} from './features/imageViewer'
-export {getCachedObjectUrl, clearImageCache} from './imageCache'
+export {
+  getCachedObjectUrl,
+  clearImageCache,
+  getCachedImageMetadata,
+  setCachedImageMetadata,
+  preloadImage,
+} from './imageCache'
 export {parseImagePath as parseImagePathForCell} from './features/imageCell'

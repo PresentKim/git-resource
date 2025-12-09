@@ -6,7 +6,11 @@ import {
   parseMcmeta,
   fetchMcmetaData,
 } from '@/utils/mcmeta'
-import {cn} from '@/utils'
+import {
+  cn,
+  getCachedObjectUrl,
+  setCachedImageMetadata,
+} from '@/utils'
 import {useSettingStore} from '@/stores/settingStore'
 
 interface AnimatedSpriteProps {
@@ -303,12 +307,18 @@ const AnimatedSprite = memo(function AnimatedSprite({
 
   // Load image
   useEffect(() => {
+    let cancelled = false
     const image = new Image()
     image.crossOrigin = 'anonymous'
 
     image.onload = async () => {
+      if (cancelled) return
       imageRef.current = image
       setLoading(false)
+      setCachedImageMetadata(src, {
+        width: image.naturalWidth,
+        height: image.naturalHeight,
+      })
       await initAnimation(image)
       // Start interval after animation is initialized
       // Check current paused/visible state using refs
@@ -319,18 +329,33 @@ const AnimatedSprite = memo(function AnimatedSprite({
         }
         intervalRef.current = window.setInterval(handleAnimationTick, 50)
       }
-      onLoadRef.current?.({width: image.width, height: image.width})
+      onLoadRef.current?.({
+        width: image.naturalWidth,
+        height: image.naturalHeight,
+      })
     }
 
     image.onerror = () => {
+      if (cancelled) return
       setLoading(false)
       setError(true)
       onErrorRef.current?.()
     }
 
-    image.src = src
+    getCachedObjectUrl(src)
+      .then(url => {
+        if (!cancelled) image.src = url
+      })
+      .catch(() => {
+        if (!cancelled) {
+          setLoading(false)
+          setError(true)
+          onErrorRef.current?.()
+        }
+      })
 
     return () => {
+      cancelled = true
       if (intervalRef.current) {
         clearInterval(intervalRef.current)
         intervalRef.current = null

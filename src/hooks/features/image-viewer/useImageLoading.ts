@@ -1,4 +1,8 @@
 import {useState, useRef, useCallback} from 'react'
+import {
+  getCachedImageMetadata,
+  setCachedImageMetadata,
+} from '@/utils'
 
 interface UseImageLoadingProps {
   onLoad?: (dimensions?: {width: number; height: number}) => void
@@ -17,7 +21,18 @@ export function useImageLoading({onLoad, onError}: UseImageLoadingProps) {
   const handleLoad = useCallback(
     (dimensions?: {width: number; height: number}) => {
       setLoading(false)
-      onLoad?.(dimensions)
+      const source = imgRef.current?.src
+      const width =
+        dimensions?.width ?? imgRef.current?.naturalWidth ?? undefined
+      const height =
+        dimensions?.height ?? imgRef.current?.naturalHeight ?? undefined
+
+      if (source && width && height) {
+        setCachedImageMetadata(source, {width, height})
+        onLoad?.({width, height})
+      } else {
+        onLoad?.(dimensions)
+      }
     },
     [onLoad],
   )
@@ -31,6 +46,14 @@ export function useImageLoading({onLoad, onError}: UseImageLoadingProps) {
   const handleImageRef = useCallback(
     (img: HTMLImageElement | null) => {
       imgRef.current = img
+      if (img?.src) {
+        const cached = getCachedImageMetadata(img.src)
+        if (cached) {
+          setLoading(false)
+          onLoad?.(cached)
+          return
+        }
+      }
       if (img && img.complete) {
         // When the image is already cached, use its natural size directly
         const width = img.naturalWidth
@@ -38,7 +61,7 @@ export function useImageLoading({onLoad, onError}: UseImageLoadingProps) {
         handleLoad({width, height})
       }
     },
-    [handleLoad],
+    [handleLoad, onLoad],
   )
 
   return {

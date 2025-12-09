@@ -12,7 +12,7 @@ import {
 import {Dialog, DialogPortal} from '@/components/ui/dialog'
 import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {Button} from '@/components/ui/button'
-import {cn, createRawImageUrl, getCachedObjectUrl} from '@/utils'
+import {cn, createRawImageUrl, getCachedObjectUrl, preloadImage} from '@/utils'
 import {useScrollLock} from '@/hooks/useScrollLock'
 import {AnimatedSprite} from './AnimatedSprite'
 import {formatFileSize} from '@/utils/features/imageViewer'
@@ -84,6 +84,20 @@ export function ImageViewer({
       onIndexChange,
     },
   )
+
+  // Preload adjacent images to speed up navigation
+  useEffect(() => {
+    const targets: string[] = []
+    const nextPath = hasNext ? images[currentIndex + 1] : undefined
+    const prevPath = hasPrevious ? images[currentIndex - 1] : undefined
+
+    if (nextPath) targets.push(createRawImageUrl(repo, nextPath))
+    if (prevPath) targets.push(createRawImageUrl(repo, prevPath))
+
+    targets.forEach(src => {
+      preloadImage(src)?.catch(() => {})
+    })
+  }, [repo, images, currentIndex, hasNext, hasPrevious])
 
   // Image zoom
   const {
@@ -197,21 +211,18 @@ export function ImageViewer({
 
   // Handle Escape key is handled by useImageKeyboard
 
-  const handleDialogOpenAutoFocus = useCallback(
-    (e: Event) => {
-      e.preventDefault()
-      const content = dialogContentRef.current
-      if (content) {
-        const firstFocusable = content.querySelector(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-        ) as HTMLElement | null
-        if (firstFocusable) {
-          firstFocusable.focus({preventScroll: true})
-        }
+  const handleDialogOpenAutoFocus = useCallback((e: Event) => {
+    e.preventDefault()
+    const content = dialogContentRef.current
+    if (content) {
+      const firstFocusable = content.querySelector(
+        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+      ) as HTMLElement | null
+      if (firstFocusable) {
+        firstFocusable.focus({preventScroll: true})
       }
-    },
-    [],
-  )
+    }
+  }, [])
 
   if (!currentImage) return null
 
