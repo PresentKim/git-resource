@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState} from 'react'
+import {useCallback, useState} from 'react'
 import {RefreshCw} from 'lucide-react'
 
 import {Button} from '@/components/ui/button'
@@ -10,34 +10,14 @@ import {cn, pickByPartialFisherYates} from '@/utils'
 const EXAMPLE_REPO_COUNT = 5
 const REROLL_ANIMATION_DURATION_MS = 200
 
-type ExampleRepository = [string, string, string]
+import {exampleRepositories} from '@/utils/example-repositories'
 
 export default function Home() {
   const [, setTargetRepository] = useTargetRepository()
-  const [exampleRepositories, setExampleRepositories] = useState<
-    ExampleRepository[]
-  >([])
   const [shuffledExampleRepositories, setShuffledExampleRepositories] =
-    useState<ExampleRepository[]>([])
+    useState(pickByPartialFisherYates(exampleRepositories, EXAMPLE_REPO_COUNT))
   const [isRerolling, setIsRerolling] = useState(false)
   const [rerollKey, setRerollKey] = useState(0)
-
-  useEffect(() => {
-    const loadExampleRepositories = async () => {
-      try {
-        const module = await import('@/utils/example-repositories.json')
-        const loaded = module.default as ExampleRepository[]
-        setExampleRepositories(loaded)
-        setShuffledExampleRepositories(
-          pickByPartialFisherYates(loaded, EXAMPLE_REPO_COUNT),
-        )
-      } catch (error) {
-        console.error('Failed to load example repositories:', error)
-      }
-    }
-
-    loadExampleRepositories()
-  }, [])
 
   const handleRerollExamples = useCallback(() => {
     if (!exampleRepositories.length) return
@@ -52,7 +32,7 @@ export default function Home() {
       )
       setIsRerolling(false)
     }, REROLL_ANIMATION_DURATION_MS)
-  }, [exampleRepositories])
+  }, [])
 
   return (
     <section className="flex flex-col w-full px-3">
