@@ -24,7 +24,12 @@ export function useImageDrag({
 
   const handleMouseDown = useCallback(
     (e: React.MouseEvent) => {
-      if (scale <= minScale) return
+      // Only handle primary button drag when zoomed in
+      if (e.button !== 0 || scale <= minScale) return
+
+      // Prevent browser default drag behavior (e.g., dragging the image/canvas ghost)
+      e.preventDefault()
+
       setIsDragging(true)
       dragStartRef.current = {
         x: e.clientX,
