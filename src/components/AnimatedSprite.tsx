@@ -1,5 +1,4 @@
 import {useCallback, useEffect, useRef, useState, memo} from 'react'
-import {LoaderCircleIcon} from 'lucide-react'
 import {
   type ParsedMcmetaAnimation,
   type McmetaData,
@@ -60,12 +59,13 @@ const AnimatedSprite = memo(function AnimatedSprite({
   const imageRef = useRef<HTMLImageElement | null>(null)
   const animationStateRef = useRef<AnimationState | null>(null)
   const intervalRef = useRef<number | null>(null)
+  const prevSrcRef = useRef<string | undefined>(undefined)
 
-  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
   const [useAPNG, setUseAPNG] = useState<boolean | null>(null)
   const [apngUrl, setApngUrl] = useState<string | null>(null)
+  const [apngLoaded, setApngLoaded] = useState(false)
   const imgRef = useRef<HTMLImageElement | null>(null)
   const githubToken = useSettingStore(state => state.githubToken)
   const onLoadRef = useRef(onLoad)
@@ -216,8 +216,13 @@ const AnimatedSprite = memo(function AnimatedSprite({
       const canvas = canvasRef.current
       if (!canvas) return
 
-      if (useAPNG === null) {
-        setUseAPNG(false)
+      // Reset APNG state if src changed
+      const currentSrc = originalSrc ?? src
+      if (prevSrcRef.current !== currentSrc) {
+        prevSrcRef.current = currentSrc
+        setApngLoaded(false)
+        setApngUrl(null)
+        setUseAPNG(null)
       }
 
       // Fetch or use preloaded mcmeta data
@@ -241,35 +246,6 @@ const AnimatedSprite = memo(function AnimatedSprite({
         ? parseMcmeta(mcmetaData, image.width, image.height)
         : null
 
-      if (useAPNG === null) {
-        const supportsAPNG = await detectAPNGSupport()
-        setUseAPNG(supportsAPNG)
-
-        // If APNG is supported and we have animation data, try to convert
-        if (
-          supportsAPNG &&
-          parsedAnimation &&
-          parsedAnimation.frames.length > 1
-        ) {
-          try {
-            const apngBlobUrl = await convertSpriteToAPNG(
-              originalSrc ?? src,
-              image,
-              frameWidthPx,
-              frameHeightPx,
-              parsedAnimation.frames,
-              parsedAnimation.interpolate,
-            )
-            setApngUrl(apngBlobUrl)
-            return
-          } catch {
-            setUseAPNG(false)
-          }
-        } else {
-          setUseAPNG(false)
-        }
-      }
-
       let originalImageData: ImageData | undefined
       if (parsedAnimation?.interpolate) {
         const tempCanvas = document.createElement('canvas')
@@ -288,6 +264,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
         }
       }
 
+      // Draw first frame immediately to show Canvas
       if (!parsedAnimation || parsedAnimation.frames.length <= 1) {
         const ctx = canvas.getContext('2d')
         if (ctx) {
@@ -332,6 +309,36 @@ const AnimatedSprite = memo(function AnimatedSprite({
           )
         }
       }
+
+      // Check APNG support and convert in background
+      if (useAPNG === null) {
+        const supportsAPNG = await detectAPNGSupport()
+        setUseAPNG(supportsAPNG)
+
+        // If APNG is supported and we have animation data, convert in background
+        if (
+          supportsAPNG &&
+          parsedAnimation &&
+          parsedAnimation.frames.length > 1
+        ) {
+          convertSpriteToAPNG(
+            originalSrc ?? src,
+            image,
+            frameWidthPx,
+            frameHeightPx,
+            parsedAnimation.frames,
+            parsedAnimation.interpolate,
+          )
+            .then(apngBlobUrl => {
+              setApngUrl(apngBlobUrl)
+            })
+            .catch(() => {
+              setUseAPNG(false)
+            })
+        } else {
+          setUseAPNG(false)
+        }
+      }
     },
     [
       mcmetaUrl,
@@ -358,8 +365,6 @@ const AnimatedSprite = memo(function AnimatedSprite({
         height: image.naturalHeight,
       })
       await initAnimation(image)
-      // Set loading to false after animation is initialized
-      setLoading(false)
       // Start interval after animation is initialized
       // Check current paused/visible state using refs
       const shouldStart = !pausedRef.current && isVisibleRef.current
@@ -378,7 +383,6 @@ const AnimatedSprite = memo(function AnimatedSprite({
     image.onerror = () => {
       if (cancelled) return
       console.warn('[AnimatedSprite][APNG] image onerror', {src})
-      setLoading(false)
       setError(true)
       onErrorRef.current?.()
     }
@@ -389,7 +393,6 @@ const AnimatedSprite = memo(function AnimatedSprite({
       })
       .catch(() => {
         if (!cancelled) {
-          setLoading(false)
           setError(true)
           onErrorRef.current?.()
         }
@@ -451,15 +454,21 @@ const AnimatedSprite = memo(function AnimatedSprite({
     )
   }
 
-  // If APNG is available and supported, use <img> tag
-  if (useAPNG === true && apngUrl) {
-    return (
-      <div ref={containerRef} className={cn('relative', className)}>
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <LoaderCircleIcon className="size-6 animate-spin text-muted-foreground" />
-          </div>
+  return (
+    <div ref={containerRef} className={cn('relative', className)}>
+      {/* Canvas: always rendered, hidden when APNG is loaded */}
+      <canvas
+        ref={canvasRef}
+        className={cn(
+          'w-full h-full object-contain',
+          pixelated && 'pixelated',
+          apngLoaded && 'hidden',
         )}
+        aria-label={alt}
+        role="img"
+      />
+      {/* APNG: rendered when available, replaces Canvas once loaded */}
+      {useAPNG === true && apngUrl && (
         <img
           ref={imgRef}
           src={apngUrl}
@@ -467,10 +476,10 @@ const AnimatedSprite = memo(function AnimatedSprite({
           className={cn(
             'w-full h-full object-contain',
             pixelated && 'pixelated',
-            loading && 'invisible',
+            !apngLoaded && 'hidden',
           )}
           onLoad={() => {
-            setLoading(false)
+            setApngLoaded(true)
             if (imgRef.current) {
               onLoadRef.current?.({
                 width: imgRef.current.naturalWidth,
@@ -479,33 +488,12 @@ const AnimatedSprite = memo(function AnimatedSprite({
             }
           }}
           onError={() => {
-            setLoading(false)
-            setError(true)
+            setUseAPNG(false)
+            setApngUrl(null)
             onErrorRef.current?.()
           }}
         />
-      </div>
-    )
-  }
-
-  // Otherwise, use Canvas rendering
-  return (
-    <div ref={containerRef} className={cn('relative', className)}>
-      {loading && (
-        <div className="absolute inset-0 flex items-center justify-center">
-          <LoaderCircleIcon className="size-6 animate-spin text-muted-foreground" />
-        </div>
       )}
-      <canvas
-        ref={canvasRef}
-        className={cn(
-          'w-full h-full object-contain',
-          pixelated && 'pixelated',
-          loading && 'invisible',
-        )}
-        aria-label={alt}
-        role="img"
-      />
     </div>
   )
 })
