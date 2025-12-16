@@ -5,6 +5,8 @@ export interface ImageMetadata {
   height: number
   fileSize: number | null
   format: string
+  animatedSize?: {width: number; height: number}
+  interpolate?: boolean
 }
 
 /**
@@ -14,7 +16,12 @@ export function useImageMetadata() {
   const [metadata, setMetadata] = useState<ImageMetadata | null>(null)
 
   const updateMetadata = useCallback(
-    (dimensions?: {width: number; height: number}, format?: string) => {
+    (
+      dimensions?: {width: number; height: number},
+      format?: string,
+      animatedSize?: {width: number; height: number},
+      interpolate?: boolean,
+    ) => {
       const width = dimensions?.width ?? 0
       const height = dimensions?.height ?? 0
       const imageFormat = format || 'UNKNOWN'
@@ -24,6 +31,8 @@ export function useImageMetadata() {
         height,
         fileSize: null,
         format: imageFormat,
+        animatedSize,
+        interpolate,
       })
     },
     [],

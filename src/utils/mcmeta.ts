@@ -46,7 +46,7 @@ export const TICK_MS = 50 // 1 Minecraft tick = 50ms
  *
  * Handles Minecraft .mcmeta animation format:
  * - interpolate: Whether to interpolate between frames (parsed but not currently implemented)
- * - width/height: Frame dimensions as ratios (e.g., 2 means texture size / 2)
+ * - width/height: Animated dimensions as ratios (e.g., 2 means texture size / 2)
  * - frametime: Default frame time in ticks (defaults to 1)
  * - frames: Array of frame indices (numbers) or frame objects with {index, time}
  */
@@ -121,7 +121,7 @@ export function calculateFrameCount(
   frameWidth?: number | null,
   frameHeight?: number | null,
 ): number {
-  // Calculate effective frame dimensions
+  // Calculate effective animated dimensions
   // If width/height are provided, they are ratios (divide texture by ratio)
   // If not provided, use full texture dimensions
   // All frames are square, so we use the width as frame size

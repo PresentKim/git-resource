@@ -27,8 +27,12 @@ interface AnimatedSpriteProps {
   pixelated?: boolean
   /** Whether the animation is paused */
   paused?: boolean
-  /** Callback when image loads (provides sprite frame dimensions) */
-  onLoad?: (dimensions: {width: number; height: number}) => void
+  /** Callback when image loads (provides original image dimensions, frame dimensions, and interpolate info) */
+  onLoad?: (
+    originalDimensions: {width: number; height: number},
+    animatedDimensions: {width: number; height: number},
+    interpolate?: boolean,
+  ) => void
   /** Callback when image fails to load */
   onError?: () => void
 }
@@ -310,6 +314,19 @@ const AnimatedSprite = memo(function AnimatedSprite({
         }
       }
 
+      // Call onLoad with original image dimensions, frame dimensions, and interpolate info
+      onLoadRef.current?.(
+        {
+          width: image.naturalWidth,
+          height: image.naturalHeight,
+        },
+        {
+          width: frameWidthPx,
+          height: frameHeightPx,
+        },
+        parsedAnimation?.interpolate,
+      )
+
       // Check APNG support and convert in background
       if (useAPNG === null) {
         const supportsAPNG = await detectAPNGSupport()
@@ -374,10 +391,6 @@ const AnimatedSprite = memo(function AnimatedSprite({
         }
         intervalRef.current = window.setInterval(handleAnimationTick, 50)
       }
-      onLoadRef.current?.({
-        width: image.naturalWidth,
-        height: image.naturalHeight,
-      })
     }
 
     image.onerror = () => {
@@ -481,10 +494,14 @@ const AnimatedSprite = memo(function AnimatedSprite({
           onLoad={() => {
             setApngLoaded(true)
             if (imgRef.current) {
-              onLoadRef.current?.({
-                width: imgRef.current.naturalWidth,
-                height: imgRef.current.naturalHeight,
-              })
+              const width = imgRef.current.naturalWidth
+              const height = imgRef.current.naturalHeight
+
+              onLoadRef.current?.(
+                {width, height},
+                {width, height},
+                animationStateRef.current?.animation.interpolate,
+              )
             }
           }}
           onError={() => {

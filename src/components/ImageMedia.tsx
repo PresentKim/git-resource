@@ -15,10 +15,14 @@ interface ImageMediaProps {
   shouldAnimate: boolean
   /**
    * Callback when image loading is completed
-   * AnimatedSprite: dimensions based on mcmeta frames
-   * <img>: naturalWidth / naturalHeight
+   * AnimatedSprite: (originalDimensions, animatedDimensions, interpolate)
+   * <img>: (dimensions)
    */
-  onLoad?: (dimensions?: {width: number; height: number}) => void
+  onLoad?: (
+    originalDimensions?: {width: number; height: number},
+    animatedDimensions?: {width: number; height: number},
+    interpolate?: boolean,
+  ) => void
   /** Callback when image fails to load */
   onError?: () => void
   /** Ref function for static <img> (zoom/drag, etc.) */
@@ -60,7 +64,7 @@ const ImageMedia = memo(function ImageMedia({
         const img = event.currentTarget
         const width = img.naturalWidth
         const height = img.naturalHeight
-        onLoad?.({width, height})
+        onLoad?.({width, height}, undefined, undefined)
       }}
       onError={onError}
     />

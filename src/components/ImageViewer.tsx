@@ -59,13 +59,35 @@ export function ImageViewer({
   // Image metadata
   const {metadata, updateMetadata, clearMetadata} = useImageMetadata()
 
+  // Image animation
+  const {shouldAnimate} = useImageAnimation({
+    imagePath: currentImage,
+    mcmetaPaths,
+    animationEnabled,
+  })
+
   // Image loading
   const handleViewerLoad = useCallback(
-    (dimensions?: {width: number; height: number}) => {
+    (
+      originalDimensions?: {width: number; height: number},
+      animatedDimensions?: {width: number; height: number},
+      interpolate?: boolean,
+    ) => {
       const format = currentImage?.split('.').pop()?.toUpperCase() || 'UNKNOWN'
-      updateMetadata(dimensions, format)
+      // For animated sprites: originalDimensions is sprite sheet size, animatedDimensions is frame size
+      // For static images: originalDimensions is image size
+      const dimensions = shouldAnimate
+        ? originalDimensions
+        : originalDimensions || animatedDimensions
+      const animatedSize = shouldAnimate ? animatedDimensions : undefined
+      updateMetadata(
+        dimensions,
+        format,
+        animatedSize,
+        shouldAnimate ? interpolate : undefined,
+      )
     },
-    [currentImage, updateMetadata],
+    [currentImage, updateMetadata, shouldAnimate],
   )
   const handleViewerError = useCallback(() => {
     clearMetadata()
@@ -165,13 +187,6 @@ export function ImageViewer({
     repo,
     imagePath: currentImage || '',
     fileName: fileName || 'image.png',
-  })
-
-  // Image animation
-  const {shouldAnimate} = useImageAnimation({
-    imagePath: currentImage,
-    mcmetaPaths,
-    animationEnabled,
   })
 
   // Image path parsing
@@ -347,8 +362,16 @@ export function ImageViewer({
                     )}
                     pixelated={pixelated}
                     shouldAnimate={true}
-                    onLoad={dimensions => {
-                      void handleLoad(dimensions)
+                    onLoad={(
+                      originalDimensions,
+                      animatedDimensions,
+                      interpolate,
+                    ) => {
+                      handleViewerLoad(
+                        originalDimensions,
+                        animatedDimensions,
+                        interpolate,
+                      )
                     }}
                     onError={handleError}
                   />
@@ -407,23 +430,42 @@ export function ImageViewer({
             )}
 
             <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-50 px-4">
-              <div className="hidden sm:flex items-center justify-center gap-2 rounded-md px-4 py-2 text-sm min-h-6">
-                {metadata ? (
-                  <>
+              <div className="hidden sm:flex flex-col items-start gap-1">
+                <div className="flex items-center justify-start gap-2 rounded-md px-4 py-2 text-sm min-h-6">
+                  {metadata ? (
+                    <>
+                      {metadata.animatedSize ? (
+                        <span className="opacity-80">
+                          ORIGINAL: {metadata.width} × {metadata.height}px
+                        </span>
+                      ) : (
+                        <span className="opacity-80">
+                          {metadata.width} × {metadata.height}px
+                        </span>
+                      )}
+                      {metadata.fileSize && (
+                        <span className="opacity-80">
+                          · {formatFileSize(metadata.fileSize)}
+                        </span>
+                      )}
+                      {metadata.format && (
+                        <span className="opacity-80">· {metadata.format}</span>
+                      )}
+                    </>
+                  ) : (
+                    <span className="invisible opacity-0">0 × 0px</span>
+                  )}
+                </div>
+                {metadata?.animatedSize && (
+                  <div className="flex items-center justify-start gap-2 rounded-md px-4 py-2 text-sm min-h-6">
                     <span className="opacity-80">
-                      {metadata.width} × {metadata.height}px
+                      ANIMATED: {metadata.animatedSize.width} ×{' '}
+                      {metadata.animatedSize.height}px
                     </span>
-                    {metadata.fileSize && (
-                      <span className="opacity-80">
-                        · {formatFileSize(metadata.fileSize)}
-                      </span>
+                    {metadata.interpolate === true && (
+                      <span className="opacity-80">· interpolate</span>
                     )}
-                    {metadata.format && (
-                      <span className="opacity-80">· {metadata.format}</span>
-                    )}
-                  </>
-                ) : (
-                  <span className="invisible opacity-0">0 × 0px</span>
+                  </div>
                 )}
               </div>
               <div
@@ -481,23 +523,44 @@ export function ImageViewer({
                 </Button>
               </div>
               <div className="flex flex-col items-center gap-2 sm:hidden w-full">
-                <div className="flex items-center justify-center gap-2 rounded-md px-3 py-1.5 text-base min-h-7 w-full">
-                  {metadata ? (
-                    <>
+                <div className="flex flex-col items-start gap-1 w-full">
+                  <div className="flex items-center justify-start gap-2 rounded-md px-3 py-1.5 text-base min-h-7 w-full">
+                    {metadata ? (
+                      <>
+                        {metadata.animatedSize ? (
+                          <span className="opacity-80">
+                            ORIGINAL: {metadata.width}×{metadata.height}px
+                          </span>
+                        ) : (
+                          <span className="opacity-80">
+                            {metadata.width}×{metadata.height}px
+                          </span>
+                        )}
+                        {metadata.fileSize && (
+                          <span className="opacity-80">
+                            · {formatFileSize(metadata.fileSize)}
+                          </span>
+                        )}
+                        {metadata.format && (
+                          <span className="opacity-80">
+                            · {metadata.format}
+                          </span>
+                        )}
+                      </>
+                    ) : (
+                      <span className="invisible opacity-0">0×0px</span>
+                    )}
+                  </div>
+                  {metadata?.animatedSize && (
+                    <div className="flex items-center justify-start gap-2 rounded-md px-3 py-1.5 text-xs min-h-6 w-full">
                       <span className="opacity-80">
-                        {metadata.width}×{metadata.height}px
+                        ANIMATED: {metadata.animatedSize.width}×
+                        {metadata.animatedSize.height}px
                       </span>
-                      {metadata.fileSize && (
-                        <span className="opacity-80">
-                          · {formatFileSize(metadata.fileSize)}
-                        </span>
+                      {metadata.interpolate === true && (
+                        <span className="opacity-80">· interpolate</span>
                       )}
-                      {metadata.format && (
-                        <span className="opacity-80">· {metadata.format}</span>
-                      )}
-                    </>
-                  ) : (
-                    <span className="invisible opacity-0">0×0px</span>
+                    </div>
                   )}
                 </div>
                 <div className="flex items-center gap-4 w-full">
