@@ -15,65 +15,44 @@ export function useRepoLoading() {
   const getDefaultBranch = usePromise(useGithubDefaultBranch())[1]
   const isLoadImagePaths = usePromise(useGithubImageFileTree())[0]
   const getImagePaths = usePromise(useGithubImageFileTree())[1]
-  const repoFromStore = useRepoStore(state => state.repo)
-  const repoFromUrl = useTargetRepository()[0]
+  const targetRepository = useTargetRepository()[0]
   const setRepo = useRepoStore(state => state.setRepo)
   const setImageFiles = useRepoStore(state => state.setImageFiles)
   const setError = useRepoStore(state => state.setError)
 
   useEffect(() => {
-    // Only proceed if we have owner and name
-    if (!repoFromStore.owner || !repoFromStore.name) {
+    const ref = targetRepository.ref?.trim()
+
+    // Get image files if ref is provided in URL
+    if (ref) {
+      setRepo(targetRepository)
+      getImagePaths(targetRepository)
+        .then(imageFileTree => {
+          setError(null)
+          setImageFiles(imageFileTree)
+        })
+        .catch(err => {
+          setError(err instanceof Error ? err : new Error(String(err)))
+        })
       return
-    }
-
-    // Check if ref is provided in URL first (most reliable source)
-    // This prevents unnecessary defaultBranch lookup when branch is already in URL
-    const refFromUrl = repoFromUrl.ref?.trim()
-    const refFromStore = repoFromStore.ref?.trim()
-
-    if (refFromUrl) {
-      // Ref is provided in URL, directly fetch image files
-      // Ensure store is synced with URL
-      if (refFromUrl !== refFromStore) {
-        setRepo({...repoFromStore, ref: refFromUrl})
-      }
-      getImagePaths({...repoFromStore, ref: refFromUrl})
-        .then(imageFileTree => {
-          setError(null)
-          setImageFiles(imageFileTree)
-        })
-        .catch(err => {
-          setError(err instanceof Error ? err : new Error(String(err)))
-        })
-    } else if (refFromStore) {
-      // Ref is in store but not in URL, use store ref
-      getImagePaths(repoFromStore)
-        .then(imageFileTree => {
-          setError(null)
-          setImageFiles(imageFileTree)
-        })
-        .catch(err => {
-          setError(err instanceof Error ? err : new Error(String(err)))
-        })
     } else {
       // No ref provided, need to fetch default branch
-      getDefaultBranch(repoFromUrl)
+      getDefaultBranch(targetRepository)
         .then(defaultBranch => {
           setError(null)
           setTargetRepository(
-            repoFromUrl.owner,
-            repoFromUrl.name,
+            targetRepository.owner,
+            targetRepository.name,
             defaultBranch,
           )
+          setRepo({...targetRepository, ref: defaultBranch})
         })
         .catch(err => {
           setError(err instanceof Error ? err : new Error(String(err)))
         })
     }
   }, [
-    repoFromStore,
-    repoFromUrl,
+    targetRepository,
     getDefaultBranch,
     getImagePaths,
     setTargetRepository,
