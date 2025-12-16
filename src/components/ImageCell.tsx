@@ -1,7 +1,7 @@
 import {useCallback, memo} from 'react'
 import {LoaderCircleIcon} from 'lucide-react'
 import {cn} from '@/utils'
-import {AnimatedSprite} from './AnimatedSprite'
+import {ImageMedia} from './ImageMedia'
 import {useRepoStore} from '@/stores/repoStore'
 import {useDisplaySettings} from '@/stores/settingStore'
 import {useImageUrl} from '@/hooks/features/image/useImageUrl'
@@ -119,40 +119,31 @@ const ImageCell = memo(function ImageCell({path, onClick}: ImageCellProps) {
       onKeyDown={handleKeyDown}
       aria-label={`View image: ${path}`}
       aria-pressed={false}>
-      {shouldAnimate ? (
-        <AnimatedSprite
-          src={imageUrl}
-          alt={`Animated image from ${path}`}
-          className="size-full"
-          onLoad={handleLoad}
-        />
-      ) : (
-        <>
-          <div
-            className={cn(
-              'size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md',
-              loading ? 'block' : 'hidden',
-            )}
-            aria-hidden="true">
-            <LoaderCircleIcon
-              className="size-full object-contain text-muted animate-spin duration-[3s]"
-              aria-hidden="true"
-            />
-          </div>
-          <img
-            ref={handleImageRef}
-            src={imageUrl}
-            alt={`Image from ${path}`}
-            className={cn(
-              'size-full object-contain peer',
-              loading ? 'hidden' : 'block',
-            )}
-            decoding="async"
-            onLoad={() => handleLoad()}
-            onError={handleError}
+      <>
+        <div
+          className={cn(
+            'size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md',
+            loading ? 'block' : 'hidden',
+          )}
+          aria-hidden="true">
+          <LoaderCircleIcon
+            className="size-full object-contain text-muted animate-spin duration-[3s]"
+            aria-hidden="true"
           />
-        </>
-      )}
+        </div>
+        <ImageMedia
+          src={imageUrl}
+          alt={
+            shouldAnimate ? `Animated image from ${path}` : `Image from ${path}`
+          }
+          className={cn('size-full object-contain peer', loading && 'hidden')}
+          shouldAnimate={shouldAnimate}
+          pixelated={false}
+          imgRef={handleImageRef}
+          onLoad={() => handleLoad()}
+          onError={handleError}
+        />
+      </>
       <ImagePathOverlay path={path} />
     </div>
   )

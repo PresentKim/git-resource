@@ -23,3 +23,6 @@ export {
 export {parseImagePath as parseImagePathForCell} from './features/imageCell'
 export {resolveDuplicatePaths, transformPath} from './pathFlatten'
 export type {FlattenMode} from './pathFlatten'
+export {detectAPNGSupport, detectAPNGSupportSync, getCachedAPNGSupport} from './apngSupport'
+export {convertSpriteToAPNG, encodeAPNG, extractSpriteFrames} from './apngEncoder'
+export type {APNGFrame} from './apngEncoder'

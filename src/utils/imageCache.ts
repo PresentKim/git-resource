@@ -86,4 +86,3 @@ export async function preloadImage(src: string) {
   preloadCache.set(src, promise)
   return promise
 }
-

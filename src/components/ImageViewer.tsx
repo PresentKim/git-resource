@@ -14,7 +14,7 @@ import * as DialogPrimitive from '@radix-ui/react-dialog'
 import {Button} from '@/components/ui/button'
 import {cn, createRawImageUrl, getCachedObjectUrl, preloadImage} from '@/utils'
 import {useScrollLock} from '@/hooks/useScrollLock'
-import {AnimatedSprite} from './AnimatedSprite'
+import {ImageMedia} from './ImageMedia'
 import {formatFileSize} from '@/utils/features/imageViewer'
 import {useDisplaySettings} from '@/stores/settingStore'
 import {useRepoStore} from '@/stores/repoStore'
@@ -331,14 +331,17 @@ export function ImageViewer({
                     transformOrigin: 'center center',
                     transition: isDragging ? 'none' : 'transform 0.1s ease-out',
                   }}>
-                  <AnimatedSprite
-                    src={resolvedSrc || rawSrc}
+                  <ImageMedia
+                    // For animated sprites, always use the original raw URL.
+                    // AnimatedSprite will handle caching and mcmeta loading based on this.
+                    src={rawSrc}
                     alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
                     className={cn(
-                      'w-full h-full max-w-[80vw] max-h-[60vh]',
+                      'w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
                       loading && 'opacity-0',
                     )}
                     pixelated={pixelated}
+                    shouldAnimate={true}
                     onLoad={dimensions => {
                       void handleLoad(dimensions)
                     }}
@@ -353,23 +356,24 @@ export function ImageViewer({
                     transformOrigin: 'center center',
                     transition: isDragging ? 'none' : 'transform 0.1s ease-out',
                   }}>
-                  <img
-                    ref={handleImageRef}
+                  <ImageMedia
                     src={resolvedSrc || rawSrc}
                     alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
                     className={cn(
-                      'w-full h-full object-contain',
-                      pixelated && 'pixelated',
+                      'w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
                       loading && 'opacity-0',
                     )}
-                    onLoad={() => {
-                      const img = imgRef.current
-                      const width = img?.naturalWidth ?? 0
-                      const height = img?.naturalHeight ?? 0
+                    pixelated={pixelated}
+                    shouldAnimate={false}
+                    imgRef={handleImageRef}
+                    onLoad={dimensions => {
+                      const width =
+                        dimensions?.width ?? imgRef.current?.naturalWidth ?? 0
+                      const height =
+                        dimensions?.height ?? imgRef.current?.naturalHeight ?? 0
                       void handleLoad({width, height})
                     }}
                     onError={handleError}
-                    draggable={false}
                   />
                 </div>
               )}

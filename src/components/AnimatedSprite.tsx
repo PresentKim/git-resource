@@ -8,10 +8,14 @@ import {
 } from '@/utils/mcmeta'
 import {cn, getCachedObjectUrl, setCachedImageMetadata} from '@/utils'
 import {useSettingStore} from '@/stores/settingStore'
+import {detectAPNGSupport} from '@/utils/apngSupport'
+import {convertSpriteToAPNG} from '@/utils/apngEncoder'
 
 interface AnimatedSpriteProps {
-  /** Source URL of the sprite sheet image */
+  /** Source URL of the image or sprite sheet (can be blob/Object URL) */
   src: string
+  /** Original raw image URL (used for mcmeta loading and caching) */
+  originalSrc?: string
   /** URL of the .mcmeta file (optional - will be auto-generated if not provided) */
   mcmetaSrc?: string
   /** Pre-loaded mcmeta data (optional - skips fetching if provided) */
@@ -41,6 +45,7 @@ interface AnimationState {
 
 const AnimatedSprite = memo(function AnimatedSprite({
   src,
+  originalSrc,
   mcmetaSrc,
   mcmetaData: preloadedMcmetaData,
   alt = 'Animated sprite',
@@ -59,6 +64,9 @@ const AnimatedSprite = memo(function AnimatedSprite({
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
   const [isVisible, setIsVisible] = useState(true)
+  const [useAPNG, setUseAPNG] = useState<boolean | null>(null)
+  const [apngUrl, setApngUrl] = useState<string | null>(null)
+  const imgRef = useRef<HTMLImageElement | null>(null)
   const githubToken = useSettingStore(state => state.githubToken)
   const onLoadRef = useRef(onLoad)
   const onErrorRef = useRef(onError)
@@ -73,12 +81,11 @@ const AnimatedSprite = memo(function AnimatedSprite({
     isVisibleRef.current = isVisible
   }, [onLoad, onError, paused, isVisible])
 
-  const mcmetaUrl = mcmetaSrc ?? `${src}.mcmeta`
+  const mcmetaUrl = mcmetaSrc ?? `${originalSrc ?? src}.mcmeta`
 
   const lerp = (delta: number, from: number, to: number): number =>
     delta * (to - from) + from
 
-  // Draw a specific frame on the canvas
   const drawFrame = useCallback(
     (
       ctx: CanvasRenderingContext2D,
@@ -204,11 +211,14 @@ const AnimatedSprite = memo(function AnimatedSprite({
     )
   }, [paused, isVisible, drawFrame])
 
-  // Initialize animation
   const initAnimation = useCallback(
     async (image: HTMLImageElement) => {
       const canvas = canvasRef.current
       if (!canvas) return
+
+      if (useAPNG === null) {
+        setUseAPNG(false)
+      }
 
       // Fetch or use preloaded mcmeta data
       let mcmetaData: McmetaData | undefined = preloadedMcmetaData
@@ -230,6 +240,35 @@ const AnimatedSprite = memo(function AnimatedSprite({
       const parsedAnimation = mcmetaData
         ? parseMcmeta(mcmetaData, image.width, image.height)
         : null
+
+      if (useAPNG === null) {
+        const supportsAPNG = await detectAPNGSupport()
+        setUseAPNG(supportsAPNG)
+
+        // If APNG is supported and we have animation data, try to convert
+        if (
+          supportsAPNG &&
+          parsedAnimation &&
+          parsedAnimation.frames.length > 1
+        ) {
+          try {
+            const apngBlobUrl = await convertSpriteToAPNG(
+              originalSrc ?? src,
+              image,
+              frameWidthPx,
+              frameHeightPx,
+              parsedAnimation.frames,
+              parsedAnimation.interpolate,
+            )
+            setApngUrl(apngBlobUrl)
+            return
+          } catch {
+            setUseAPNG(false)
+          }
+        } else {
+          setUseAPNG(false)
+        }
+      }
 
       let originalImageData: ImageData | undefined
       if (parsedAnimation?.interpolate) {
@@ -276,7 +315,6 @@ const AnimatedSprite = memo(function AnimatedSprite({
         originalImageData,
       }
 
-      // Draw initial frame
       const ctx = canvas.getContext('2d', {willReadFrequently: true})
       if (ctx) {
         const frame = parsedAnimation.frames[0]
@@ -294,11 +332,16 @@ const AnimatedSprite = memo(function AnimatedSprite({
           )
         }
       }
-
-      // Don't start interval here - let useEffect handle it based on paused/isVisible
-      // This prevents re-initialization when paused/isVisible changes
     },
-    [mcmetaUrl, preloadedMcmetaData, githubToken, drawFrame],
+    [
+      mcmetaUrl,
+      preloadedMcmetaData,
+      githubToken,
+      drawFrame,
+      src,
+      originalSrc,
+      useAPNG,
+    ],
   )
 
   // Load image
@@ -310,12 +353,13 @@ const AnimatedSprite = memo(function AnimatedSprite({
     image.onload = async () => {
       if (cancelled) return
       imageRef.current = image
-      setLoading(false)
-      setCachedImageMetadata(src, {
+      setCachedImageMetadata(originalSrc ?? src, {
         width: image.naturalWidth,
         height: image.naturalHeight,
       })
       await initAnimation(image)
+      // Set loading to false after animation is initialized
+      setLoading(false)
       // Start interval after animation is initialized
       // Check current paused/visible state using refs
       const shouldStart = !pausedRef.current && isVisibleRef.current
@@ -333,12 +377,13 @@ const AnimatedSprite = memo(function AnimatedSprite({
 
     image.onerror = () => {
       if (cancelled) return
+      console.warn('[AnimatedSprite][APNG] image onerror', {src})
       setLoading(false)
       setError(true)
       onErrorRef.current?.()
     }
 
-    getCachedObjectUrl(src)
+    getCachedObjectUrl(originalSrc ?? src)
       .then(url => {
         if (!cancelled) image.src = url
       })
@@ -361,7 +406,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
       imageRef.current = null
       animationStateRef.current = null
     }
-  }, [src, initAnimation, handleAnimationTick])
+  }, [src, originalSrc, initAnimation, handleAnimationTick])
 
   useEffect(() => {
     const container = containerRef.current
@@ -406,6 +451,44 @@ const AnimatedSprite = memo(function AnimatedSprite({
     )
   }
 
+  // If APNG is available and supported, use <img> tag
+  if (useAPNG === true && apngUrl) {
+    return (
+      <div ref={containerRef} className={cn('relative', className)}>
+        {loading && (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <LoaderCircleIcon className="size-6 animate-spin text-muted-foreground" />
+          </div>
+        )}
+        <img
+          ref={imgRef}
+          src={apngUrl}
+          alt={alt}
+          className={cn(
+            'w-full h-full object-contain',
+            pixelated && 'pixelated',
+            loading && 'invisible',
+          )}
+          onLoad={() => {
+            setLoading(false)
+            if (imgRef.current) {
+              onLoadRef.current?.({
+                width: imgRef.current.naturalWidth,
+                height: imgRef.current.naturalHeight,
+              })
+            }
+          }}
+          onError={() => {
+            setLoading(false)
+            setError(true)
+            onErrorRef.current?.()
+          }}
+        />
+      </div>
+    )
+  }
+
+  // Otherwise, use Canvas rendering
   return (
     <div ref={containerRef} className={cn('relative', className)}>
       {loading && (
