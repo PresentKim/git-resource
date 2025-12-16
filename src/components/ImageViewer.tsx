@@ -29,7 +29,6 @@ import {useImageKeyboard} from '@/hooks/features/image-viewer/useImageKeyboard'
 import {useImageDownload} from '@/hooks/features/image-viewer/useImageDownload'
 import {useImageAnimation} from '@/hooks/features/image-viewer/useImageAnimation'
 import {useImagePath} from '@/hooks/features/image-viewer/useImagePath'
-import {useImageHistory} from '@/hooks/features/image-viewer/useImageHistory'
 
 interface ImageViewerProps {
   open: boolean
@@ -152,18 +151,11 @@ export function ImageViewer({
     enabled: open,
   })
 
-  // Image history (needs handleClose before useImageKeyboard)
-  const {handleClose} = useImageHistory({
-    open,
-    currentIndex,
-    onOpenChange,
-  })
-
   // Image keyboard events
   useImageKeyboard({
     onPrevious: handlePrevious,
     onNext: handleNext,
-    onClose: handleClose,
+    onClose: () => onOpenChange(false),
     enabled: open,
   })
 
@@ -262,7 +254,7 @@ export function ImageViewer({
           onPointerDownOutside={e => e.preventDefault()}
           onEscapeKeyDown={e => {
             e.preventDefault()
-            handleClose()
+            onOpenChange(false)
           }}>
           <div
             ref={dialogContentRef}
@@ -275,7 +267,7 @@ export function ImageViewer({
               size="icon"
               className="absolute top-4 right-4 z-60 overlay-button"
               aria-label="Close"
-              onClick={handleClose}>
+              onClick={() => onOpenChange(false)}>
               <X className="size-6" />
             </Button>
 
