@@ -53,7 +53,9 @@ export function ImageViewer({
 
   const currentImage = images[currentIndex]
   const rawSrc = currentImage ? createRawImageUrl(repo, currentImage) : ''
-  const [resolvedSrc, setResolvedSrc] = useState(rawSrc)
+  const [resolvedSrc, setResolvedSrc] = useState<{forSrc: string; url: string}>(
+    () => ({forSrc: rawSrc, url: rawSrc}),
+  )
 
   // Image metadata
   const {metadata, updateMetadata, clearMetadata} = useImageMetadata()
@@ -188,7 +190,7 @@ export function ImageViewer({
     let cancelled = false
     if (!rawSrc) {
       queueMicrotask(() => {
-        if (!cancelled) setResolvedSrc('')
+        if (!cancelled) setResolvedSrc({forSrc: '', url: ''})
       })
       return () => {
         cancelled = true
@@ -197,16 +199,19 @@ export function ImageViewer({
 
     getCachedObjectUrl(rawSrc)
       .then(url => {
-        if (!cancelled) setResolvedSrc(url || rawSrc)
+        if (!cancelled) setResolvedSrc({forSrc: rawSrc, url: url || rawSrc})
       })
       .catch(() => {
-        if (!cancelled) setResolvedSrc(rawSrc)
+        if (!cancelled) setResolvedSrc({forSrc: rawSrc, url: rawSrc})
       })
 
     return () => {
       cancelled = true
     }
   }, [rawSrc])
+
+  const displayStaticSrc =
+    resolvedSrc.forSrc === rawSrc ? resolvedSrc.url : rawSrc
 
   // Reset zoom when image changes
   useEffect(() => {
@@ -365,7 +370,7 @@ export function ImageViewer({
                     transition: isDragging ? 'none' : 'transform 0.1s ease-out',
                   }}>
                   <ImageMedia
-                    src={resolvedSrc || rawSrc}
+                    src={displayStaticSrc}
                     alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
                     className={cn(
                       'w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
