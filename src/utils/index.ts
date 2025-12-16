@@ -34,3 +34,4 @@ export {
   extractSpriteFrames,
 } from './apngEncoder'
 export type {APNGFrame} from './apngEncoder'
+export {fisherYatesShuffle, pickByPartialFisherYates} from './array-random'
