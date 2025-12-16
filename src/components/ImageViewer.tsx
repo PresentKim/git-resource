@@ -59,6 +59,17 @@ export function ImageViewer({
   const {metadata, updateMetadata, clearMetadata} = useImageMetadata()
 
   // Image loading
+  const handleViewerLoad = useCallback(
+    (dimensions?: {width: number; height: number}) => {
+      const format = currentImage?.split('.').pop()?.toUpperCase() || 'UNKNOWN'
+      updateMetadata(dimensions, format)
+    },
+    [currentImage, updateMetadata],
+  )
+  const handleViewerError = useCallback(() => {
+    clearMetadata()
+  }, [clearMetadata])
+
   const {
     loading,
     error: imageError,
@@ -67,13 +78,8 @@ export function ImageViewer({
     handleError,
     handleImageRef,
   } = useImageLoading({
-    onLoad: dimensions => {
-      const format = currentImage?.split('.').pop()?.toUpperCase() || 'UNKNOWN'
-      updateMetadata(dimensions, format)
-    },
-    onError: () => {
-      clearMetadata()
-    },
+    onLoad: handleViewerLoad,
+    onError: handleViewerError,
   })
 
   // Image navigation
@@ -100,6 +106,10 @@ export function ImageViewer({
   }, [repo, images, currentIndex, hasNext, hasPrevious])
 
   // Image zoom
+  const handleZoomImageChange = useCallback(() => {
+    clearMetadata()
+  }, [clearMetadata])
+
   const {
     scale,
     translateX,
@@ -110,9 +120,7 @@ export function ImageViewer({
     resetZoom,
     setTranslate,
   } = useImageZoom({
-    onImageChange: () => {
-      clearMetadata()
-    },
+    onImageChange: handleZoomImageChange,
   })
 
   // Image drag
