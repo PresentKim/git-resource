@@ -372,6 +372,11 @@ export function ImageViewer({
                         animatedDimensions,
                         interpolate,
                       )
+                      const dimensions =
+                        animatedDimensions ?? originalDimensions
+                      if (dimensions) {
+                        handleLoad(dimensions)
+                      }
                     }}
                     onError={handleError}
                   />
