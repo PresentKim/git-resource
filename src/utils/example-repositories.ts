@@ -1,3 +1,5 @@
+import {fisherYatesShuffle} from './array-random'
+
 export type ExampleRepository = [string, string, string]
 
 export const exampleRepositories: ExampleRepository[] = [
@@ -133,3 +135,8 @@ export const exampleRepositories: ExampleRepository[] = [
   ['SlimeKnights', 'TinkersConstruct', '1.19.2'],
   ['refinedmods', 'refinedstorage', 'develop'],
 ]
+
+// Example repositories are shuffled once at initial load.
+// This prevents reshuffling on every Home render and keeps the list stable
+// unless the user explicitly requests a shuffle.
+fisherYatesShuffle(exampleRepositories)

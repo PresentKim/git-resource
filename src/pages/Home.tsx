@@ -6,16 +6,15 @@ import {RepoInput} from '@/components/RepoInput'
 
 import {useTargetRepository} from '@/hooks/useTargetRepository'
 import {cn, pickByPartialFisherYates} from '@/utils'
+import {exampleRepositories} from '@/utils/example-repositories'
 
 const EXAMPLE_REPO_COUNT = 5
 const REROLL_ANIMATION_DURATION_MS = 200
 
-import {exampleRepositories} from '@/utils/example-repositories'
-
 export default function Home() {
   const [, setTargetRepository] = useTargetRepository()
   const [shuffledExampleRepositories, setShuffledExampleRepositories] =
-    useState(pickByPartialFisherYates(exampleRepositories, EXAMPLE_REPO_COUNT))
+    useState(exampleRepositories.slice(0, EXAMPLE_REPO_COUNT))
   const [isRerolling, setIsRerolling] = useState(false)
   const [rerollKey, setRerollKey] = useState(0)
 
