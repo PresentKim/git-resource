@@ -36,6 +36,7 @@
     "tailwind-merge": "^3.4.0",
     "tailwindcss": "^4.1.17",
     "tailwindcss-animate": "^1.0.7",
+    "upng-js": "^2.1.0",
     "vaul": "^1.1.2",
     "zustand": "^5.0.8"
   },
@@ -45,6 +46,7 @@
     "@types/node": "^24.10.1",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
+    "@types/upng-js": "^2",
     "@vitejs/plugin-react": "^5.1.1",
     "eslint": "^9.39.1",
     "eslint-config-prettier": "^10.1.8",

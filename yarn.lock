@@ -2077,6 +2077,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/upng-js@npm:^2":
+  version: 2.1.5
+  resolution: "@types/upng-js@npm:2.1.5"
+  checksum: 10c0/54829eb57f2670e12bb67986b597074c0a7e6ec256b5025c5a850f9c813544eee2897762597bb4827db7b6dbf96bdc3d62fee801aef68b2513cc8d0c1bc4c29a
+  languageName: node
+  linkType: hard
+
 "@typescript-eslint/eslint-plugin@npm:8.48.0":
   version: 8.48.0
   resolution: "@typescript-eslint/eslint-plugin@npm:8.48.0"
@@ -3013,6 +3020,7 @@ __metadata:
     "@types/node": "npm:^24.10.1"
     "@types/react": "npm:^19.2.7"
     "@types/react-dom": "npm:^19.2.3"
+    "@types/upng-js": "npm:^2"
     "@vitejs/plugin-react": "npm:^5.1.1"
     class-variance-authority: "npm:^0.7.1"
     clsx: "npm:^2.1.1"
@@ -3035,6 +3043,7 @@ __metadata:
     tailwindcss-animate: "npm:^1.0.7"
     typescript: "npm:^5.9.3"
     typescript-eslint: "npm:^8.48.0"
+    upng-js: "npm:^2.1.0"
     vaul: "npm:^1.1.2"
     vite: "npm:^7.2.4"
     zustand: "npm:^5.0.8"
@@ -3819,7 +3828,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"pako@npm:~1.0.2":
+"pako@npm:^1.0.5, pako@npm:~1.0.2":
   version: 1.0.11
   resolution: "pako@npm:1.0.11"
   checksum: 10c0/86dd99d8b34c3930345b8bbeb5e1cd8a05f608eeb40967b293f72fe469d0e9c88b783a8777e4cc7dc7c91ce54c5e93d88ff4b4f060e6ff18408fd21030d9ffbe
@@ -4498,6 +4507,15 @@ __metadata:
   bin:
     update-browserslist-db: cli.js
   checksum: 10c0/682e8ecbf9de474a626f6462aa85927936cdd256fe584c6df2508b0df9f7362c44c957e9970df55dfe44d3623807d26316ea2c7d26b80bb76a16c56c37233c32
+  languageName: node
+  linkType: hard
+
+"upng-js@npm:^2.1.0":
+  version: 2.1.0
+  resolution: "upng-js@npm:2.1.0"
+  dependencies:
+    pako: "npm:^1.0.5"
+  checksum: 10c0/ee66db26339af1ae2bb4784680978435fab2f6010cd828502dbaecdf167e509a26b203af9e098b23c665711e3b76e1d47028f1cab233b85f6977daa50cb69784
   languageName: node
   linkType: hard
 

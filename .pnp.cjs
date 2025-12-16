@@ -41,6 +41,7 @@ const RAW_RUNTIME_STATE =
           ["@types/node", "npm:24.10.1"],\
           ["@types/react", "npm:19.2.7"],\
           ["@types/react-dom", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:19.2.3"],\
+          ["@types/upng-js", "npm:2.1.5"],\
           ["@vitejs/plugin-react", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:5.1.1"],\
           ["class-variance-authority", "npm:0.7.1"],\
           ["clsx", "npm:2.1.1"],\
@@ -63,6 +64,7 @@ const RAW_RUNTIME_STATE =
           ["tailwindcss-animate", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:1.0.7"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"],\
           ["typescript-eslint", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:8.48.0"],\
+          ["upng-js", "npm:2.1.0"],\
           ["vaul", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:1.1.2"],\
           ["vite", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:7.2.4"],\
           ["zustand", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:5.0.8"]\
@@ -2756,6 +2758,15 @@ const RAW_RUNTIME_STATE =
         "linkType": "HARD"\
       }]\
     ]],\
+    ["@types/upng-js", [\
+      ["npm:2.1.5", {\
+        "packageLocation": "./.yarn/cache/@types-upng-js-npm-2.1.5-9a33a861af-54829eb57f.zip/node_modules/@types/upng-js/",\
+        "packageDependencies": [\
+          ["@types/upng-js", "npm:2.1.5"]\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
     ["@typescript-eslint/eslint-plugin", [\
       ["npm:8.48.0", {\
         "packageLocation": "./.yarn/cache/@typescript-eslint-eslint-plugin-npm-8.48.0-1ac1de2061-5f4f9ac3ac.zip/node_modules/@typescript-eslint/eslint-plugin/",\
@@ -3925,6 +3936,7 @@ const RAW_RUNTIME_STATE =
           ["@types/node", "npm:24.10.1"],\
           ["@types/react", "npm:19.2.7"],\
           ["@types/react-dom", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:19.2.3"],\
+          ["@types/upng-js", "npm:2.1.5"],\
           ["@vitejs/plugin-react", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:5.1.1"],\
           ["class-variance-authority", "npm:0.7.1"],\
           ["clsx", "npm:2.1.1"],\
@@ -3947,6 +3959,7 @@ const RAW_RUNTIME_STATE =
           ["tailwindcss-animate", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:1.0.7"],\
           ["typescript", "patch:typescript@npm%3A5.9.3#optional!builtin<compat/typescript>::version=5.9.3&hash=5786d5"],\
           ["typescript-eslint", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:8.48.0"],\
+          ["upng-js", "npm:2.1.0"],\
           ["vaul", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:1.1.2"],\
           ["vite", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:7.2.4"],\
           ["zustand", "virtual:2b2b7bf2b46283bd174c475c523c201435c58bbb8b89c2e55acb1800908e83606026a2a8b0cbb76370f15923e079509c4407df5ddb77cc88f90331f681a4906c#npm:5.0.8"]\
@@ -5636,6 +5649,16 @@ const RAW_RUNTIME_STATE =
         "packagePeers": [\
           "@types/browserslist",\
           "browserslist"\
+        ],\
+        "linkType": "HARD"\
+      }]\
+    ]],\
+    ["upng-js", [\
+      ["npm:2.1.0", {\
+        "packageLocation": "./.yarn/cache/upng-js-npm-2.1.0-ef015e0934-ee66db2633.zip/node_modules/upng-js/",\
+        "packageDependencies": [\
+          ["upng-js", "npm:2.1.0"],\
+          ["pako", "npm:1.0.11"]\
         ],\
         "linkType": "HARD"\
       }]\
