@@ -5,37 +5,12 @@ import {Button} from '@/components/ui/button'
 import {RepoInput} from '@/components/RepoInput'
 
 import {useTargetRepository} from '@/hooks/useTargetRepository'
-import {cn} from '@/utils'
+import {cn, pickByPartialFisherYates} from '@/utils'
 
 const EXAMPLE_REPO_COUNT = 5
 const REROLL_ANIMATION_DURATION_MS = 200
 
 type ExampleRepository = [string, string, string]
-
-/**
- * Fisher-Yates shuffle algorithm for better randomness
- */
-function shuffleArray<T>(array: T[]): T[] {
-  const shuffled = [...array]
-  for (let i = shuffled.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]]
-  }
-  return shuffled
-}
-
-/**
- * Pick random examples from a list
- */
-function pickRandomExamples(
-  list: ExampleRepository[],
-  count: number,
-): ExampleRepository[] {
-  if (list.length <= count) {
-    return shuffleArray(list)
-  }
-  return shuffleArray(list).slice(0, count) as ExampleRepository[]
-}
 
 export default function Home() {
   const [, setTargetRepository] = useTargetRepository()
@@ -54,7 +29,7 @@ export default function Home() {
         const loaded = module.default as ExampleRepository[]
         setExampleRepositories(loaded)
         setShuffledExampleRepositories(
-          pickRandomExamples(loaded, EXAMPLE_REPO_COUNT),
+          pickByPartialFisherYates(loaded, EXAMPLE_REPO_COUNT),
         )
       } catch (error) {
         console.error('Failed to load example repositories:', error)
@@ -73,7 +48,7 @@ export default function Home() {
     // After fade-out, apply the new shuffled list
     setTimeout(() => {
       setShuffledExampleRepositories(
-        pickRandomExamples(exampleRepositories, EXAMPLE_REPO_COUNT),
+        pickByPartialFisherYates(exampleRepositories, EXAMPLE_REPO_COUNT),
       )
       setIsRerolling(false)
     }, REROLL_ANIMATION_DURATION_MS)
