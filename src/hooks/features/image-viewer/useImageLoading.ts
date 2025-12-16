@@ -1,8 +1,5 @@
 import {useState, useRef, useCallback} from 'react'
-import {
-  getCachedImageMetadata,
-  setCachedImageMetadata,
-} from '@/utils'
+import {getCachedImageMetadata, setCachedImageMetadata} from '@/utils'
 
 interface UseImageLoadingProps {
   onLoad?: (dimensions?: {width: number; height: number}) => void

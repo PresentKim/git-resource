@@ -1,7 +1,11 @@
 import {memo, useState} from 'react'
 import {Button} from '@/components/ui/button'
 import {Popover, PopoverContent, PopoverTrigger} from '@/components/ui/popover'
-import {Download as DownloadIcon, Loader as LoaderIcon, ChevronDown} from 'lucide-react'
+import {
+  Download as DownloadIcon,
+  Loader as LoaderIcon,
+  ChevronDown,
+} from 'lucide-react'
 import {useRepoStore} from '@/stores/repoStore'
 import {useImageCount} from '@/hooks/features/filter/useImageCount'
 import {useImageDownload} from '@/hooks/features/download/useImageDownload'
@@ -109,7 +113,9 @@ const DownloadButton = memo(function DownloadButton() {
       </div>
       <PopoverContent side="bottom" align="end" className="w-64">
         <div className="space-y-2">
-          <p className="text-xs font-semibold text-foreground">Path structure</p>
+          <p className="text-xs font-semibold text-foreground">
+            Path structure
+          </p>
           <div className="space-y-1">
             {(['original', 'last-level', 'flat'] as FlattenMode[]).map(mode => (
               <button
