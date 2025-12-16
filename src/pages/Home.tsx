@@ -1,10 +1,11 @@
 import {useCallback, useEffect, useState} from 'react'
-import {Shuffle} from 'lucide-react'
+import {RefreshCw} from 'lucide-react'
 
 import {Button} from '@/components/ui/button'
 import {RepoInput} from '@/components/RepoInput'
 
 import {useTargetRepository} from '@/hooks/useTargetRepository'
+import {cn} from '@/utils'
 
 const EXAMPLE_REPO_COUNT = 5
 const REROLL_ANIMATION_DURATION_MS = 200
@@ -79,118 +80,102 @@ export default function Home() {
   }, [exampleRepositories])
 
   return (
-    <section
-      aria-labelledby="hero-title"
-      className="flex w-full justify-center px-4 py-10 sm:py-16">
-      <div className="flex w-full max-w-4xl flex-col gap-10 sm:gap-12">
-        <div className="space-y-4 sm:space-y-6 text-center">
-          <div className="inline-flex items-center justify-center rounded-full border border-border/60 bg-card/50 px-3 py-1 text-xs font-medium text-muted-foreground shadow-sm backdrop-blur">
-            <span className="mr-1 inline-block h-1.5 w-1.5 rounded-full bg-chart-2" />
-            Browse GitHub repository images instantly
-          </div>
-          <div className="space-y-3 sm:space-y-4">
-            <h1
-              id="hero-title"
-              className="text-balance text-4xl font-semibold tracking-tight sm:text-5xl lg:text-6xl">
-              Explore GitHub images
-              <span className="block bg-linear-to-r from-chart-1 via-chart-4 to-chart-2 bg-clip-text text-transparent">
-                filter, preview, and download in one place
-              </span>
-            </h1>
-            <p className="mx-auto max-w-2xl text-balance text-sm text-muted-foreground sm:text-base">
-              Paste any public GitHub repository URL and
-              <span className="font-semibold text-accent">
-                {' '}
-                browse all image assets with powerful filtering and download
-                capabilities
-              </span>
-              .
-            </p>
-            <ul className="flex flex-wrap items-center justify-center gap-x-4 gap-y-1 text-xs text-muted-foreground sm:text-sm">
-              <li>🔍 include / -exclude text filter</li>
-              <li>⚡ caching + lazy loading</li>
-              <li>🌓 dark-mode-friendly layout</li>
-            </ul>
-          </div>
-        </div>
+    <section className="flex flex-col w-full px-3">
+      <div
+        className={cn(
+          'inline-flex items-center justify-center w-fit mx-auto px-3 py-1 mt-24 md:mt-28 select-none',
+          'rounded-full border border-border/60',
+          'bg-card/50 shadow-sm backdrop-blur',
+          'text-xs font-medium text-muted-foreground',
+        )}>
+        <span className="mr-1 inline-block size-1.5 rounded-full bg-chart-2" />
+        Browse GitHub repository images instantly
+      </div>
+      <h1
+        aria-label="Hero title"
+        id="hero-title"
+        className={cn(
+          'w-full max-w-2xl mx-auto pt-10 pb-2',
+          'text-center text-balance font-semibold tracking-tight text-4xl md:text-6xl leading-[1.1]',
+        )}>
+        Explore GitHub images
+        <span className="block bg-linear-to-r from-chart-1 via-chart-4 to-chart-2 bg-clip-text text-transparent">
+          filter, preview, and download in one place
+        </span>
+      </h1>
 
-        <div className="mx-auto w-full max-w-2xl rounded-2xl border border-border/70 bg-card/70 p-4 shadow-lg backdrop-blur sm:p-5">
-          <h2 className="mb-3 text-sm font-medium text-muted-foreground sm:text-base">
-            Start with a repository URL
+      <div
+        aria-label="Repository input"
+        className="mx-auto w-full max-w-2xl pt-12 sm:pt-16">
+        <h2 className="mb-3 ml-3 text-base font-semibold">
+          • Paste GitHub repository URL
+        </h2>
+        <RepoInput />
+      </div>
+
+      <div aria-label="Separator" className="flex items-center py-8 sm:py-10">
+        <div className="h-px flex-1 bg-border" />
+        <span className="px-1 text-xs text-border">OR</span>
+        <div className="h-px flex-1 bg-border" />
+      </div>
+
+      <div
+        aria-label="Example repositories"
+        className="mx-auto w-full max-w-2xl space-y-4">
+        <div className="flex flex-row justify-between items-center gap-2 sm:text-left">
+          <h2 className="mb-3 ml-3 text-base font-semibold">
+            • Explore with example repositories
           </h2>
-          <div className="w-full">
-            <RepoInput />
-          </div>
-          <p className="mt-2 text-xs text-muted-foreground sm:text-sm">
-            Example:{' '}
-            <span className="font-mono text-xs text-accent">
-              https://github.com/owner/repo
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            className="flex items-center gap-1 text-xs"
+            onClick={handleRerollExamples}
+            disabled={isRerolling}
+            aria-label="Shuffle example repositories">
+            <RefreshCw
+              className={`size-4 transition-transform duration-500 ${
+                isRerolling ? 'animate-spin' : ''
+              }`}
+            />
+            <span className="hidden sm:block font-semibold">
+              Shuffle examples
             </span>
-          </p>
+          </Button>
         </div>
 
-        <div className="flex items-center gap-3 text-xs uppercase tracking-[0.2em] text-muted-foreground">
-          <div className="h-px flex-1 bg-border/60" />
-          <span>OR</span>
-          <div className="h-px flex-1 bg-border/60" />
-        </div>
+        <div
+          key={rerollKey}
+          className={`grid w-full grid-cols-1 gap-2 transition-opacity duration-200 ${
+            isRerolling ? 'opacity-0' : 'opacity-100'
+          }`}
+          role="list"
+          aria-label="Example repositories">
+          {shuffledExampleRepositories.map(([owner, name, ref], index) => {
+            const handleClick = () => setTargetRepository(owner, name, ref)
+            const displayName = `${owner}/${name}`
 
-        <div className="mx-auto w-full max-w-3xl space-y-4 rounded-xl border border-dashed border-border/70 bg-card/40 p-4 sm:space-y-5 sm:p-5">
-          <div className="flex flex-col items-center gap-2 text-center sm:flex-row sm:justify-between sm:text-left">
-            <div className="space-y-1">
-              <p className="text-sm font-medium text-muted-foreground">
-                Explore with example repositories
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Pick a curated repo to see how the image gallery works.
-              </p>
-            </div>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              className="flex items-center gap-1 text-xs transition-transform duration-300 hover:scale-105"
-              onClick={handleRerollExamples}
-              disabled={isRerolling}
-              aria-label="Shuffle example repositories">
-              <Shuffle
-                className={`h-3.5 w-3.5 transition-transform duration-500 ${
-                  isRerolling ? 'animate-spin' : ''
-                }`}
-              />
-              <span>Shuffle examples</span>
-            </Button>
-          </div>
-
-          <div
-            key={rerollKey}
-            className={`grid w-full grid-cols-1 gap-2 transition-opacity duration-200 ${
-              isRerolling ? 'opacity-0' : 'opacity-100'
-            }`}
-            role="list"
-            aria-label="Example repositories">
-            {shuffledExampleRepositories.map(([owner, name, ref], index) => {
-              const handleClick = () => setTargetRepository(owner, name, ref)
-              const displayName = `${owner}/${name}`
-
-              return (
-                <Button
-                  key={`${rerollKey}-${index}`}
-                  role="listitem"
-                  variant="outline"
-                  size="sm"
-                  className="flex h-9 items-center justify-start overflow-hidden text-ellipsis whitespace-nowrap border-border/60 bg-background/40 text-xs font-normal text-muted-foreground transition-all duration-300 hover:bg-accent/20 hover:text-foreground hover:scale-[1.02] animate-fade-in-slide"
-                  style={{
-                    animationDelay: `${index * 50}ms`,
-                    opacity: 0,
-                  }}
-                  onClick={handleClick}
-                  aria-label={`Open example repository ${displayName}`}>
-                  <span className="font-mono">{displayName}</span>
-                </Button>
-              )
-            })}
-          </div>
+            return (
+              <Button
+                key={`${rerollKey}-${index}`}
+                role="listitem"
+                variant="outline"
+                className={cn(
+                  'flex items-center justify-start overflow-hidden border-border/60',
+                  'text-ellipsis whitespace-nowrap text-sm text-foreground',
+                  'animate-fade-in-slide transition-all duration-150',
+                  'hover:bg-accent/20 hover:text-foreground hover:scale-102',
+                )}
+                style={{
+                  animationDelay: `${index * 50}ms`,
+                }}
+                onClick={handleClick}
+                aria-label={`Open example repository ${displayName}`}>
+                <span className="font-mono">{displayName}</span>
+              </Button>
+            )
+          })}
         </div>
       </div>
     </section>
