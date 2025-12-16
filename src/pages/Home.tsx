@@ -69,7 +69,7 @@ export default function Home() {
     setIsRerolling(true)
     setRerollKey(prev => prev + 1)
 
-    // 페이드 아웃 후 새 리스트 설정
+    // After fade-out, apply the new shuffled list
     setTimeout(() => {
       setShuffledExampleRepositories(
         pickRandomExamples(exampleRepositories, EXAMPLE_REPO_COUNT),
