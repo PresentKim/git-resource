@@ -1,4 +1,4 @@
-import {Search as SearchIcon, X as XIcon} from 'lucide-react'
+import {SendHorizonal, X as XIcon} from 'lucide-react'
 import {Input} from '@/components/ui/input'
 import {Button} from '@/components/ui/button'
 
@@ -32,18 +32,15 @@ export function RepoInput({className, ...props}: React.ComponentProps<'div'>) {
 
   return (
     <div
-      className={cn(
-        'flex flex-col sm:flex-row justify-center items-center w-full sm:space-x-2 space-y-2 sm:space-y-0',
-        className,
-      )}
+      className={cn('flex flex-row items-center w-full', className)}
       {...props}>
       <div className="relative flex-1 w-full">
         <Input
           ref={inputRef}
           onKeyDown={handleKeyDown}
           type="text"
-          placeholder="https://github.com/example/test/main"
-          className="w-full pr-8 peer"
+          placeholder="https://github.com/:owner/:repo/:ref"
+          className="w-full pr-8 peer rounded-r-none"
           aria-label="GitHub repository URL"
           aria-describedby="repo-input-description"
         />
@@ -61,10 +58,11 @@ export function RepoInput({className, ...props}: React.ComponentProps<'div'>) {
       </div>
       <Button
         onClick={handleApplyRepo}
-        className="w-full sm:w-fit gap-2"
-        aria-label="Open repository">
-        <SearchIcon strokeWidth={3} className="size-4" />
-        <p className="">Open Repo</p>
+        aria-label="Open repository"
+        variant="outline"
+        size="icon"
+        className="rounded-l-none">
+        <SendHorizonal strokeWidth={4} className="size-5" />
       </Button>
     </div>
   )
