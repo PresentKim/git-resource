@@ -435,42 +435,32 @@ export function ImageViewer({
             )}
 
             <div className="absolute bottom-4 left-0 right-0 flex flex-col items-center gap-2 z-50 px-4">
-              <div className="hidden sm:flex flex-col items-start gap-1">
-                <div className="flex items-center justify-start gap-2 rounded-md px-4 py-2 text-sm min-h-6">
-                  {metadata ? (
-                    <>
-                      {metadata.animatedSize ? (
-                        <span className="opacity-80">
-                          ORIGINAL: {metadata.width} × {metadata.height}px
-                        </span>
-                      ) : (
-                        <span className="opacity-80">
-                          {metadata.width} × {metadata.height}px
-                        </span>
-                      )}
+              <div className="flex flex-col items-start text-sm min-h-6 opacity-80">
+                {metadata ? (
+                  <>
+                    <span>
+                      {metadata.animatedSize && <>ORIGINAL: </>}
+                      <>
+                        {metadata.width} × {metadata.height}px
+                      </>
                       {metadata.fileSize && (
-                        <span className="opacity-80">
-                          · {formatFileSize(metadata.fileSize)}
-                        </span>
+                        <> · {formatFileSize(metadata.fileSize)}</>
                       )}
-                      {metadata.format && (
-                        <span className="opacity-80">· {metadata.format}</span>
-                      )}
-                    </>
-                  ) : (
-                    <span className="invisible opacity-0">0 × 0px</span>
-                  )}
-                </div>
-                {metadata?.animatedSize && (
-                  <div className="flex items-center justify-start gap-2 rounded-md px-4 py-2 text-sm min-h-6">
-                    <span className="opacity-80">
-                      ANIMATED: {metadata.animatedSize.width} ×{' '}
-                      {metadata.animatedSize.height}px
+                      {metadata.format && <>· {metadata.format}</>}
                     </span>
-                    {metadata.interpolate === true && (
-                      <span className="opacity-80">· interpolate</span>
+                  </>
+                ) : (
+                  <span className="invisible opacity-0">0 × 0px</span>
+                )}
+                {metadata?.animatedSize && (
+                  <span>
+                    ANIMATED: {metadata.animatedSize.width} ×{' '}
+                    {metadata.animatedSize.height}px
+                    {metadata.fileSize && (
+                      <> · {formatFileSize(metadata.fileSize)}</>
                     )}
-                  </div>
+                    {metadata.interpolate === true && <>· INTERPOLATE</>}
+                  </span>
                 )}
               </div>
               <div
@@ -528,46 +518,6 @@ export function ImageViewer({
                 </Button>
               </div>
               <div className="flex flex-col items-center gap-2 sm:hidden w-full">
-                <div className="flex flex-col items-start gap-1 w-full">
-                  <div className="flex items-center justify-start gap-2 rounded-md px-3 py-1.5 text-base min-h-7 w-full">
-                    {metadata ? (
-                      <>
-                        {metadata.animatedSize ? (
-                          <span className="opacity-80">
-                            ORIGINAL: {metadata.width}×{metadata.height}px
-                          </span>
-                        ) : (
-                          <span className="opacity-80">
-                            {metadata.width}×{metadata.height}px
-                          </span>
-                        )}
-                        {metadata.fileSize && (
-                          <span className="opacity-80">
-                            · {formatFileSize(metadata.fileSize)}
-                          </span>
-                        )}
-                        {metadata.format && (
-                          <span className="opacity-80">
-                            · {metadata.format}
-                          </span>
-                        )}
-                      </>
-                    ) : (
-                      <span className="invisible opacity-0">0×0px</span>
-                    )}
-                  </div>
-                  {metadata?.animatedSize && (
-                    <div className="flex items-center justify-start gap-2 rounded-md px-3 py-1.5 text-xs min-h-6 w-full">
-                      <span className="opacity-80">
-                        ANIMATED: {metadata.animatedSize.width}×
-                        {metadata.animatedSize.height}px
-                      </span>
-                      {metadata.interpolate === true && (
-                        <span className="opacity-80">· interpolate</span>
-                      )}
-                    </div>
-                  )}
-                </div>
                 <div className="flex items-center gap-4 w-full">
                   {hasPrevious && (
                     <Button
