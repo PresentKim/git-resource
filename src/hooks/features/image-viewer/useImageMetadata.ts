@@ -26,14 +26,14 @@ export function useImageMetadata() {
       const height = dimensions?.height ?? 0
       const imageFormat = format || 'UNKNOWN'
 
-      setMetadata({
+      setMetadata(prev => ({
         width,
         height,
-        fileSize: null,
+        fileSize: prev?.fileSize ?? null,
         format: imageFormat,
-        animatedSize,
-        interpolate,
-      })
+        animatedSize: animatedSize ?? prev?.animatedSize,
+        interpolate: interpolate ?? prev?.interpolate,
+      }))
     },
     [],
   )
