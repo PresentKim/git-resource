@@ -52,8 +52,7 @@ export async function encodeAPNG(
       clampedArray.byteLength,
     )
     rgbaArrays.push(uint8Array.buffer)
-    // UPNG expects delay in centiseconds (1/100 second)
-    delays.push(Math.round(frame.delay / 10))
+    delays.push(frame.delay)
   }
 
   // Encode APNG using UPNG
