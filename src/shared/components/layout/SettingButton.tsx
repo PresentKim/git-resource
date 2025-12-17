@@ -1,0 +1,297 @@
+import {Settings as SettingsIcon, Info, Sun, Moon} from 'lucide-react'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogTrigger,
+  DialogFooter,
+  DialogClose,
+} from '@/shared/components/ui/dialog'
+import {Button} from '@/shared/components/ui/button'
+import {Input} from '@/shared/components/ui/input'
+import {Label} from '@/shared/components/ui/label'
+import {Slider} from '@/shared/components/ui/slider'
+import {Switch} from '@/shared/components/ui/switch'
+
+import {useGithubRateLimitStore} from '@/shared/stores/githubApiStore'
+import {useSettingsForm} from '@/shared/hooks/settings/useSettingsForm'
+import {useSettingsSave} from '@/shared/hooks/settings/useSettingsSave'
+import {useSettingsDialog} from '@/shared/hooks/settings/useSettingsDialog'
+
+export function SettingButton() {
+  const rateLimit = useGithubRateLimitStore()
+
+  // Settings form
+  const {
+    githubToken,
+    setGithubToken,
+    columnCount,
+    setColumnCount,
+    pixelated,
+    setPixelated,
+    animationEnabled,
+    setAnimationEnabled,
+    theme,
+    setTheme,
+    gridBackground,
+    setGridBackground,
+    loadInitialValues,
+    hasChanges,
+  } = useSettingsForm()
+
+  // Settings save
+  const {handleSave} = useSettingsSave({
+    formValues: {
+      githubToken,
+      columnCount,
+      pixelated,
+      animationEnabled,
+      theme,
+      gridBackground,
+    },
+    setInitialValues: loadInitialValues,
+  })
+
+  // Settings dialog
+  const {handleOpenChange} = useSettingsDialog({
+    onOpen: loadInitialValues,
+  })
+
+  return (
+    <Dialog onOpenChange={handleOpenChange} modal={false}>
+      <DialogTrigger asChild>
+        <Button
+          aria-label="Settings"
+          variant="ghost"
+          size="icon"
+          className="rounded-full hover:bg-accent/20 hover:text-accent-foreground">
+          <SettingsIcon className="h-5 w-5" />
+        </Button>
+      </DialogTrigger>
+      <DialogContent
+        onOpenAutoFocus={event => event.preventDefault()}
+        className="max-h-[calc(100vh-4rem)] w-[min(100vw-1.5rem,40rem)] overflow-y-auto border-border/70 bg-card shadow-xl shadow-black/40 sm:max-w-2xl">
+        <DialogHeader className="space-y-1 border-b border-border/60 pb-3">
+          <DialogTitle className="flex items-center justify-between text-lg font-semibold">
+            <span>Viewer settings</span>
+          </DialogTitle>
+          <DialogDescription className="text-xs text-muted-foreground">
+            Configure how images are loaded and rendered. These settings are
+            stored in your browser only.
+          </DialogDescription>
+        </DialogHeader>
+
+        <div className="grid gap-6 py-5 sm:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
+          <div className="space-y-5">
+            <div
+              data-slot="github-token-input"
+              className="space-y-2 rounded-lg border border-border/60 bg-background/40 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <Label
+                  htmlFor="githubToken"
+                  className="flex items-center gap-2 text-xs font-medium uppercase tracking-[0.14em] text-foreground">
+                  GitHub token
+                  <a
+                    href="https://docs.github.com/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#primary-rate-limit-for-unauthenticated-users"
+                    target="_blank"
+                    rel="noreferrer">
+                    <Info className="h-3.5 w-3.5 text-accent cursor-help" />
+                  </a>
+                </Label>
+                {rateLimit.limit ? (
+                  <div className="text-xs text-accent">
+                    Rate limit:&nbsp;
+                    <span className="font-mono">
+                      {rateLimit.remaining || '-'} / {rateLimit.limit || '-'}
+                    </span>
+                  </div>
+                ) : null}
+              </div>
+              <Input
+                id="githubToken"
+                value={githubToken}
+                onChange={e => setGithubToken(e.target.value)}
+                placeholder="github_pat_1234567890"
+                className="h-9 text-xs"
+              />
+              <p className="text-xs text-muted-foreground">
+                Used to increase GitHub API rate limits and access private
+                repositories.
+              </p>
+            </div>
+
+            <div
+              data-slot="column-count-slider"
+              className="space-y-2 rounded-lg border border-border/60 bg-background/40 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <Label className="text-xs font-medium uppercase tracking-[0.14em] text-foreground">
+                  Columns in grid
+                </Label>
+                <span className="text-xs text-accent">
+                  {columnCount ? `${columnCount} columns` : 'auto'}
+                </span>
+              </div>
+              <Slider
+                id="columnCount"
+                min={0}
+                max={20}
+                step={1}
+                value={[columnCount]}
+                onValueChange={value => setColumnCount(value[0])}
+              />
+              <p className="text-xs text-muted-foreground">
+                Set to <span className="font-mono text-accent">0</span> to
+                automatically fit the screen width.
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-4 rounded-lg border border-border/60 bg-background/40 p-3 min-w-0">
+            <div data-slot="theme-selector" className="space-y-2 min-w-0">
+              <Label className="text-sm font-medium">Theme</Label>
+              <div className="flex gap-2 w-full min-w-0">
+                <Button
+                  type="button"
+                  variant={theme === 'light' ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="flex-1 gap-1.5 min-w-0"
+                  onClick={() => setTheme('light')}>
+                  <Sun className="h-4 w-4 shrink-0" />
+                  <span className="text-xs whitespace-nowrap">Light</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={theme === 'dark' ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="flex-1 gap-1.5 min-w-0"
+                  onClick={() => setTheme('dark')}>
+                  <Moon className="h-4 w-4 shrink-0" />
+                  <span className="text-xs whitespace-nowrap">Dark</span>
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Choose your preferred color theme.
+              </p>
+            </div>
+
+            <div
+              data-slot="grid-background-selector"
+              className="space-y-2 border-t border-border/50 pt-3">
+              <Label className="text-sm font-medium">Grid background</Label>
+              <div className="grid grid-cols-2 gap-2">
+                <Button
+                  type="button"
+                  variant={gridBackground === 'auto' ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="gap-1.5 justify-start"
+                  onClick={() => setGridBackground('auto')}>
+                  <div className="h-4 w-4 rounded border border-border shrink-0 flex items-center justify-center text-xs font-semibold">
+                    A
+                  </div>
+                  <span className="text-xs">Auto</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={
+                    gridBackground === 'transparent' ? 'secondary' : 'outline'
+                  }
+                  size="sm"
+                  className="gap-1.5 justify-start"
+                  onClick={() => setGridBackground('transparent')}>
+                  <div className="h-4 w-4 rounded border border-border shrink-0 bg-transparent-grid" />
+                  <span className="text-xs">Grid</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={gridBackground === 'white' ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="gap-1.5 justify-start"
+                  onClick={() => setGridBackground('white')}>
+                  <div className="h-4 w-4 rounded border border-border shrink-0 bg-white" />
+                  <span className="text-xs">White</span>
+                </Button>
+                <Button
+                  type="button"
+                  variant={gridBackground === 'black' ? 'secondary' : 'outline'}
+                  size="sm"
+                  className="gap-1.5 justify-start"
+                  onClick={() => setGridBackground('black')}>
+                  <div className="h-4 w-4 rounded border border-border shrink-0 bg-black" />
+                  <span className="text-xs">Black</span>
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Background color for the image grid.
+              </p>
+            </div>
+
+            <div
+              data-slot="pixelated-toggle"
+              className="space-y-1.5 border-t border-border/50 pt-3">
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="pixelated" className="text-sm font-medium">
+                  Pixelated images
+                </Label>
+                <Switch
+                  id="pixelated"
+                  checked={pixelated}
+                  onCheckedChange={setPixelated}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Render images with crisp pixels, ideal for pixel-art textures.
+              </p>
+            </div>
+
+            <div
+              data-slot="animation-toggle"
+              className="space-y-1.5 border-t border-border/50 pt-3">
+              <div className="flex items-center justify-between gap-2">
+                <Label
+                  htmlFor="animationEnabled"
+                  className="text-sm font-medium">
+                  Animate .mcmeta textures
+                </Label>
+                <Switch
+                  id="animationEnabled"
+                  checked={animationEnabled}
+                  onCheckedChange={setAnimationEnabled}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Play Minecraft-style animations for textures that include a
+                corresponding{' '}
+                <span className="font-mono text-accent">.mcmeta</span> file.
+              </p>
+            </div>
+
+            <p className="pt-1 text-xs text-muted-foreground/80">
+              Changes are applied per browser and do not affect the underlying
+              repositories.
+            </p>
+          </div>
+        </div>
+
+        <DialogFooter className="mt-1 border-t border-border/60 pt-3">
+          <DialogClose asChild>
+            <Button type="button" variant="outline" size="sm">
+              Cancel
+            </Button>
+          </DialogClose>
+          <DialogClose asChild>
+            <Button
+              type="button"
+              variant={hasChanges ? 'default' : 'secondary'}
+              size="sm"
+              className="font-bold"
+              onClick={handleSave}>
+              Apply settings
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}

@@ -1,10 +1,10 @@
 import {Suspense, lazy, useEffect, useMemo} from 'react'
 import {BrowserRouter as Router, Routes, Route} from 'react-router-dom'
-import {useSettingStore} from '@/stores/settingStore'
+import {useSettingStore} from '@/shared/stores/settingStore'
 
-const BaseLayout = lazy(() => import('@/layout/BaseLayout'))
-const Home = lazy(() => import('@/pages/Home'))
-const RepoView = lazy(() => import('@/pages/RepoView'))
+const BaseLayout = lazy(() => import('@/shared/components/layout/BaseLayout'))
+const HomePage = lazy(() => import('@/features/home/HomePage'))
+const RepoPage = lazy(() => import('@/features/repo/RepoPage'))
 
 /**
  * Apply theme to document root
@@ -32,8 +32,8 @@ function App() {
       <Router>
         <Routes>
           <Route element={<BaseLayout />}>
-            <Route path="/" element={<Home />} />
-            <Route path="/*" element={<RepoView />} />
+            <Route path="/" element={<HomePage />} />
+            <Route path="/*" element={<RepoPage />} />
           </Route>
         </Routes>
       </Router>
