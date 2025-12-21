@@ -9,10 +9,12 @@ import {
   Download as DownloadIcon,
   Loader as LoaderIcon,
   ChevronDown,
+  Grid3x3 as SpriteIcon,
 } from 'lucide-react'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {useImageCount} from '@/features/repo/filter/useImageCount'
 import {useImageDownload} from '@/features/repo/download/useImageDownload'
+import {SpriteDownloadDialog} from '@/features/repo/download/SpriteDownloadDialog'
 import type {FlattenMode} from '@/shared/utils'
 import {cn} from '@/shared/utils'
 
@@ -148,13 +150,37 @@ const DownloadButton = memo(function DownloadButton() {
   )
 })
 
+const SpriteButton = memo(function SpriteButton() {
+  const {filteredCount} = useImageCount()
+  const [dialogOpen, setDialogOpen] = useState(false)
+
+  return (
+    <>
+      <Button
+        aria-label="Create sprite image from filtered images"
+        disabled={!filteredCount}
+        onClick={() => setDialogOpen(true)}
+        size="sm"
+        variant="outline"
+        className="text-xs font-semibold flex items-center gap-1">
+        <SpriteIcon className="size-4" />
+        <span>SPRITE</span>
+      </Button>
+      <SpriteDownloadDialog open={dialogOpen} onOpenChange={setDialogOpen} />
+    </>
+  )
+})
+
 export const FilterToolbar = memo(function FilterToolbar() {
   const {filteredCount, totalCount} = useImageCount()
 
   return (
     <div className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start">
       <ImageCountBadge filteredCount={filteredCount} totalCount={totalCount} />
-      <DownloadButton />
+      <div className="flex items-center gap-2">
+        <SpriteButton />
+        <DownloadButton />
+      </div>
     </div>
   )
 })

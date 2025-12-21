@@ -4,6 +4,16 @@ import {useMemo} from 'react'
 export type Theme = 'light' | 'dark'
 export type GridBackground = 'auto' | 'white' | 'black' | 'transparent'
 
+export interface SpriteSettings {
+  gap: number
+  backgroundColor: string
+  customColor: string
+  useCustomColor: boolean
+  scale: number
+  imageSmoothing: boolean
+  columns: number | null
+}
+
 interface SettingsStore {
   githubToken: string
   setGithubToken: (token: string) => void
@@ -25,6 +35,9 @@ interface SettingsStore {
 
   gridBackground: GridBackground
   setGridBackground: (background: GridBackground) => void
+
+  spriteSettings: SpriteSettings
+  setSpriteSettings: (settings: SpriteSettings) => void
 }
 
 // LocalStorage keys
@@ -35,6 +48,7 @@ const STORAGE_KEYS = {
   ANIMATION_ENABLED: 'settings.animationEnabled',
   THEME: 'settings.theme',
   GRID_BACKGROUND: 'settings.gridBackground',
+  SPRITE_SETTINGS: 'settings.spriteSettings',
 } as const
 
 // Constants
@@ -127,6 +141,31 @@ export const useSettingStore = create<SettingsStore>((set, get) => ({
   setGridBackground: (background: GridBackground) => {
     set({gridBackground: background})
     localStorage.setItem(STORAGE_KEYS.GRID_BACKGROUND, background)
+  },
+
+  spriteSettings: (() => {
+    const stored = localStorage.getItem(STORAGE_KEYS.SPRITE_SETTINGS)
+    if (stored) {
+      try {
+        return JSON.parse(stored) as SpriteSettings
+      } catch {
+        // Invalid JSON, return default
+      }
+    }
+    // Default sprite settings
+    return {
+      gap: 0,
+      backgroundColor: 'transparent',
+      customColor: '#ffffff',
+      useCustomColor: false,
+      scale: 1,
+      imageSmoothing: true,
+      columns: null, // null = use current grid column count
+    }
+  })(),
+  setSpriteSettings: (settings: SpriteSettings) => {
+    set({spriteSettings: settings})
+    localStorage.setItem(STORAGE_KEYS.SPRITE_SETTINGS, JSON.stringify(settings))
   },
 }))
 
