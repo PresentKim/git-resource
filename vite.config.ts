@@ -7,7 +7,14 @@ export default defineConfig(({mode}) => {
   const env = {...process.env, ...loadEnv(mode, process.cwd())}
 
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [
+      react({
+        babel: {
+          plugins: [['babel-plugin-react-compiler']],
+        },
+      }),
+      tailwindcss(),
+    ],
     base: env.VITE_BASE_URL || '/',
     resolve: {
       alias: {
