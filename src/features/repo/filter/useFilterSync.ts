@@ -4,15 +4,15 @@ import {useRepoStore} from '@/shared/stores/repoStore'
 
 /**
  * Hook for synchronizing filter changes with image list
- * Updates filtered images when filter changes
  */
 export function useFilterSync() {
   const [filter] = useFilterQuery()
   const updateFilteredImages = useRepoStore(state => state.updateFilteredImages)
+  const imageFiles = useRepoStore(state => state.imageFiles)
 
   useEffect(() => {
     updateFilteredImages(filter)
-  }, [filter, updateFilteredImages])
+  }, [filter, imageFiles, updateFilteredImages])
 
   return {}
 }
