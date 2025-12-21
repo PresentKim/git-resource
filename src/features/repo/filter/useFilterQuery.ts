@@ -1,5 +1,9 @@
 import {useQueryState} from 'nuqs'
 
+/**
+ * Hook for managing filter query state.
+ */
 export function useFilterQuery() {
-  return useQueryState('filter', {defaultValue: ''})
+  const [filter, setFilter] = useQueryState('filter', {defaultValue: ''})
+  return {filter, setFilter}
 }

@@ -1,6 +1,6 @@
-import {memo, useCallback} from 'react'
-
+import {useEffect, useState} from 'react'
 import {Filter as FilterIcon, HelpCircle, X as XIcon} from 'lucide-react'
+
 import {Input} from '@/shared/components/ui/input'
 import {Button} from '@/shared/components/ui/button'
 import {
@@ -9,13 +9,10 @@ import {
   PopoverTrigger,
 } from '@/shared/components/ui/popover'
 
-import {useFilterState} from '@/features/repo/filter/useFilterState'
-import {useFilterActions} from '@/features/repo/filter/useFilterActions'
-import {useInputSync} from '@/shared/hooks/form/useInputSync'
-import {useInputRef} from '@/shared/hooks/form/useInputRef'
+import {useFilterQuery} from '@/features/repo/filter/useFilterQuery'
 import {cn} from '@/shared/utils'
 
-const FilterHelpPopover = memo(function FilterHelpPopover() {
+function FilterHelpPopover() {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -52,52 +49,41 @@ const FilterHelpPopover = memo(function FilterHelpPopover() {
       </PopoverContent>
     </Popover>
   )
-})
-
-interface FilterInputFieldProps {
-  initialValue: string
-  onClear: () => void
-  onApply: (value: string) => void
-  inputRef: React.RefObject<HTMLInputElement | null>
 }
 
-const FilterInputField = memo(
-  function FilterInputField({
-    initialValue,
-    onClear,
-    onApply,
-    inputRef,
-  }: FilterInputFieldProps) {
-    const {localValue, setLocalValue} = useInputSync({
-      externalValue: initialValue,
-      inputRef,
-    })
+export function FilterInput({
+  className,
+  ...props
+}: React.ComponentProps<'div'>) {
+  const {filter: filterQuery, setFilter: setFilterQuery} = useFilterQuery()
+  const [filterInput, setFilterInput] = useState(filterQuery)
+  // Sync input with query when query changes externally
+  useEffect(() => {
+    setFilterInput(filterQuery)
+  }, [filterQuery])
 
-    const handleKeyDown = useCallback(
-      (e: React.KeyboardEvent<HTMLInputElement>) => {
-        if (e.key === 'Enter') {
-          const value = inputRef.current?.value || ''
-          setLocalValue(value)
-          onApply(value)
-        }
-      },
-      [onApply, inputRef, setLocalValue],
-    )
+  const handleApplyFilter = () => setFilterQuery(filterInput)
+  const handleClearFilter = () => setFilterInput('')
 
-    const handleChange = useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        setLocalValue(e.target.value)
-      },
-      [setLocalValue],
-    )
+  const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      handleApplyFilter()
+    }
+  }
 
-    return (
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterInput(e.target.value)
+  }
+
+  return (
+    <div
+      className={cn('flex w-full items-center justify-end gap-1.5', className)}
+      {...props}>
       <div className="relative flex-1 max-w-lg">
         <Input
-          ref={inputRef}
-          value={localValue}
-          onChange={handleChange}
-          onKeyDown={handleKeyDown}
+          value={filterInput}
+          onChange={handleInputChange}
+          onKeyDown={handleInputKeyDown}
           type="text"
           placeholder="'keyword' to include, '-keyword' to exclude"
           className="w-full pr-8 peer"
@@ -110,63 +96,22 @@ const FilterInputField = memo(
         </span>
         <Button
           aria-label="Clear filter"
-          onClick={onClear}
+          onClick={handleClearFilter}
           size="icon"
           variant="ghost"
           className="absolute right-0 top-0 h-full px-2 peer-placeholder-shown:hidden">
           <XIcon className="h-4 w-4" />
         </Button>
       </div>
-    )
-  },
-  (prevProps, nextProps) => {
-    return prevProps.initialValue === nextProps.initialValue
-  },
-)
-
-const FilterApplyButton = memo(function FilterApplyButton({
-  onApply,
-}: {
-  onApply: () => void
-}) {
-  return (
-    <Button
-      aria-label="Apply filter"
-      onClick={onApply}
-      size="icon"
-      variant="outline"
-      className="shrink-0">
-      <FilterIcon className="h-4 w-4" />
-    </Button>
-  )
-})
-
-export const FilterInput = memo(function FilterInput({
-  className,
-  ...props
-}: React.ComponentProps<'div'>) {
-  const {filter, setFilter} = useFilterState()
-  const {inputRef} = useInputRef()
-
-  const {handleClearFilter, handleApplyFilter, handleInputApply} =
-    useFilterActions({
-      filter,
-      setFilter,
-      inputRef,
-    })
-
-  return (
-    <div
-      className={cn('flex w-full items-center justify-end gap-1.5', className)}
-      {...props}>
-      <FilterInputField
-        initialValue={filter}
-        onClear={handleClearFilter}
-        onApply={handleInputApply}
-        inputRef={inputRef}
-      />
       <FilterHelpPopover />
-      <FilterApplyButton onApply={handleApplyFilter} />
+      <Button
+        aria-label="Apply filter"
+        onClick={handleApplyFilter}
+        size="icon"
+        variant="outline"
+        className="shrink-0">
+        <FilterIcon className="h-4 w-4" />
+      </Button>
     </div>
   )
-})
+}
