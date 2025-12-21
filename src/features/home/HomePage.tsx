@@ -14,7 +14,7 @@ const REROLL_ANIMATION_DURATION_MS = 200
 export default function HomePage() {
   const [, setTargetRepository] = useTargetRepository()
   const [shuffledExampleRepositories, setShuffledExampleRepositories] =
-    useState(exampleRepositories.slice(0, EXAMPLE_REPO_COUNT))
+    useState(exampleRepositories.slice(-EXAMPLE_REPO_COUNT))
   const [isRerolling, setIsRerolling] = useState(false)
   const [rerollKey, setRerollKey] = useState(0)
 
