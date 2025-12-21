@@ -1,6 +1,10 @@
-import {GithubRepo, createRawImageUrl} from './github'
 import type JSZip from 'jszip'
-import {type FlattenMode, resolveDuplicatePaths} from './pathFlatten'
+import {
+  GithubRepo,
+  createRawImageUrl,
+  type FlattenMode,
+  resolveDuplicatePaths,
+} from '@/shared/utils'
 
 // Constants
 const LARGE_DOWNLOAD_THRESHOLD = 2000

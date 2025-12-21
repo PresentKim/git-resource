@@ -12,7 +12,7 @@ import {
 } from 'lucide-react'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {useImageCount} from '@/features/repo/filter/useImageCount'
-import {useImageDownload} from '@/shared/hooks/download/useImageDownload'
+import {useImageDownload} from '@/features/repo/download/useImageDownload'
 import type {FlattenMode} from '@/shared/utils'
 import {cn} from '@/shared/utils'
 

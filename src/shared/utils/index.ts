@@ -1,6 +1,5 @@
 export {cn} from './cn'
 export {observerResize, observeIntersection} from './observe'
-export {downloadImagesAsZip} from './downloadImagesAsZip'
 export {createGithubRepo, parseGithubUrl, createRawImageUrl} from './github'
 export type {GithubRepo} from './github'
 export {

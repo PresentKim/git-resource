@@ -1,5 +1,5 @@
 import {useCallback, useState} from 'react'
-import {downloadImagesAsZip} from '@/shared/utils'
+import {downloadImagesAsZip} from '@/features/repo/download/utils/downloadImagesAsZip'
 import type {GithubRepo, FlattenMode} from '@/shared/utils'
 
 interface UseImageDownloadProps {
