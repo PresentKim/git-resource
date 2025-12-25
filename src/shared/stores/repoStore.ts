@@ -102,7 +102,6 @@ interface RepoStore {
   imageFiles: GithubImageFileTree | null
   filteredImageFiles: string[] | null
   filterCache: Map<string, string[]>
-  imageFilesVersion: number
   mcmetaPaths: Set<string>
   error: Error | null
   viewerState: {open: boolean; currentIndex: number}
@@ -130,7 +129,6 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   imageFiles: null,
   filteredImageFiles: null,
   filterCache: new Map<string, string[]>(),
-  imageFilesVersion: 0,
   mcmetaPaths: new Set<string>(),
   error: null,
   viewerState: {open: false, currentIndex: 0},
@@ -149,7 +147,6 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
       imageFiles: files,
       mcmetaPaths,
       filterCache: new Map<string, string[]>(),
-      imageFilesVersion: get().imageFilesVersion + 1,
     })
 
     // Set initial filtered images (all images, filter will be applied separately)
@@ -161,7 +158,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   },
 
   updateFilteredImages: (filter: string) => {
-    const {imageFiles, filterCache, imageFilesVersion} = get()
+    const {imageFiles, filterCache} = get()
     if (!imageFiles) {
       // Don't set isFiltering to false if images haven't loaded yet
       // This allows the loading screen to remain visible
@@ -169,7 +166,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
       return
     }
 
-    const cacheKey = `${imageFilesVersion}|${filter}`
+    const cacheKey = filter.toLowerCase()
     const cached = filterCache.get(cacheKey)
     if (cached) {
       set({filteredImageFiles: cached, isFiltering: false})
@@ -233,7 +230,6 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
       imageFiles: null,
       filteredImageFiles: null,
       filterCache: new Map<string, string[]>(),
-      imageFilesVersion: 0,
       mcmetaPaths: new Set<string>(),
       error: null,
       viewerState: {open: false, currentIndex: 0},
