@@ -1,4 +1,4 @@
-import {useEffect, useState} from 'react'
+import {useEffect} from 'react'
 import {Filter as FilterIcon, HelpCircle, X as XIcon} from 'lucide-react'
 
 import {Input} from '@/shared/components/ui/input'
@@ -11,6 +11,7 @@ import {
 
 import {useFilterQuery} from '@/features/repo/filter/useFilterQuery'
 import {cn} from '@/shared/utils'
+import {useInputRef} from '@/shared/hooks/form/useInputRef'
 
 function FilterHelpPopover() {
   return (
@@ -56,23 +57,25 @@ export function FilterInput({
   ...props
 }: React.ComponentProps<'div'>) {
   const {filter: filterQuery, setFilter: setFilterQuery} = useFilterQuery()
-  const [filterInput, setFilterInput] = useState(filterQuery)
+  const {
+    inputRef: filterInputRef,
+    clearInput: clearFilterInput,
+    getValue: getFilterInput,
+    setValue: setFilterInput,
+  } = useInputRef()
+
   // Sync input with query when query changes externally
   useEffect(() => {
     setFilterInput(filterQuery)
-  }, [filterQuery])
+  }, [filterQuery, setFilterInput])
 
-  const handleApplyFilter = () => setFilterQuery(filterInput)
-  const handleClearFilter = () => setFilterInput('')
+  const handleApplyFilter = () => setFilterQuery(getFilterInput())
+  const handleClearFilter = () => clearFilterInput()
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleApplyFilter()
     }
-  }
-
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFilterInput(e.target.value)
   }
 
   return (
@@ -81,8 +84,8 @@ export function FilterInput({
       {...props}>
       <div className="relative flex-1 max-w-lg">
         <Input
-          value={filterInput}
-          onChange={handleInputChange}
+          ref={filterInputRef}
+          defaultValue={getFilterInput()}
           onKeyDown={handleInputKeyDown}
           type="text"
           placeholder="'keyword' to include, '-keyword' to exclude"
