@@ -3,12 +3,12 @@ import {Input} from '@/shared/components/ui/input'
 import {Button} from '@/shared/components/ui/button'
 
 import {useInputRef} from '@/shared/hooks/form/useInputRef'
-import {useRepoSetting} from '@/features/home/components/useRepoSetting'
+import {useRepoPath} from '@/features/repo/useRepoPath'
 import {cn, parseGithubUrl} from '@/shared/utils'
 
 export function RepoInput({className, ...props}: React.ComponentProps<'div'>) {
+  const [, setRepoPath] = useRepoPath()
   const {inputRef, clearInput, getValue} = useInputRef()
-  const {setRepo} = useRepoSetting()
 
   const handleClearRepo = () => {
     clearInput()
@@ -21,7 +21,7 @@ export function RepoInput({className, ...props}: React.ComponentProps<'div'>) {
     const parsedRepo = parseGithubUrl(url)
     if (!parsedRepo) return
 
-    setRepo(parsedRepo)
+    setRepoPath(parsedRepo.owner, parsedRepo.name, parsedRepo.ref)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

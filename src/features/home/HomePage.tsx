@@ -4,7 +4,7 @@ import {RefreshCw} from 'lucide-react'
 import {Button} from '@/shared/components/ui/button'
 import {RepoInput} from '@/features/home/components/RepoInput'
 
-import {useTargetRepository} from '@/shared/hooks/useTargetRepository'
+import {useRepoPath} from '@/features/repo/useRepoPath'
 import {cn, pickByPartialFisherYates} from '@/shared/utils'
 import {exampleRepositories} from '@/shared/utils/example-repositories'
 
@@ -12,7 +12,7 @@ const EXAMPLE_REPO_COUNT = 5
 const REROLL_ANIMATION_DURATION_MS = 200
 
 export default function HomePage() {
-  const [, setTargetRepository] = useTargetRepository()
+  const [, setRepoPath] = useRepoPath()
   const [shuffledExampleRepositories, setShuffledExampleRepositories] =
     useState(exampleRepositories.slice(-EXAMPLE_REPO_COUNT))
   const [isRerolling, setIsRerolling] = useState(false)
@@ -107,7 +107,7 @@ export default function HomePage() {
           role="list"
           aria-label="Example repositories">
           {shuffledExampleRepositories.map(([owner, name, ref], index) => {
-            const handleClick = () => setTargetRepository(owner, name, ref)
+            const handleClick = () => setRepoPath(owner, name, ref)
             const displayName = `${owner}/${name}`
 
             return (

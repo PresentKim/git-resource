@@ -1,5 +1,5 @@
 import {useEffect} from 'react'
-import {useTargetRepository} from '@/shared/hooks/useTargetRepository'
+import {useRepoPath} from '@/features/repo/useRepoPath'
 import {useRepoStore} from '@/shared/stores/repoStore'
 
 /**
@@ -7,22 +7,22 @@ import {useRepoStore} from '@/shared/stores/repoStore'
  * Handles repo state synchronization between URL and store
  */
 export function useRepoSync() {
-  const [repoFromUrl] = useTargetRepository()
+  const [repoPath] = useRepoPath()
   const repo = useRepoStore(state => state.repo)
   const setRepo = useRepoStore(state => state.setRepo)
 
   useEffect(() => {
     if (
-      repoFromUrl.owner !== repo.owner ||
-      repoFromUrl.name !== repo.name ||
-      repoFromUrl.ref !== repo.ref
+      repoPath.owner !== repo.owner ||
+      repoPath.name !== repo.name ||
+      repoPath.ref !== repo.ref
     ) {
-      setRepo(repoFromUrl)
+      setRepo(repoPath)
     }
-  }, [repoFromUrl, repo, setRepo])
+  }, [repoPath, repo, setRepo])
 
   return {
     repo,
-    repoFromUrl,
+    repoFromUrl: repoPath,
   }
 }
