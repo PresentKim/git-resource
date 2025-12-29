@@ -61,7 +61,7 @@ export function SettingButton() {
 
   return (
     <Dialog onOpenChange={handleOpenChange} modal={false}>
-      <DialogTrigger asChild>
+      <DialogTrigger>
         <Button
           aria-label="Settings"
           variant="ghost"
@@ -70,9 +70,7 @@ export function SettingButton() {
           <SettingsIcon className="h-5 w-5" />
         </Button>
       </DialogTrigger>
-      <DialogContent
-        onOpenAutoFocus={event => event.preventDefault()}
-        className="max-h-[calc(100vh-4rem)] w-[min(100vw-1.5rem,40rem)] overflow-y-auto border-border/70 bg-card shadow-xl shadow-black/40 sm:max-w-2xl">
+      <DialogContent className="max-h-[calc(100vh-4rem)] w-[min(100vw-1.5rem,40rem)] overflow-y-auto border-border/70 bg-card shadow-xl shadow-black/40 sm:max-w-2xl">
         <DialogHeader className="space-y-1 border-b border-border/60 pb-3">
           <DialogTitle className="flex items-center justify-between text-lg font-semibold">
             <span>Viewer settings</span>
@@ -97,11 +95,11 @@ export function SettingButton() {
                     href="https://docs.github.com/rest/using-the-rest-api/rate-limits-for-the-rest-api?apiVersion=2022-11-28#primary-rate-limit-for-unauthenticated-users"
                     target="_blank"
                     rel="noreferrer">
-                    <Info className="h-3.5 w-3.5 text-accent cursor-help" />
+                    <Info className="h-3.5 w-3.5 text-accent-foreground cursor-help" />
                   </a>
                 </Label>
                 {rateLimit.limit ? (
-                  <div className="text-xs text-accent">
+                  <div className="text-xs text-accent-foreground">
                     Rate limit:&nbsp;
                     <span className="font-mono">
                       {rateLimit.remaining || '-'} / {rateLimit.limit || '-'}
@@ -129,7 +127,7 @@ export function SettingButton() {
                 <Label className="text-xs font-medium uppercase tracking-[0.14em] text-foreground">
                   Columns in grid
                 </Label>
-                <span className="text-xs text-accent">
+                <span className="text-xs text-accent-foreground">
                   {columnCount ? `${columnCount} columns` : 'auto'}
                 </span>
               </div>
@@ -139,10 +137,11 @@ export function SettingButton() {
                 max={20}
                 step={1}
                 value={[columnCount]}
-                onValueChange={value => setColumnCount(value[0])}
+                onValueChange={value => setColumnCount(value as number)}
               />
               <p className="text-xs text-muted-foreground">
-                Set to <span className="font-mono text-accent">0</span> to
+                Set to{' '}
+                <span className="font-mono text-accent-foreground">0</span> to
                 automatically fit the screen width.
               </p>
             </div>
@@ -263,7 +262,10 @@ export function SettingButton() {
               <p className="text-xs text-muted-foreground">
                 Play Minecraft-style animations for textures that include a
                 corresponding{' '}
-                <span className="font-mono text-accent">.mcmeta</span> file.
+                <span className="font-mono text-accent-foreground">
+                  .mcmeta
+                </span>{' '}
+                file.
               </p>
             </div>
 
@@ -275,12 +277,12 @@ export function SettingButton() {
         </div>
 
         <DialogFooter className="mt-1 border-t border-border/60 pt-3">
-          <DialogClose asChild>
+          <DialogClose>
             <Button type="button" variant="outline" size="sm">
               Cancel
             </Button>
           </DialogClose>
-          <DialogClose asChild>
+          <DialogClose>
             <Button
               type="button"
               variant={hasChanges ? 'default' : 'secondary'}

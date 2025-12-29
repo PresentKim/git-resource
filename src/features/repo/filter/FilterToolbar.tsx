@@ -28,7 +28,9 @@ const ImageCountBadge = memo(
     return (
       <span className="rounded-full bg-background/70 px-2 py-1">
         Showing{' '}
-        <span className="font-semibold text-accent">{filteredCount}</span>
+        <span className="font-semibold text-accent-foreground">
+          {filteredCount}
+        </span>
         {' of '}
         {totalCount.toLocaleString()} images
       </span>
@@ -105,7 +107,7 @@ const DownloadButton = memo(function DownloadButton() {
           )}
         </Button>
         {!isDownloading && (
-          <PopoverTrigger asChild>
+          <PopoverTrigger>
             <Button
               aria-label="Download options"
               size="sm"

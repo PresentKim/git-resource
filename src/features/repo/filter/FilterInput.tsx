@@ -16,7 +16,7 @@ import {useInputRef} from '@/shared/hooks/form/useInputRef'
 function FilterHelpPopover() {
   return (
     <Popover>
-      <PopoverTrigger asChild>
+      <PopoverTrigger>
         <Button
           aria-label="Filter syntax help"
           size="sm"
@@ -30,20 +30,25 @@ function FilterHelpPopover() {
           <p className="font-semibold text-foreground">Filter syntax</p>
           <p className="text-muted-foreground">
             Use plain keywords to include, and prefix with{' '}
-            <span className="font-mono text-accent">-</span> to exclude.
+            <span className="font-mono text-accent-foreground">-</span> to
+            exclude.
           </p>
           <ul className="space-y-1 text-muted-foreground">
             <li>
-              <span className="font-mono text-accent">button</span> – include
-              paths containing &quot;button&quot;
+              <span className="font-mono text-accent-foreground">button</span> –
+              include paths containing &quot;button&quot;
             </li>
             <li>
-              <span className="font-mono text-accent">button -dark</span> –
-              include &quot;button&quot; but exclude &quot;dark&quot;
+              <span className="font-mono text-accent-foreground">
+                button -dark
+              </span>{' '}
+              – include &quot;button&quot; but exclude &quot;dark&quot;
             </li>
             <li>
-              <span className="font-mono text-accent">ui/icons/ -32</span> –
-              include &quot;ui/icons/&quot; but exclude &quot;32&quot;
+              <span className="font-mono text-accent-foreground">
+                ui/icons/ -32
+              </span>{' '}
+              – include &quot;ui/icons/&quot; but exclude &quot;32&quot;
             </li>
           </ul>
         </div>

@@ -53,7 +53,7 @@ export default function HomePage() {
           'text-center text-balance font-semibold tracking-tight text-4xl md:text-6xl leading-[1.1]',
         )}>
         Explore GitHub images
-        <span className="block bg-linear-to-r from-chart-1 via-chart-4 to-chart-2 bg-clip-text text-transparent">
+        <span className="block bg-linear-to-r from-chart-3 via-chart-8 to-chart-6 bg-clip-text text-transparent">
           filter, preview, and download in one place
         </span>
       </h1>

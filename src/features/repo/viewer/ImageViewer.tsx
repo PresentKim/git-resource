@@ -9,8 +9,12 @@ import {
   ZoomOut,
   RotateCcw,
 } from 'lucide-react'
-import {Dialog, DialogPortal} from '@/shared/components/ui/dialog'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogPortal,
+  DialogTitle,
+} from '@/shared/components/ui/dialog'
 import {Button} from '@/shared/components/ui/button'
 import {
   cn,
@@ -234,21 +238,6 @@ export function ImageViewer({
 
   useScrollLock(open)
 
-  // Handle Escape key is handled by useImageKeyboard
-
-  const handleDialogOpenAutoFocus = useCallback((e: Event) => {
-    e.preventDefault()
-    const content = dialogContentRef.current
-    if (content) {
-      const firstFocusable = content.querySelector(
-        'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
-      ) as HTMLElement | null
-      if (firstFocusable) {
-        firstFocusable.focus({preventScroll: true})
-      }
-    }
-  }, [])
-
   if (!currentImage) return null
 
   const imageTitleId = 'image-viewer-title'
@@ -256,7 +245,7 @@ export function ImageViewer({
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogPortal>
-        <DialogPrimitive.Content
+        <DialogContent
           className={cn(
             'fixed inset-0 z-50',
             'w-screen h-dvh',
@@ -269,19 +258,13 @@ export function ImageViewer({
             gridBackground === 'black' && 'text-white',
           )}
           aria-labelledby={imageTitleId}
-          aria-describedby={undefined}
-          onOpenAutoFocus={handleDialogOpenAutoFocus}
-          onPointerDownOutside={e => e.preventDefault()}
-          onEscapeKeyDown={e => {
-            e.preventDefault()
-            onOpenChange(false)
-          }}>
+          aria-describedby={undefined}>
           <div
             ref={dialogContentRef}
             className="relative flex flex-col w-full h-full max-h-dvh">
-            <DialogPrimitive.Title className="sr-only">
+            <DialogTitle className="sr-only">
               {fileName} - Image {currentIndex + 1} of {images.length}
-            </DialogPrimitive.Title>
+            </DialogTitle>
             <Button
               variant="ghost"
               size="icon"
@@ -603,7 +586,7 @@ export function ImageViewer({
               </div>
             </div>
           </div>
-        </DialogPrimitive.Content>
+        </DialogContent>
       </DialogPortal>
     </Dialog>
   )

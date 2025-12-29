@@ -118,7 +118,7 @@ export default function RepoPage() {
             className="flex flex-col items-center gap-4 text-center max-w-md"
             aria-live="polite">
             <div className="flex flex-col items-center gap-3">
-              <LoaderIcon className="size-8 animate-spin text-accent" />
+              <LoaderIcon className="size-8 animate-spin text-accent-foreground" />
               <div className="space-y-1">
                 <h2 className="text-lg font-semibold text-foreground">
                   {isLoadRef
