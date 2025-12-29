@@ -1,7 +1,11 @@
-import {useEffect} from 'react'
-import {Filter as FilterIcon, HelpCircle, X as XIcon} from 'lucide-react'
-
-import {Input} from '@/shared/components/ui/input'
+import {useEffect, useState} from 'react'
+import {IconFilter, IconHelpCircle} from '@tabler/icons-react'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+} from '@/shared/components/ui/input-group'
 import {Button} from '@/shared/components/ui/button'
 import {
   Popover,
@@ -10,8 +14,6 @@ import {
 } from '@/shared/components/ui/popover'
 
 import {useFilterQuery} from '@/features/repo/filter/useFilterQuery'
-import {cn} from '@/shared/utils'
-import {useInputRef} from '@/shared/hooks/form/useInputRef'
 
 function FilterHelpPopover() {
   return (
@@ -22,7 +24,7 @@ function FilterHelpPopover() {
           size="sm"
           variant="ghost"
           className="h-7 w-7 shrink-0 p-0 text-muted-foreground hover:text-foreground">
-          <HelpCircle className="h-3.5 w-3.5" />
+          <IconHelpCircle title="Filter syntax help" className="size-5" />
         </Button>
       </PopoverTrigger>
       <PopoverContent side="bottom" align="end">
@@ -57,25 +59,16 @@ function FilterHelpPopover() {
   )
 }
 
-export function FilterInput({
-  className,
-  ...props
-}: React.ComponentProps<'div'>) {
+export function FilterInput() {
   const {filter: filterQuery, setFilter: setFilterQuery} = useFilterQuery()
-  const {
-    inputRef: filterInputRef,
-    clearInput: clearFilterInput,
-    getValue: getFilterInput,
-    setValue: setFilterInput,
-  } = useInputRef()
+  const [filterInput, setFilterInput] = useState('')
 
   // Sync input with query when query changes externally
   useEffect(() => {
     setFilterInput(filterQuery)
-  }, [filterQuery, setFilterInput])
+  }, [filterQuery])
 
-  const handleApplyFilter = () => setFilterQuery(getFilterInput())
-  const handleClearFilter = () => clearFilterInput()
+  const handleApplyFilter = () => setFilterQuery(filterInput)
 
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
@@ -83,43 +76,31 @@ export function FilterInput({
     }
   }
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFilterInput(e.target.value)
+  }
+
   return (
-    <div
-      className={cn('flex w-full items-center justify-end gap-1.5', className)}
-      {...props}>
-      <div className="relative flex-1 max-w-lg">
-        <Input
-          ref={filterInputRef}
-          defaultValue={getFilterInput()}
-          onKeyDown={handleInputKeyDown}
-          type="text"
-          placeholder="'keyword' to include, '-keyword' to exclude"
-          className="w-full pr-8 peer"
-          aria-label="Filter images"
-          aria-describedby="filter-description"
-        />
-        <span id="filter-description" className="sr-only">
-          Enter keywords to include or exclude images. Use '-keyword' to
-          exclude.
-        </span>
-        <Button
-          aria-label="Clear filter"
-          onClick={handleClearFilter}
-          size="icon"
-          variant="ghost"
-          className="absolute right-0 top-0 h-full px-2 peer-placeholder-shown:hidden">
-          <XIcon className="h-4 w-4" />
-        </Button>
-      </div>
-      <FilterHelpPopover />
-      <Button
-        aria-label="Apply filter"
-        onClick={handleApplyFilter}
-        size="icon"
-        variant="outline"
-        className="shrink-0">
-        <FilterIcon className="h-4 w-4" />
-      </Button>
-    </div>
+    <InputGroup>
+      <InputGroupInput
+        value={filterInput}
+        onKeyDown={handleInputKeyDown}
+        onChange={handleInputChange}
+        type="text"
+        placeholder="'keyword' to include, '-keyword' to exclude"
+        aria-label="Filter images"
+        aria-describedby="filter-description"
+      />
+      <InputGroupAddon align="inline-end">
+        <FilterHelpPopover />
+        <InputGroupButton
+          aria-label="Apply filter"
+          title="Apply filter"
+          onClick={handleApplyFilter}
+          disabled={!filterInput.trim()}>
+          <IconFilter title="Apply filter" className="size-5" />
+        </InputGroupButton>
+      </InputGroupAddon>
+    </InputGroup>
   )
 }

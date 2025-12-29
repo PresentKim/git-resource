@@ -1,69 +1,93 @@
-import {SendHorizonal, X as XIcon} from 'lucide-react'
-import {Input} from '@/shared/components/ui/input'
-import {Button} from '@/shared/components/ui/button'
+import {useState} from 'react'
+import {IconSend2, IconAlertCircle} from '@tabler/icons-react'
 
-import {useInputRef} from '@/shared/hooks/form/useInputRef'
+import {
+  InputGroup,
+  InputGroupAddon,
+  InputGroupButton,
+  InputGroupInput,
+  InputGroupText,
+} from '@/shared/components/ui/input-group'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/shared/components/ui/tooltip'
+import {parseGithubUrl} from '@/shared/utils'
 import {useRepoPath} from '@/features/repo/useRepoPath'
-import {cn, parseGithubUrl} from '@/shared/utils'
 
-export function RepoInput({className, ...props}: React.ComponentProps<'div'>) {
+export function RepoInput() {
   const [, setRepoPath] = useRepoPath()
-  const {inputRef, clearInput, getValue} = useInputRef()
+  const [repoInput, setRepoInput] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
-  const handleClearRepo = () => {
-    clearInput()
-  }
+  const handleSend = () => {
+    if (repoInput.trim() === '') {
+      setError('URL is required')
+      return
+    }
 
-  const handleApplyRepo = () => {
-    const url = getValue()
-    if (!url) return
+    const parsedRepo = parseGithubUrl(repoInput)
+    if (!parsedRepo) {
+      setError('Invalid URL')
+      return
+    }
 
-    const parsedRepo = parseGithubUrl(url)
-    if (!parsedRepo) return
-
+    setError(null)
     setRepoPath(parsedRepo.owner, parsedRepo.name, parsedRepo.ref)
   }
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
-      handleApplyRepo()
+      handleSend()
     }
   }
 
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value.trim()
+    const match = value.match(/^https:\/\/github\.com\/(.+)$/i)
+    if (match) {
+      value = match[1]
+    }
+
+    setRepoInput(value)
+    setError(null)
+  }
+
   return (
-    <div
-      className={cn('flex flex-row items-center w-full', className)}
-      {...props}>
-      <div className="relative flex-1 w-full">
-        <Input
-          ref={inputRef}
-          onKeyDown={handleKeyDown}
-          type="text"
-          placeholder="https://github.com/:owner/:repo/:ref"
-          className="w-full pr-8 peer rounded-r-none"
-          aria-label="GitHub repository URL"
-          aria-describedby="repo-input-description"
-        />
-        <span id="repo-input-description" className="sr-only">
-          Enter a GitHub repository URL to browse images
-        </span>
-        <Button
-          onClick={handleClearRepo}
-          size="icon"
+    <InputGroup>
+      <InputGroupAddon>
+        <InputGroupText>https://github.com/</InputGroupText>
+      </InputGroupAddon>
+      <InputGroupInput
+        aria-invalid={!!error}
+        value={repoInput}
+        onKeyDown={handleKeyDown}
+        onChange={handleChange}
+        type="text"
+        placeholder=":owner/:repo/:ref"
+        className={error ? 'border-destructive' : ''}
+        aria-label="GitHub repository URL"
+        aria-describedby="repo-input-description"
+      />
+      <InputGroupAddon align="inline-end">
+        {error && (
+          <Tooltip>
+            <TooltipTrigger>
+              <IconAlertCircle title="Error" className="size-5" />
+            </TooltipTrigger>
+            <TooltipContent>{error}</TooltipContent>
+          </Tooltip>
+        )}
+        <InputGroupButton
+          aria-label="Clear repository URL"
+          title="Clear repository URL"
           variant="ghost"
-          className="absolute right-0 top-0 max-w-sm h-full px-2 peer-placeholder-shown:hidden"
-          aria-label="Clear repository URL">
-          <XIcon className="size-4" />
-        </Button>
-      </div>
-      <Button
-        onClick={handleApplyRepo}
-        aria-label="Open repository"
-        variant="outline"
-        size="icon"
-        className="rounded-l-none">
-        <SendHorizonal strokeWidth={4} className="size-5" />
-      </Button>
-    </div>
+          onClick={handleSend}
+          disabled={!repoInput || !!error}>
+          <IconSend2 title="Open repository" className="size-5" />
+        </InputGroupButton>
+      </InputGroupAddon>
+    </InputGroup>
   )
 }
