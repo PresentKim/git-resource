@@ -12,7 +12,6 @@ import {generateNoImagesMessage} from '@/shared/utils/randomMessages'
 import {RandomMessageLoader} from '@/shared/components/RandomMessageLoader'
 import {useDisplaySettings} from '@/shared/stores/settingStore'
 import {useRepoStore} from '@/shared/stores/repoStore'
-import {useRepoSync} from '@/features/repo/useRepoSync'
 import {useFilterSync} from '@/features/repo/filter/useFilterSync'
 import {useRepoLoading} from '@/features/repo/useRepoLoading'
 import {useImageClickHandler} from '@/features/repo/useImageClickHandler'
@@ -22,9 +21,6 @@ import {Loader as LoaderIcon} from 'lucide-react'
 export default function RepoPage() {
   const {gridBackground, columnCount, pixelated} = useDisplaySettings()
   const repo = useRepoStore(state => state.repo)
-
-  // Sync repository from URL to store
-  useRepoSync()
 
   // Sync filter changes
   useFilterSync()

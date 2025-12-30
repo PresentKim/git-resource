@@ -2,16 +2,20 @@ import {useMemo} from 'react'
 import {useParams, useNavigate} from 'react-router-dom'
 
 import {createGithubRepo, type GithubRepo, parseGithubUrl} from '@/shared/utils'
+import {useRepoStore} from '@/shared/stores/repoStore'
 
 export function useRepoPath() {
   const {'*': path} = useParams<'*'>()
   const navigate = useNavigate()
+  const setRepo = useRepoStore(state => state.setRepo)
 
   const repoPath: GithubRepo = useMemo(() => {
-    return path
+    const currentRepo = path
       ? (parseGithubUrl(path) ?? createGithubRepo('', '', ''))
       : createGithubRepo('', '', '')
-  }, [path])
+    setRepo(currentRepo)
+    return currentRepo
+  }, [path, setRepo])
 
   const setRepoPath = (
     owner: string,
