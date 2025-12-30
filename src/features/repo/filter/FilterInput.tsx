@@ -1,5 +1,6 @@
 import {useEffect, useState} from 'react'
 import {IconFilter, IconHelpCircle} from '@tabler/icons-react'
+
 import {
   InputGroup,
   InputGroupAddon,
@@ -18,15 +19,14 @@ import {useFilterQuery} from '@/features/repo/filter/useFilterQuery'
 function FilterHelpPopover() {
   return (
     <Popover>
-      <PopoverTrigger>
-        <Button
-          aria-label="Filter syntax help"
-          size="sm"
-          variant="ghost"
-          className="h-7 w-7 shrink-0 p-0 text-muted-foreground hover:text-foreground">
-          <IconHelpCircle title="Filter syntax help" className="size-5" />
-        </Button>
-      </PopoverTrigger>
+      <PopoverTrigger
+        aria-label="Filter syntax help"
+        render={
+          <Button variant="ghost">
+            <IconHelpCircle className="size-5" />
+          </Button>
+        }
+      />
       <PopoverContent side="bottom" align="end">
         <div className="space-y-2 text-xs">
           <p className="font-semibold text-foreground">Filter syntax</p>

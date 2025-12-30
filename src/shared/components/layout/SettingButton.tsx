@@ -61,15 +61,13 @@ export function SettingButton() {
 
   return (
     <Dialog onOpenChange={handleOpenChange} modal={false}>
-      <DialogTrigger>
-        <Button
-          aria-label="Settings"
-          variant="ghost"
-          size="icon"
-          className="rounded-full hover:bg-accent/20 hover:text-accent-foreground">
-          <SettingsIcon className="h-5 w-5" />
-        </Button>
-      </DialogTrigger>
+      <DialogTrigger
+        render={
+          <Button aria-label="Settings" variant="ghost">
+            <SettingsIcon className="size-5" />
+          </Button>
+        }
+      />
       <DialogContent className="max-h-[calc(100vh-4rem)] w-[min(100vw-1.5rem,40rem)] overflow-y-auto border-border/70 bg-card shadow-xl shadow-black/40 sm:max-w-2xl">
         <DialogHeader className="space-y-1 border-b border-border/60 pb-3">
           <DialogTitle className="flex items-center justify-between text-lg font-semibold">

@@ -107,16 +107,17 @@ const DownloadButton = memo(function DownloadButton() {
           )}
         </Button>
         {!isDownloading && (
-          <PopoverTrigger>
-            <Button
-              aria-label="Download options"
-              size="sm"
-              variant="outline"
-              disabled={!filteredCount}
-              className="px-2">
-              <ChevronDown className="size-4" />
-            </Button>
-          </PopoverTrigger>
+          <PopoverTrigger
+            render={
+              <Button
+                aria-label="Download options"
+                size="sm"
+                variant="outline"
+                disabled={!filteredCount}>
+                <ChevronDown className="size-4" />
+              </Button>
+            }
+          />
         )}
       </div>
       <PopoverContent side="bottom" align="end" className="w-64">
