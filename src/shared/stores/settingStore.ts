@@ -1,7 +1,7 @@
 import {create} from 'zustand'
 import {useMemo} from 'react'
 
-export type Theme = 'light' | 'dark'
+export type Theme = 'system' | 'light' | 'dark'
 export type GridBackground = 'auto' | 'white' | 'black' | 'transparent'
 
 export interface SpriteSettings {

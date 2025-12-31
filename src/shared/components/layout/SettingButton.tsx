@@ -1,4 +1,6 @@
-import {Settings as SettingsIcon, Info, Sun, Moon} from 'lucide-react'
+import {Settings as SettingsIcon, Info} from 'lucide-react'
+import {IconBrightness2, IconCircleHalf2, IconMoon} from '@tabler/icons-react'
+
 import {
   Dialog,
   DialogContent,
@@ -16,6 +18,7 @@ import {Slider} from '@/shared/components/ui/slider'
 import {Switch} from '@/shared/components/ui/switch'
 
 import {useGithubRateLimitStore} from '@/shared/stores/githubApiStore'
+import {type Theme} from '@/shared/stores/settingStore'
 import {useSettingsForm} from '@/shared/hooks/settings/useSettingsForm'
 import {useSettingsSave} from '@/shared/hooks/settings/useSettingsSave'
 import {useSettingsDialog} from '@/shared/hooks/settings/useSettingsDialog'
@@ -149,24 +152,22 @@ export function SettingButton() {
             <div data-slot="theme-selector" className="space-y-2 min-w-0">
               <Label className="text-sm font-medium">Theme</Label>
               <div className="flex gap-2 w-full min-w-0">
-                <Button
-                  type="button"
-                  variant={theme === 'light' ? 'secondary' : 'outline'}
-                  size="sm"
-                  className="flex-1 gap-1.5 min-w-0"
-                  onClick={() => setTheme('light')}>
-                  <Sun className="h-4 w-4 shrink-0" />
-                  <span className="text-xs whitespace-nowrap">Light</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant={theme === 'dark' ? 'secondary' : 'outline'}
-                  size="sm"
-                  className="flex-1 gap-1.5 min-w-0"
-                  onClick={() => setTheme('dark')}>
-                  <Moon className="h-4 w-4 shrink-0" />
-                  <span className="text-xs whitespace-nowrap">Dark</span>
-                </Button>
+                {(
+                  [
+                    ['system', IconCircleHalf2],
+                    ['light', IconBrightness2],
+                    ['dark', IconMoon],
+                  ] as const
+                ).map(([themeValue, ThemeIcon]) => (
+                  <Button
+                    key={themeValue}
+                    type="button"
+                    variant={themeValue === theme ? 'default' : 'outline'}
+                    className="flex-1"
+                    onClick={() => setTheme(themeValue as Theme)}>
+                    <ThemeIcon className="size-5" />
+                  </Button>
+                ))}
               </div>
               <p className="text-xs text-muted-foreground">
                 Choose your preferred color theme.

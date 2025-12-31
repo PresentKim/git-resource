@@ -38,7 +38,7 @@ export default function Header(props: React.ComponentProps<'header'>) {
       data-slot="header"
       className="w-full border-b border-border/40 bg-background/80 backdrop-blur-lg"
       {...props}>
-      <div className="flex flex-row justify-between w-full max-w-7xl min-h-10 mx-auto py-2 px-4 sm:px-6">
+      <div className="flex flex-row justify-between items-center w-full max-w-7xl min-h-10 mx-auto py-2 px-4 sm:px-6">
         <div className="flex-1 flex flex-row flex-wrap justify-between items-center gap-2 mr-2">
           <HomeButton />
           <RepoInfo />
