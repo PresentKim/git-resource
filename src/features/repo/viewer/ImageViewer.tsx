@@ -58,12 +58,29 @@ export function ImageViewer({
   const repo = useRepoStore(state => state.repo)
   const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
   const {pixelated, animationEnabled, gridBackground} = useDisplaySettings()
+  const rafRef = useRef<number | null>(null)
 
   const currentImage = images[currentIndex]
   const rawSrc = currentImage ? createRawImageUrl(repo, currentImage) : ''
   const [resolvedSrc, setResolvedSrc] = useState<{forSrc: string; url: string}>(
     () => ({forSrc: rawSrc, url: rawSrc}),
   )
+
+  const [pixelGrid, setPixelGrid] = useState<{
+    visible: boolean
+    left: number
+    top: number
+    width: number
+    height: number
+    pixelSize: number
+  }>({
+    visible: false,
+    left: 0,
+    top: 0,
+    width: 0,
+    height: 0,
+    pixelSize: 0,
+  })
 
   // Image metadata
   const {metadata, updateMetadata, clearMetadata} = useImageMetadata()
@@ -240,14 +257,114 @@ export function ImageViewer({
 
   if (!currentImage) return null
 
+  const schedulePixelGridUpdate = () => {
+    if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
+    rafRef.current = requestAnimationFrame(() => {
+      const container = imageContainerRef.current
+      const img = imgRef.current
+      if (!open || !container || !img) {
+        setPixelGrid(prev => (prev.visible ? {...prev, visible: false} : prev))
+        return
+      }
+
+      const showGrid =
+        gridBackground === 'transparent' &&
+        !shouldAnimate &&
+        !loading &&
+        !imageError &&
+        !!metadata?.width &&
+        !!metadata?.height
+
+      if (!showGrid) {
+        setPixelGrid(prev => (prev.visible ? {...prev, visible: false} : prev))
+        return
+      }
+
+      const containerRect = container.getBoundingClientRect()
+      const imgRect = img.getBoundingClientRect()
+
+      const width = Math.max(0, imgRect.width)
+      const height = Math.max(0, imgRect.height)
+      const left = imgRect.left - containerRect.left
+      const top = imgRect.top - containerRect.top
+      const pixelSize =
+        metadata && metadata.width > 0 ? width / metadata.width : 0
+
+      // Avoid rendering when too small / unstable.
+      const visible =
+        width > 0 &&
+        height > 0 &&
+        Number.isFinite(pixelSize) &&
+        pixelSize >= 2
+
+      setPixelGrid(prev => {
+        // Small hysteresis to prevent state churn.
+        if (
+          prev.visible === visible &&
+          Math.abs(prev.left - left) < 0.5 &&
+          Math.abs(prev.top - top) < 0.5 &&
+          Math.abs(prev.width - width) < 0.5 &&
+          Math.abs(prev.height - height) < 0.5 &&
+          Math.abs(prev.pixelSize - pixelSize) < 0.01
+        ) {
+          return prev
+        }
+        return {visible, left, top, width, height, pixelSize}
+      })
+    })
+  }
+
+  // Keep pixel grid aligned to the actual rendered <img> rect.
+  useEffect(() => {
+    schedulePixelGridUpdate()
+    return () => {
+      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
+      rafRef.current = null
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    open,
+    gridBackground,
+    shouldAnimate,
+    loading,
+    imageError,
+    metadata?.width,
+    metadata?.height,
+    scale,
+    translateX,
+    translateY,
+  ])
+
+  useEffect(() => {
+    const container = imageContainerRef.current
+    const img = imgRef.current
+    if (!open || !container || !img) return
+
+    schedulePixelGridUpdate()
+
+    const onWindowResize = () => schedulePixelGridUpdate()
+    window.addEventListener('resize', onWindowResize, {passive: true})
+
+    const ro = new ResizeObserver(() => schedulePixelGridUpdate())
+    ro.observe(container)
+    ro.observe(img)
+
+    return () => {
+      window.removeEventListener('resize', onWindowResize)
+      ro.disconnect()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [open, currentImage, shouldAnimate])
+
   const imageTitleId = 'image-viewer-title'
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange} modal={false}>
       <DialogPortal>
         <DialogContent
+          aria-labelledby={imageTitleId}
           className={cn(
-            'fixed inset-0 z-50',
+            'fixed z-50',
             'w-screen h-dvh',
             'p-0 border-0 rounded-none',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
@@ -256,9 +373,7 @@ export function ImageViewer({
             'text-foreground',
             gridBackground === 'white' && 'text-black',
             gridBackground === 'black' && 'text-white',
-          )}
-          aria-labelledby={imageTitleId}
-          aria-describedby={undefined}>
+          )}>
           <div
             ref={dialogContentRef}
             className="relative flex flex-col w-full h-full max-h-dvh">
@@ -397,6 +512,29 @@ export function ImageViewer({
                     onError={handleError}
                   />
                 </div>
+              )}
+
+              {pixelGrid.visible && (
+                <div
+                  aria-hidden="true"
+                  className="absolute pointer-events-none z-20"
+                  style={{
+                    left: pixelGrid.left,
+                    top: pixelGrid.top,
+                    width: pixelGrid.width,
+                    height: pixelGrid.height,
+                    backgroundImage: [
+                      // vertical lines
+                      `repeating-linear-gradient(90deg, rgba(0,0,0,0.25) 0 1px, rgba(0,0,0,0) 1px ${pixelGrid.pixelSize}px)`,
+                      // horizontal lines
+                      `repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0 1px, rgba(0,0,0,0) 1px ${pixelGrid.pixelSize}px)`,
+                    ].join(','),
+                    // When the background is dark, black lines are too subtle.
+                    mixBlendMode:
+                      gridBackground === 'black' ? 'screen' : 'multiply',
+                    opacity: 0.7,
+                  }}
+                />
               )}
             </div>
 
