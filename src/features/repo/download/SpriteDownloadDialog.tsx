@@ -1,4 +1,4 @@
-import {memo, useState, useCallback} from 'react'
+import {useState, useEffectEvent} from 'react'
 import {
   Dialog,
   DialogContent,
@@ -14,11 +14,7 @@ import {Slider} from '@/shared/components/ui/slider'
 import {Switch} from '@/shared/components/ui/switch'
 import {useSpriteDownload} from '@/features/repo/download/useSpriteDownload'
 import {useRepoStore} from '@/shared/stores/repoStore'
-import {
-  useDisplaySettings,
-  useSettingStore,
-  type SpriteSettings,
-} from '@/shared/stores/settingStore'
+import {useDisplaySettings, useSettingStore} from '@/shared/stores/settingStore'
 import {Loader as LoaderIcon} from 'lucide-react'
 import {cn} from '@/shared/utils'
 import type {SpriteOptions} from '@/features/repo/download/utils/createSpriteImage'
@@ -40,18 +36,15 @@ const PRESET_COLORS = [
   {label: 'Gray', value: '#808080'},
 ] as const
 
-export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
+export function SpriteDownloadDialog({
   open,
   onOpenChange,
 }: SpriteDownloadDialogProps) {
   const repo = useRepoStore(state => state.repo)
   const filteredImageFiles = useRepoStore(state => state.filteredImageFiles)
   const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
-  const {
-    columnCount: displayColumnCount,
-    pixelated,
-    animationEnabled,
-  } = useDisplaySettings()
+  const {columnCount: displayColumnCount, animationEnabled} =
+    useDisplaySettings()
   const {spriteSettings, setSpriteSettings} = useSettingStore()
   const githubToken = useSettingStore(state => state.githubToken)
   const {isDownloading, downloadProgress, handleDownload} = useSpriteDownload({
@@ -62,89 +55,25 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
     githubToken,
   })
 
-  // Use saved settings or defaults
-  const [gap, setGap] = useState(() => spriteSettings.gap)
-  const [backgroundColor, setBackgroundColor] = useState(
-    () => spriteSettings.backgroundColor,
-  )
-  const [customColor, setCustomColor] = useState(
-    () => spriteSettings.customColor,
-  )
-  const [useCustomColor, setUseCustomColor] = useState(
-    () => spriteSettings.useCustomColor,
-  )
-  const [scale, setScale] = useState(() => spriteSettings.scale)
-  // Default: opposite of pixelated setting (if pixelated is true, imageSmoothing is false)
-  // Use saved value if available, otherwise based on pixelated setting
-  const [imageSmoothing, setImageSmoothing] = useState(
-    () => spriteSettings.imageSmoothing ?? !pixelated,
-  )
-  // Column count: use saved value if available, otherwise use current grid column count
-  const [spriteColumns, setSpriteColumns] = useState<number | null>(
-    () => spriteSettings.columns,
-  )
+  const actualColumnCount = spriteSettings.columns ?? displayColumnCount
 
-  // Load settings when dialog opens
-  useEffect(() => {
-    if (open) {
-      setGap(spriteSettings.gap)
-      setBackgroundColor(spriteSettings.backgroundColor)
-      setCustomColor(spriteSettings.customColor)
-      setUseCustomColor(spriteSettings.useCustomColor)
-      setScale(spriteSettings.scale)
-      setImageSmoothing(spriteSettings.imageSmoothing ?? !pixelated)
-      setSpriteColumns(spriteSettings.columns)
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open])
-
-  // Save settings when they change
-  useEffect(() => {
-    if (open) {
-      const newSettings: SpriteSettings = {
-        gap,
-        backgroundColor,
-        customColor,
-        useCustomColor,
-        scale,
-        imageSmoothing,
-        columns: spriteColumns,
-      }
-      setSpriteSettings(newSettings)
-    }
-  }, [
-    open,
-    gap,
-    backgroundColor,
-    customColor,
-    useCustomColor,
-    scale,
-    imageSmoothing,
-    spriteColumns,
-    setSpriteSettings,
-  ])
-
-  // Use spriteColumns if set, otherwise use displayColumnCount
-  const actualColumnCount = spriteColumns ?? displayColumnCount
-
-  // Calculate estimated sprite size
   const [sizeEstimate, setSizeEstimate] = useState<SpriteSizeEstimate | null>(
     null,
   )
 
+  const onImageEmpty = useEffectEvent(() => setSizeEstimate(null))
+
   useEffect(() => {
     if (!filteredImageFiles || filteredImageFiles.length === 0) {
-      setSizeEstimate(null)
+      onImageEmpty()
       return
     }
 
     let cancelled = false
 
     estimateSpriteSize(repo, filteredImageFiles, {
-      gap,
-      backgroundColor: useCustomColor ? customColor : backgroundColor,
+      ...spriteSettings,
       columns: actualColumnCount,
-      scale,
       mcmetaPaths,
       animationEnabled,
       githubToken,
@@ -160,46 +89,31 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
   }, [
     repo,
     filteredImageFiles,
-    gap,
-    backgroundColor,
-    customColor,
-    useCustomColor,
     actualColumnCount,
-    scale,
     mcmetaPaths,
     animationEnabled,
     githubToken,
+    spriteSettings,
   ])
 
-  const handleDownloadClick = useCallback(async () => {
-    try {
-      const options: SpriteOptions = {
-        gap,
-        backgroundColor: useCustomColor ? customColor : backgroundColor,
-        columns: actualColumnCount,
-        scale,
-        imageSmoothing,
-      }
-      await handleDownload(options)
-      onOpenChange(false)
-    } catch {
-      // Error is already logged in the hook
+  const handleDownloadClick = async () => {
+    const options: SpriteOptions = {
+      ...spriteSettings,
+      backgroundColor: spriteSettings.useCustomColor
+        ? spriteSettings.customColor
+        : spriteSettings.backgroundColor,
+      columns: actualColumnCount,
     }
-  }, [
-    gap,
-    backgroundColor,
-    customColor,
-    useCustomColor,
-    actualColumnCount,
-    scale,
-    imageSmoothing,
-    handleDownload,
-    onOpenChange,
-  ])
+    await handleDownload(options)
+    onOpenChange(false)
+  }
 
   const handleColorPresetClick = (value: string) => {
-    setUseCustomColor(false)
-    setBackgroundColor(value)
+    setSpriteSettings({
+      ...spriteSettings,
+      useCustomColor: false,
+      backgroundColor: value,
+    })
   }
 
   const imageCount = filteredImageFiles?.length || 0
@@ -221,9 +135,7 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
             <div className="flex items-center justify-between">
               <Label htmlFor="columns-input">Column Count</Label>
               <span className="text-xs text-muted-foreground">
-                {spriteColumns === null
-                  ? `Current grid (${displayColumnCount} cols)`
-                  : `${spriteColumns} cols`}
+                {actualColumnCount} cols
               </span>
             </div>
             <div className="flex items-center gap-2">
@@ -232,15 +144,23 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
                 type="number"
                 min={1}
                 max={100}
-                value={spriteColumns === null ? '' : spriteColumns}
+                value={
+                  spriteSettings.columns === null ? '' : spriteSettings.columns
+                }
                 onChange={e => {
                   const value = e.target.value
                   if (value === '') {
-                    setSpriteColumns(null)
+                    setSpriteSettings({
+                      ...spriteSettings,
+                      columns: null,
+                    })
                   } else {
                     const num = parseInt(value, 10)
                     if (!isNaN(num) && num > 0) {
-                      setSpriteColumns(num)
+                      setSpriteSettings({
+                        ...spriteSettings,
+                        columns: num,
+                      })
                     }
                   }
                 }}
@@ -252,8 +172,13 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
                 type="button"
                 variant="outline"
                 size="sm"
-                onClick={() => setSpriteColumns(null)}
-                disabled={isDownloading || spriteColumns === null}
+                onClick={() =>
+                  setSpriteSettings({
+                    ...spriteSettings,
+                    columns: null,
+                  })
+                }
+                disabled={isDownloading || spriteSettings.columns === null}
                 className="text-xs">
                 Use Current Grid
               </Button>
@@ -264,15 +189,19 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label htmlFor="gap-slider">Image Gap</Label>
-              <span className="text-sm text-muted-foreground">{gap}px</span>
+              <span className="text-sm text-muted-foreground">
+                {spriteSettings.gap}px
+              </span>
             </div>
             <Slider
               id="gap-slider"
               min={0}
               max={50}
               step={1}
-              value={[gap]}
-              onValueChange={([value]) => setGap(value)}
+              value={[spriteSettings.gap]}
+              onValueChange={value =>
+                setSpriteSettings({...spriteSettings, gap: value as number})
+              }
               disabled={isDownloading}
             />
             <div className="flex gap-2">
@@ -282,11 +211,17 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setGap(value)}
+                  onClick={() =>
+                    setSpriteSettings({
+                      ...spriteSettings,
+                      gap: value,
+                    })
+                  }
                   disabled={isDownloading}
                   className={cn(
                     'text-xs',
-                    gap === value && 'bg-accent text-accent-foreground',
+                    spriteSettings.gap === value &&
+                      'bg-accent text-accent-foreground',
                   )}>
                   {value}px
                 </Button>
@@ -298,15 +233,22 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
           <div className="space-y-3">
             <div className="flex items-center justify-between">
               <Label htmlFor="scale-slider">Scale Factor</Label>
-              <span className="text-sm text-muted-foreground">{scale}x</span>
+              <span className="text-sm text-muted-foreground">
+                {spriteSettings.scale}x
+              </span>
             </div>
             <Slider
               id="scale-slider"
               min={0.5}
               max={10}
               step={0.5}
-              value={[scale]}
-              onValueChange={([value]) => setScale(value)}
+              value={[spriteSettings.scale]}
+              onValueChange={value =>
+                setSpriteSettings({
+                  ...spriteSettings,
+                  scale: value as number,
+                })
+              }
               disabled={isDownloading}
             />
             <div className="flex gap-2 flex-wrap">
@@ -316,33 +258,44 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
                   type="button"
                   variant="outline"
                   size="sm"
-                  onClick={() => setScale(value)}
+                  onClick={() =>
+                    setSpriteSettings({
+                      ...spriteSettings,
+                      scale: value,
+                    })
+                  }
                   disabled={isDownloading}
                   className={cn(
                     'text-xs',
-                    scale === value && 'bg-accent text-accent-foreground',
+                    spriteSettings.scale === value &&
+                      'bg-accent text-accent-foreground',
                   )}>
                   {value}x
                 </Button>
               ))}
             </div>
             {/* Image interpolation setting (only shown when scale > 1) */}
-            {scale > 1 && (
+            {spriteSettings.scale > 1 && (
               <div className="flex items-center justify-between pt-2 border-t">
                 <div className="flex flex-col gap-1">
                   <Label htmlFor="image-smoothing" className="text-sm">
                     Image Interpolation
                   </Label>
                   <span className="text-xs text-muted-foreground">
-                    {imageSmoothing
+                    {spriteSettings.imageSmoothing
                       ? 'Smooth interpolation (for regular images)'
                       : 'Pixel preservation (for pixel art)'}
                   </span>
                 </div>
                 <Switch
                   id="image-smoothing"
-                  checked={imageSmoothing}
-                  onCheckedChange={setImageSmoothing}
+                  checked={spriteSettings.imageSmoothing}
+                  onCheckedChange={e =>
+                    setSpriteSettings({
+                      ...spriteSettings,
+                      imageSmoothing: e,
+                    })
+                  }
                   disabled={isDownloading}
                 />
               </div>
@@ -383,7 +336,8 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
                   disabled={isDownloading}
                   className={cn(
                     'rounded-md border-2 p-2 text-xs transition-colors',
-                    backgroundColor === value && !useCustomColor
+                    spriteSettings.backgroundColor === value &&
+                      !spriteSettings.useCustomColor
                       ? 'border-accent bg-accent/10'
                       : 'border-border hover:bg-muted',
                     isDownloading && 'opacity-50 cursor-not-allowed',
@@ -408,8 +362,13 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
               <input
                 type="checkbox"
                 id="custom-color"
-                checked={useCustomColor}
-                onChange={e => setUseCustomColor(e.target.checked)}
+                checked={spriteSettings.useCustomColor}
+                onChange={e =>
+                  setSpriteSettings({
+                    ...spriteSettings,
+                    useCustomColor: e.target.checked,
+                  })
+                }
                 disabled={isDownloading}
                 className="h-4 w-4 rounded border-border"
               />
@@ -417,19 +376,29 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
                 Custom Color
               </Label>
             </div>
-            {useCustomColor && (
+            {spriteSettings.useCustomColor && (
               <div className="flex items-center gap-2">
                 <Input
                   type="color"
-                  value={customColor}
-                  onChange={e => setCustomColor(e.target.value)}
+                  value={spriteSettings.customColor}
+                  onChange={e =>
+                    setSpriteSettings({
+                      ...spriteSettings,
+                      customColor: e.target.value,
+                    })
+                  }
                   disabled={isDownloading}
                   className="h-10 w-20"
                 />
                 <Input
                   type="text"
-                  value={customColor}
-                  onChange={e => setCustomColor(e.target.value)}
+                  value={spriteSettings.customColor}
+                  onChange={e =>
+                    setSpriteSettings({
+                      ...spriteSettings,
+                      customColor: e.target.value,
+                    })
+                  }
                   disabled={isDownloading}
                   placeholder="#ffffff"
                   className="flex-1"
@@ -467,4 +436,4 @@ export const SpriteDownloadDialog = memo(function SpriteDownloadDialog({
       </DialogContent>
     </Dialog>
   )
-})
+}
