@@ -17,11 +17,11 @@ interface VirtualizedFlexGridProps<T> {
 }
 
 const DEFAULT_GAP = 10
-const DEFAULT_OVERSCAN = 5 // Simple fixed overscan for unidirectional expansion
+const DEFAULT_OVERSCAN = 5
 
 /**
  * Virtualized flex grid component for efficient rendering of large lists
- * Uses unidirectional expansion: loaded items are never removed
+ * Only rows near the viewport are mounted; the rest are unmounted
  */
 function VirtualizedFlexGrid<T>({
   items,
@@ -34,11 +34,13 @@ function VirtualizedFlexGrid<T>({
   const wrapperRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
   const visibleHeight = useVisibleHeight(wrapperRef)
-  const scrollOffset = useScrollOffset(wrapperRef)
   const itemSize = useItemSize(containerRef, columnCount, gap)
+  // Quantize scroll to row boundaries so scrolling within a row re-renders nothing
+  const scrollOffset = useScrollOffset(
+    wrapperRef,
+    itemSize > 0 ? itemSize + gap : 0,
+  )
 
-  // Use simple fixed overscan for unidirectional expansion
-  // Adaptive overscan is not needed since loaded items are never removed
   const overscan = manualOverscan ?? DEFAULT_OVERSCAN
 
   const {totalHeight, offsetTop, visibleIndexs} = useVirtualGrid(
