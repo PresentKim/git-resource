@@ -16,7 +16,7 @@ import {Switch} from '@/shared/components/ui/switch'
 import {useSpriteDownload} from '@/features/repo/download/useSpriteDownload'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {useDisplaySettings, useSettingStore} from '@/shared/stores/settingStore'
-import {Loader as LoaderIcon} from 'lucide-react'
+import {Check, Loader as LoaderIcon} from 'lucide-react'
 import {cn} from '@/shared/utils'
 import type {SpriteOptions} from '@/features/repo/download/utils/createSpriteImage'
 import {
@@ -365,7 +365,7 @@ export function SpriteDownloadDialog({
                   }
                   onChange={() => handleColorPresetClick(value)}
                   disabled={isDownloading}
-                  className="p-2 pr-2 text-center text-xs">
+                  compact>
                   <div
                     className={cn(
                       'mx-auto mb-1 h-6 w-full rounded',
@@ -378,7 +378,10 @@ export function SpriteDownloadDialog({
                         : undefined
                     }
                   />
-                  {label}
+                  <span className="flex items-center justify-center gap-1 text-xs text-muted-foreground group-has-checked:font-semibold group-has-checked:text-foreground">
+                    <Check className="hidden size-3.5 group-has-checked:block" />
+                    {label}
+                  </span>
                 </ChoiceCard>
               ))}
             </div>
