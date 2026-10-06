@@ -61,6 +61,7 @@ export function ImageViewer({
   const rafRef = useRef<number | null>(null)
 
   const currentImage = images[currentIndex]
+  const positionLabel = `${(currentIndex + 1).toLocaleString()} of ${images.length.toLocaleString()}`
   const rawSrc = currentImage ? createRawImageUrl(repo, currentImage) : ''
   const [resolvedSrc, setResolvedSrc] = useState<{forSrc: string; url: string}>(
     () => ({forSrc: rawSrc, url: rawSrc}),
@@ -375,7 +376,7 @@ export function ImageViewer({
             ref={dialogContentRef}
             className="relative flex flex-col w-full h-full max-h-dvh">
             <DialogTitle className="sr-only">
-              {fileName} - Image {currentIndex + 1} of {images.length}
+              {fileName} - Image {positionLabel}
             </DialogTitle>
             <Button
               variant="ghost"
@@ -455,7 +456,7 @@ export function ImageViewer({
                     // For animated sprites, always use the original raw URL.
                     // AnimatedSprite will handle caching and mcmeta loading based on this.
                     src={rawSrc}
-                    alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
+                    alt={`${fileName} (${positionLabel})`}
                     className={cn(
                       'w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
                       loading && 'opacity-0',
@@ -491,7 +492,7 @@ export function ImageViewer({
                   }}>
                   <ImageMedia
                     src={displayStaticSrc}
-                    alt={`${fileName} (${currentIndex + 1} of ${images.length})`}
+                    alt={`${fileName} (${positionLabel})`}
                     className={cn(
                       'w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
                       loading && 'opacity-0',
@@ -569,7 +570,7 @@ export function ImageViewer({
                       {metadata.fileSize && (
                         <> · {formatFileSize(metadata.fileSize)}</>
                       )}
-                      {metadata.format && <>· {metadata.format}</>}
+                      {metadata.format && <> · {metadata.format}</>}
                     </span>
                   </>
                 ) : (
@@ -582,7 +583,7 @@ export function ImageViewer({
                     {metadata.fileSize && (
                       <> · {formatFileSize(metadata.fileSize)}</>
                     )}
-                    {metadata.interpolate === true && <>· INTERPOLATE</>}
+                    {metadata.interpolate === true && <> · INTERPOLATE</>}
                   </span>
                 )}
               </div>
@@ -590,9 +591,7 @@ export function ImageViewer({
                 className="hidden items-center gap-3 rounded-md px-4 py-2 text-xs sm:flex"
                 aria-live="polite"
                 aria-atomic="true">
-                <span>
-                  Image {currentIndex + 1} of {images.length}
-                </span>
+                <span>Image {positionLabel}</span>
                 <div className="flex items-center gap-1">
                   <Button
                     type="button"
@@ -657,7 +656,7 @@ export function ImageViewer({
                     aria-live="polite"
                     aria-atomic="true">
                     <span className="whitespace-nowrap">
-                      Image {currentIndex + 1} of {images.length}
+                      Image {positionLabel}
                     </span>
                   </div>
                   {hasNext && (
