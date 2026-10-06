@@ -33,9 +33,11 @@ export function useImageZoom({
   const handleZoom = useCallback(
     (delta: number, centerX?: number, centerY?: number) => {
       setScale(prevScale => {
+        // Proportional step: +0.2 is "20% larger" at any zoom level. A fixed
+        // addition made one click from a tiny scale jump several times over.
         const newScale = Math.max(
           minScale,
-          Math.min(maxScale, prevScale + delta),
+          Math.min(maxScale, prevScale * (1 + delta)),
         )
 
         // Zoom towards center point if provided
@@ -60,6 +62,16 @@ export function useImageZoom({
     [minScale, maxScale],
   )
 
+  /** Jump to an absolute scale, centered, within the zoom limits */
+  const setZoom = useCallback(
+    (next: number) => {
+      setScale(Math.max(minScale, Math.min(maxScale, next)))
+      setTranslateX(0)
+      setTranslateY(0)
+    },
+    [minScale, maxScale],
+  )
+
   const handleResetZoom = useCallback(() => {
     resetZoom()
   }, [resetZoom])
@@ -74,7 +86,10 @@ export function useImageZoom({
     translateX,
     translateY,
     containerRef,
+    minScale,
+    maxScale,
     handleZoom,
+    setZoom,
     handleResetZoom,
     resetZoom,
     setTranslate,

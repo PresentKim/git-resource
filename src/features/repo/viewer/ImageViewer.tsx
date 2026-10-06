@@ -47,6 +47,8 @@ interface ImageViewerProps {
   onIndexChange?: (index: number) => void
 }
 
+const MIN_ZOOM_SCALE = 0.02
+
 export function ImageViewer({
   open,
   onOpenChange,
@@ -82,6 +84,9 @@ export function ImageViewer({
     height: 0,
     pixelSize: 0,
   })
+
+  // Rendered size / natural size of the image; null when it cannot be measured
+  const [displayScale, setDisplayScale] = useState<number | null>(null)
 
   // Image metadata
   const {metadata, updateMetadata, clearMetadata} = useImageMetadata()
@@ -165,11 +170,16 @@ export function ImageViewer({
     translateX,
     translateY,
     containerRef: zoomContainerRef,
+    minScale,
+    maxScale,
     handleZoom,
+    setZoom,
     handleResetZoom,
     resetZoom,
     setTranslate,
   } = useImageZoom({
+    // Low enough to reach 1:1 on pixel art that is shown many times larger
+    minScale: MIN_ZOOM_SCALE,
     onImageChange: handleZoomImageChange,
   })
 
@@ -262,8 +272,26 @@ export function ImageViewer({
       const container = imageContainerRef.current
       const img = imgRef.current
       if (!open || !container || !img) {
+        setDisplayScale(null)
         setPixelGrid(prev => (prev.visible ? {...prev, visible: false} : prev))
         return
+      }
+
+      // The <img> box is letterboxed by object-contain, so the content size
+      // at scale 1 is the smaller of the two axis ratios. offsetWidth and
+      // offsetHeight ignore transforms, so this is not thrown off by the
+      // zoom transition the way getBoundingClientRect would be.
+      if (!shouldAnimate && !loading && !imageError && metadata?.width) {
+        const fitted = Math.min(
+          img.offsetWidth / metadata.width,
+          img.offsetHeight / metadata.height,
+        )
+        const measured = fitted * scale
+        setDisplayScale(prev =>
+          prev !== null && Math.abs(prev - measured) < 0.0005 ? prev : measured,
+        )
+      } else {
+        setDisplayScale(null)
       }
 
       const showGrid =
@@ -349,6 +377,18 @@ export function ImageViewer({
       ro.disconnect()
     }
   }, [open, currentImage, shouldAnimate, imageContainerRef, imgRef])
+
+  // Real size on screen (1:1 = one image pixel per screen pixel); falls back to
+  // the zoom relative to the fitted size when the image cannot be measured
+  const zoomLabel =
+    displayScale !== null
+      ? `${Math.round(displayScale * 100).toLocaleString()}%`
+      : `${Math.round(scale * 100)}%`
+  const isActualSize =
+    displayScale !== null && Math.abs(displayScale - 1) < 0.005
+  const handleActualSize = () => {
+    if (displayScale) setZoom(scale / displayScale)
+  }
 
   if (!currentImage) return null
 
@@ -600,11 +640,11 @@ export function ImageViewer({
                     className="px-2 py-1 text-sm font-semibold"
                     onClick={() => handleZoom(-0.2)}
                     aria-label="Zoom out"
-                    disabled={scale <= 0.5}>
+                    disabled={scale <= minScale}>
                     <ZoomOut className="h-3.5 w-3.5" />
                   </Button>
                   <span className="px-2 text-sm min-w-12 text-center">
-                    {Math.round(scale * 100)}%
+                    {zoomLabel}
                   </span>
                   <Button
                     type="button"
@@ -613,8 +653,19 @@ export function ImageViewer({
                     className="px-2 py-1 text-sm font-semibold"
                     onClick={() => handleZoom(0.2)}
                     aria-label="Zoom in"
-                    disabled={scale >= 5}>
+                    disabled={scale >= maxScale}>
                     <ZoomIn className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="px-2 py-1 text-sm font-semibold"
+                    onClick={handleActualSize}
+                    aria-label="Actual size (1:1)"
+                    title="Actual size (1:1)"
+                    disabled={displayScale === null || isActualSize}>
+                    1:1
                   </Button>
                   {scale !== 1 && (
                     <Button
@@ -623,7 +674,8 @@ export function ImageViewer({
                       variant="outline"
                       className="px-2 py-1 text-sm font-semibold"
                       onClick={handleResetZoom}
-                      aria-label="Reset zoom">
+                      aria-label="Fit to screen"
+                      title="Fit to screen">
                       <RotateCcw className="h-3.5 w-3.5" />
                     </Button>
                   )}
@@ -679,11 +731,11 @@ export function ImageViewer({
                       className="h-8 px-2 py-1 text-sm font-semibold"
                       onClick={() => handleZoom(-0.2)}
                       aria-label="Zoom out"
-                      disabled={scale <= 0.5}>
+                      disabled={scale <= minScale}>
                       <ZoomOut className="size-4" />
                     </Button>
                     <span className="px-1 text-sm min-w-10 text-center">
-                      {Math.round(scale * 100)}%
+                      {zoomLabel}
                     </span>
                     <Button
                       type="button"
@@ -692,8 +744,19 @@ export function ImageViewer({
                       className="h-8 px-2 py-1 text-sm font-semibold"
                       onClick={() => handleZoom(0.2)}
                       aria-label="Zoom in"
-                      disabled={scale >= 5}>
+                      disabled={scale >= maxScale}>
                       <ZoomIn className="size-4" />
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      className="h-8 px-2 py-1 text-sm font-semibold"
+                      onClick={handleActualSize}
+                      aria-label="Actual size (1:1)"
+                      title="Actual size (1:1)"
+                      disabled={displayScale === null || isActualSize}>
+                      1:1
                     </Button>
                     {scale !== 1 && (
                       <Button
@@ -702,7 +765,8 @@ export function ImageViewer({
                         variant="outline"
                         className="h-8 px-2 py-1 text-sm font-semibold"
                         onClick={handleResetZoom}
-                        aria-label="Reset zoom">
+                        aria-label="Fit to screen"
+                        title="Fit to screen">
                         <RotateCcw className="size-4" />
                       </Button>
                     )}
