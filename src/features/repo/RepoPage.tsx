@@ -88,13 +88,15 @@ export default function RepoPage() {
       {!error && (
         <div
           className={cn(
-            'sticky top-(--header-offset) z-40 flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3',
-            // Same duration as the header's slide, so the two move together
-            'transition-[top] duration-150',
-            // Backdrop above the toolbar: while the header slides away there
-            // can be a gap between it and the toolbar, and without this the
-            // images scrolling underneath show through it
-            "before:pointer-events-none before:absolute before:-inset-x-1 sm:before:-inset-x-2 before:bottom-full before:h-screen before:content-['']",
+            'sticky top-[calc(var(--header-height)+0.5rem)] z-40 flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3',
+            // Moves with the header using the same transform transition. With
+            // the header hidden it slides up by the header's height, which
+            // leaves the same 0.5rem gap to the top that it has below the
+            // header, instead of sitting flush against the edge
+            'transition-transform duration-200 ease-out in-data-[header=hidden]:-translate-y-(--header-height)',
+            // Backdrop above the toolbar, so images scrolling underneath never
+            // show through the strip between it and the top of the screen
+            "before:pointer-events-none before:absolute before:-inset-x-1 sm:before:-inset-x-2 before:bottom-full before:h-16 before:content-['']",
             gridBackground === 'white'
               ? 'before:bg-white'
               : gridBackground === 'black'
