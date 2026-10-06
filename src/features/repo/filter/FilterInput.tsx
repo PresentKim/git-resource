@@ -1,5 +1,5 @@
-import {useEffect, useState} from 'react'
-import {IconFilter, IconHelpCircle} from '@tabler/icons-react'
+import {useEffect, useRef, useState} from 'react'
+import {IconFilter, IconHelpCircle, IconX} from '@tabler/icons-react'
 
 import {
   InputGroup,
@@ -62,6 +62,7 @@ function FilterHelpPopover() {
 export function FilterInput() {
   const {filter: filterQuery, setFilter: setFilterQuery} = useFilterQuery()
   const [filterInput, setFilterInput] = useState('')
+  const inputRef = useRef<HTMLInputElement>(null)
 
   // Sync input with query when query changes externally
   useEffect(() => {
@@ -70,9 +71,17 @@ export function FilterInput() {
 
   const handleApplyFilter = () => setFilterQuery(filterInput)
 
+  const handleClearFilter = () => {
+    setFilterInput('')
+    setFilterQuery('')
+    inputRef.current?.focus()
+  }
+
   const handleInputKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       handleApplyFilter()
+    } else if (e.key === 'Escape' && filterInput) {
+      handleClearFilter()
     }
   }
 
@@ -80,25 +89,36 @@ export function FilterInput() {
     setFilterInput(e.target.value)
   }
 
+  // Nothing to apply while the input already matches the active filter
+  const isApplied = filterInput.trim() === filterQuery.trim()
+
   return (
     <InputGroup>
       <InputGroupInput
+        ref={inputRef}
         value={filterInput}
         onKeyDown={handleInputKeyDown}
         onChange={handleInputChange}
         type="text"
-        placeholder="'keyword' to include, '-keyword' to exclude"
+        placeholder="Filter paths, e.g. sword -old"
         aria-label="Filter images"
-        aria-describedby="filter-description"
       />
       <InputGroupAddon align="inline-end">
+        {filterInput && (
+          <InputGroupButton
+            aria-label="Clear filter"
+            title="Clear filter (Esc)"
+            onClick={handleClearFilter}>
+            <IconX className="size-5" />
+          </InputGroupButton>
+        )}
         <FilterHelpPopover />
         <InputGroupButton
           aria-label="Apply filter"
-          title="Apply filter"
+          title="Apply filter (Enter)"
           onClick={handleApplyFilter}
-          disabled={!filterInput.trim()}>
-          <IconFilter title="Apply filter" className="size-5" />
+          disabled={isApplied}>
+          <IconFilter className="size-5" />
         </InputGroupButton>
       </InputGroupAddon>
     </InputGroup>
