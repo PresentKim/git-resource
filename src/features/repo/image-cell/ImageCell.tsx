@@ -8,6 +8,12 @@ import {useImageAnimation} from '@/features/repo/image-cell/useImageAnimation'
 import {useKeyboardAccessibility} from '@/shared/hooks/accessibility/useKeyboardAccessibility'
 import {useImageRef} from '@/features/repo/image-cell/useImageRef'
 import {parseImagePath} from '@/shared/utils/imageCell'
+import {
+  hasLoaded,
+  isScrollingFast,
+  rememberLoaded,
+  whenScrollSettles,
+} from '@/features/repo/image-cell/imageLoadGate'
 
 /**
  * Overlay component showing image path information
@@ -47,13 +53,6 @@ function ImagePathOverlay({path}: {path: string}) {
   )
 }
 
-/**
- * How long a cell must stay mounted before its image is requested.
- * Rows that fly past during a fast scroll unmount before this elapses, so
- * they never create an <img> or hit the network.
- */
-const IMAGE_LOAD_DELAY_MS = 100
-
 interface ImageCellProps {
   path: string
   index: number
@@ -79,14 +78,18 @@ const ImageCell = memo(function ImageCell({
 }: ImageCellProps) {
   const onClick = useCallback(() => onSelect(index), [onSelect, index])
 
-  const [imageRequested, setImageRequested] = useState(false)
-  useEffect(() => {
-    const timer = setTimeout(() => setImageRequested(true), IMAGE_LOAD_DELAY_MS)
-    return () => clearTimeout(timer)
-  }, [])
-
   // Image URL
   const {imageUrl} = useImageUrl({repo, imagePath: path})
+
+  // Cells that appear while the page is flying past wait for the scroll to
+  // slow down before loading; otherwise they load right away
+  const [imageRequested, setImageRequested] = useState(
+    () => hasLoaded(imageUrl) || !isScrollingFast(),
+  )
+  useEffect(() => {
+    if (imageRequested) return
+    return whenScrollSettles(() => setImageRequested(true))
+  }, [imageRequested])
 
   // Image loading
   const {
@@ -156,7 +159,10 @@ const ImageCell = memo(function ImageCell({
             shouldAnimate={shouldAnimate}
             pixelated={false}
             imgRef={handleImageRef}
-            onLoad={() => handleLoad()}
+            onLoad={() => {
+              rememberLoaded(imageUrl)
+              handleLoad()
+            }}
             onError={handleError}
           />
         )}
