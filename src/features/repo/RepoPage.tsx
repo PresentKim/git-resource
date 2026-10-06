@@ -18,8 +18,30 @@ import {useImageClickHandler} from '@/features/repo/useImageClickHandler'
 import {cn} from '@/shared/utils'
 import {Loader as LoaderIcon} from 'lucide-react'
 
+/**
+ * Owns the viewer state subscription so that opening/closing the viewer or
+ * changing the current image does not re-render the (large) gallery.
+ */
+function RepoImageViewer({images}: {images: string[]}) {
+  const viewerState = useRepoStore(state => state.viewerState)
+  const setViewerState = useRepoStore(state => state.setViewerState)
+
+  return (
+    <ImageViewer
+      open={viewerState.open}
+      onOpenChange={open => setViewerState({...viewerState, open})}
+      images={images}
+      currentIndex={viewerState.currentIndex}
+      onIndexChange={index =>
+        setViewerState({...viewerState, currentIndex: index})
+      }
+    />
+  )
+}
+
 export default function RepoPage() {
-  const {gridBackground, columnCount, pixelated} = useDisplaySettings()
+  const {gridBackground, columnCount, pixelated, animationEnabled} =
+    useDisplaySettings()
   const repo = useRepoStore(state => state.repo)
 
   // Sync filter changes
@@ -32,15 +54,22 @@ export default function RepoPage() {
   const imageFiles = useRepoStore(state => state.imageFiles)
   const filteredImageFiles = useRepoStore(state => state.filteredImageFiles)
   const error = useRepoStore(state => state.error)
-  const viewerState = useRepoStore(state => state.viewerState)
+  const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
   const isFiltering = useRepoStore(state => state.isFiltering)
-  const setViewerState = useRepoStore(state => state.setViewerState)
 
-  // Image click handlers
-  const {getClickHandler} = useImageClickHandler()
+  // Image click handler (stable, shared by all cells)
+  const {handleImageClick} = useImageClickHandler()
 
   const itemRenderer = ({index, item}: RenderData<string>) => (
-    <ImageCell key={index} path={item} onClick={getClickHandler(index)} />
+    <ImageCell
+      key={index}
+      index={index}
+      path={item}
+      repo={repo}
+      mcmetaPaths={mcmetaPaths}
+      animationEnabled={animationEnabled}
+      onSelect={handleImageClick}
+    />
   )
 
   return (
@@ -167,15 +196,7 @@ export default function RepoPage() {
               className={pixelated ? 'pixelated' : ''}
             />
           </div>
-          <ImageViewer
-            open={viewerState.open}
-            onOpenChange={open => setViewerState({...viewerState, open})}
-            images={filteredImageFiles || []}
-            currentIndex={viewerState.currentIndex}
-            onIndexChange={index =>
-              setViewerState({...viewerState, currentIndex: index})
-            }
-          />
+          <RepoImageViewer images={filteredImageFiles} />
         </>
       ) : null}
     </section>

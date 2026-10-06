@@ -1,9 +1,7 @@
 import {useCallback, memo} from 'react'
-import {LoaderCircleIcon} from 'lucide-react'
 import {cn} from '@/shared/utils'
+import type {GithubRepo} from '@/shared/utils'
 import {ImageMedia} from './ImageMedia'
-import {useRepoStore} from '@/shared/stores/repoStore'
-import {useDisplaySettings} from '@/shared/stores/settingStore'
 import {useImageUrl} from '@/features/repo/image-cell/useImageUrl'
 import {useImageLoading} from '@/features/repo/image-cell/useImageLoading'
 import {useImageAnimation} from '@/features/repo/image-cell/useImageAnimation'
@@ -33,7 +31,7 @@ function ImagePathOverlay({path}: {path: string}) {
         'dark:from-black/95 dark:via-black/85',
         'px-2 py-1.5',
         'opacity-0 group-hover:opacity-100',
-        'transition-all duration-200 ease-out',
+        'transition-[opacity,transform] duration-200 ease-out',
         'transform translate-y-1 group-hover:translate-y-0',
         'pointer-events-none',
       )}
@@ -58,14 +56,28 @@ function ImagePathOverlay({path}: {path: string}) {
 
 interface ImageCellProps {
   path: string
-  onClick?: () => void
+  index: number
+  repo: GithubRepo
+  mcmetaPaths: Set<string>
+  animationEnabled: boolean
+  /** Must be referentially stable so memoized cells are not re-rendered */
+  onSelect: (index: number) => void
 }
 
-const ImageCell = memo(function ImageCell({path, onClick}: ImageCellProps) {
-  // Get state from stores
-  const repo = useRepoStore(state => state.repo)
-  const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
-  const {animationEnabled} = useDisplaySettings()
+/**
+ * Cells receive everything as props instead of subscribing to stores:
+ * thousands of per-cell store subscriptions are costly, and a stable-props
+ * memo lets the grid skip cells whose inputs did not change.
+ */
+const ImageCell = memo(function ImageCell({
+  path,
+  index,
+  repo,
+  mcmetaPaths,
+  animationEnabled,
+  onSelect,
+}: ImageCellProps) {
+  const onClick = useCallback(() => onSelect(index), [onSelect, index])
 
   // Image URL
   const {imageUrl} = useImageUrl({repo, imagePath: path})
@@ -114,23 +126,18 @@ const ImageCell = memo(function ImageCell({path, onClick}: ImageCellProps) {
     <div
       role="button"
       tabIndex={0}
-      className="group relative aspect-square size-full ring-foreground transition-all duration-200 ease-out active:ring-2 active:rounded-xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-ring hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40"
+      className="group relative aspect-square size-full ring-foreground transition-transform duration-200 ease-out active:ring-2 active:rounded-xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-ring hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40"
       onClick={onClick}
       onKeyDown={handleKeyDown}
       aria-label={`View image: ${path}`}
       aria-pressed={false}>
       <>
-        <div
-          className={cn(
-            'size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md',
-            loading ? 'block' : 'hidden',
-          )}
-          aria-hidden="true">
-          <LoaderCircleIcon
-            className="size-full object-contain text-muted animate-spin duration-[3s]"
+        {loading && (
+          <div
+            className="size-full rounded-md bg-muted/40 ring-1 ring-muted-foreground/10"
             aria-hidden="true"
           />
-        </div>
+        )}
         <ImageMedia
           src={imageUrl}
           alt={

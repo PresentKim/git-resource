@@ -1,9 +1,9 @@
-import {useCallback, useRef} from 'react'
+import {useCallback} from 'react'
 import {useRepoStore} from '@/shared/stores/repoStore'
 
 /**
- * Hook for managing image click handlers
- * Provides memoized click handlers for image cells
+ * Hook providing a single, stable handler for opening the image viewer.
+ * Cells call it with their own index, so no per-cell closures are needed.
  */
 export function useImageClickHandler() {
   const setViewerState = useRepoStore(state => state.setViewerState)
@@ -15,21 +15,5 @@ export function useImageClickHandler() {
     [setViewerState],
   )
 
-  // Create stable click handlers map to avoid recreating functions
-  const clickHandlersRef = useRef<Map<number, () => void>>(new Map())
-
-  const getClickHandler = useCallback(
-    (index: number) => {
-      if (!clickHandlersRef.current.has(index)) {
-        clickHandlersRef.current.set(index, () => handleImageClick(index))
-      }
-      return clickHandlersRef.current.get(index)!
-    },
-    [handleImageClick],
-  )
-
-  return {
-    handleImageClick,
-    getClickHandler,
-  }
+  return {handleImageClick}
 }
