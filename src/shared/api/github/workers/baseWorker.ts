@@ -30,6 +30,12 @@ function isForbiddenError(error: unknown): boolean {
   )
 }
 
+/**
+ * Thrown by parseResponse when the API response is incomplete,
+ * so the fallback data source must be used instead
+ */
+export class FallbackRequiredError extends Error {}
+
 export abstract class BaseGithubWorker<TRequest, TResponse> {
   protected storage = new WorkerStorage()
 
@@ -95,8 +101,8 @@ export abstract class BaseGithubWorker<TRequest, TResponse> {
 
       return this.createResponse(parsedData, rateLimit)
     } catch (error) {
-      // Try fallback for 403 errors
-      if (isForbiddenError(error)) {
+      // Try fallback for 403 errors and incomplete responses
+      if (isForbiddenError(error) || error instanceof FallbackRequiredError) {
         try {
           const responseData = await this.fallbackFetchData(request)
           await this.storage.setCache(cacheKey, '', responseData)

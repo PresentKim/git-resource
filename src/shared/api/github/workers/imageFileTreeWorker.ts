@@ -5,7 +5,7 @@ import type {
   ImageFileTreeResponse,
   GithubImageFileTree,
 } from '../types'
-import {BaseGithubWorker} from './baseWorker'
+import {BaseGithubWorker, FallbackRequiredError} from './baseWorker'
 
 const IMAGE_FILE_EXTENSIONS_REGEX = /\.(png|jpe?g|gif|webp|svg)$/i
 const MCMETA_FILE_EXTENSIONS_REGEX = /\.mcmeta$/i
@@ -126,6 +126,11 @@ class ImageFileTreeWorker extends BaseGithubWorker<
   protected parseResponse(
     response: ImageFileTreeResponse,
   ): GithubImageFileTree {
+    // The recursive tree API drops entries beyond its size limit
+    if (response.truncated) {
+      throw new FallbackRequiredError('GitHub tree response was truncated')
+    }
+
     return response.tree.reduce((acc, {path, type}) => {
       if (
         type === 'blob' &&

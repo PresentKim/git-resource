@@ -38,5 +38,6 @@ export interface ImageFileTreeResponse {
     path: string
     type: 'tree' | 'blob'
   }>
+  truncated?: boolean
 }
 export type GithubImageFileTree = string[]
