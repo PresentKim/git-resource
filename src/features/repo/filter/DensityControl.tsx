@@ -9,6 +9,7 @@ import {
   PopoverTrigger,
 } from '@/shared/components/ui/popover'
 import {Slider} from '@/shared/components/ui/slider'
+import {Switch} from '@/shared/components/ui/switch'
 import {useSettingStore} from '@/shared/stores/settingStore'
 
 const MIN_COLUMNS = 1
@@ -24,6 +25,9 @@ export const DensityControl = memo(function DensityControl() {
   const shownColumns = useSettingStore(state => state.filledColumnCount)
   const setColumnCount = useSettingStore(state => state.setColumnCount)
   const isAuto = columnCount === 0
+  // A very wide screen can fit more than the usual maximum; keep that value
+  // on the slider instead of clamping it when Auto is switched off
+  const maxColumns = Math.max(MAX_COLUMNS, shownColumns)
 
   return (
     <Popover>
@@ -43,37 +47,51 @@ export const DensityControl = memo(function DensityControl() {
       <PopoverContent side="bottom" align="end" className="w-64">
         <div className="space-y-3">
           <div className="flex items-center justify-between gap-2">
-            <Label htmlFor="density-slider" className="text-xs font-semibold">
-              Columns
-            </Label>
-            <span className="text-xs text-muted-foreground">
-              {shownColumns}
-              {isAuto && ' (auto)'}
-            </span>
+            <div className="flex items-baseline gap-2">
+              <Label htmlFor="density-slider" className="text-xs font-semibold">
+                Columns
+              </Label>
+              <span className="text-xs tabular-nums text-muted-foreground">
+                {shownColumns}
+              </span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Label
+                id="density-auto-label"
+                htmlFor="density-auto"
+                className="text-xs font-semibold">
+                Auto
+              </Label>
+              {/* Switching Auto off keeps the number of columns on screen */}
+              {/* The id lands on the hidden checkbox, so the switch itself is
+                  named through aria-labelledby */}
+              <Switch
+                id="density-auto"
+                aria-labelledby="density-auto-label"
+                size="sm"
+                checked={isAuto}
+                onCheckedChange={checked =>
+                  setColumnCount(checked ? 0 : shownColumns)
+                }
+              />
+            </div>
           </div>
           <Slider
             id="density-slider"
             min={MIN_COLUMNS}
-            max={MAX_COLUMNS}
+            max={maxColumns}
             step={1}
+            disabled={isAuto}
             value={[shownColumns]}
             onValueChange={value =>
               setColumnCount(Array.isArray(value) ? value[0] : value)
             }
           />
-          <div className="flex items-center justify-between gap-2">
-            <p className="text-xs text-muted-foreground">
-              Fewer columns, larger images.
-            </p>
-            <Button
-              size="sm"
-              variant="ghost"
-              className="text-xs"
-              disabled={isAuto}
-              onClick={() => setColumnCount(0)}>
-              Auto
-            </Button>
-          </div>
+          <p className="text-xs text-muted-foreground">
+            {isAuto
+              ? 'Fits as many columns as the screen width allows.'
+              : 'Fewer columns, larger images.'}
+          </p>
         </div>
       </PopoverContent>
     </Popover>
