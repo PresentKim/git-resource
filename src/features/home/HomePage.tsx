@@ -99,38 +99,37 @@ export default function HomePage() {
           </Button>
         </div>
 
-        <div
+        <ul
           key={rerollKey}
           className={`grid w-full grid-cols-1 gap-2 transition-opacity duration-200 ${
             isRerolling ? 'opacity-0' : 'opacity-100'
           }`}
-          role="list"
           aria-label="Example repositories">
           {shuffledExampleRepositories.map(([owner, name, ref], index) => {
             const handleClick = () => setRepoPath(owner, name, ref)
             const displayName = `${owner}/${name}`
 
             return (
-              <Button
-                key={`${rerollKey}-${index}`}
-                role="listitem"
-                variant="outline"
-                className={cn(
-                  'flex items-center justify-start overflow-hidden border-border/60',
-                  'text-ellipsis whitespace-nowrap text-sm text-foreground',
-                  'animate-fade-in-slide transition-all duration-150',
-                  'hover:bg-accent/20 hover:text-foreground hover:scale-102',
-                )}
-                style={{
-                  animationDelay: `${index * 50}ms`,
-                }}
-                onClick={handleClick}
-                aria-label={`Open example repository ${displayName}`}>
-                <span className="font-mono">{displayName}</span>
-              </Button>
+              <li key={`${rerollKey}-${index}`}>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    'flex w-full items-center justify-start overflow-hidden border-border/60',
+                    'text-ellipsis whitespace-nowrap text-sm text-foreground',
+                    'animate-fade-in-slide transition-all duration-150',
+                    'hover:bg-accent/20 hover:text-foreground hover:scale-102',
+                  )}
+                  style={{
+                    animationDelay: `${index * 50}ms`,
+                  }}
+                  onClick={handleClick}
+                  aria-label={`Open example repository ${displayName}`}>
+                  <span className="font-mono">{displayName}</span>
+                </Button>
+              </li>
             )
           })}
-        </div>
+        </ul>
       </div>
     </section>
   )
