@@ -70,19 +70,14 @@ const calculateColumnCount = (): number => {
   const calculatedColumns = Math.floor(window.innerWidth / ASPECT_ITEM_SIZE)
   return Math.max(MIN_COLUMN_COUNT, calculatedColumns)
 }
+const THEMES: readonly Theme[] = ['system', 'light', 'dark']
+
 /**
- * Get initial theme from localStorage with migration support
+ * Get initial theme from localStorage, defaulting to dark for new visitors
  */
 const getInitialTheme = (): Theme => {
-  const stored = localStorage.getItem(STORAGE_KEYS.THEME) as
-    | Theme
-    | 'system'
-    | null
-  // Migrate 'system' to 'dark'
-  if (stored === 'system' || !stored) {
-    return 'dark'
-  }
-  return stored
+  const stored = localStorage.getItem(STORAGE_KEYS.THEME)
+  return THEMES.find(theme => theme === stored) ?? 'dark'
 }
 
 /**
