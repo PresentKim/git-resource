@@ -5,9 +5,9 @@ import {
 import {ImageCell} from '@/features/repo/image-cell/ImageCell'
 import {FilterToolbar} from '@/features/repo/filter/FilterToolbar'
 import {FilterInput} from '@/features/repo/filter/FilterInput'
-import {Button} from '@/shared/components/ui/button'
 import {ImageViewer} from '@/features/repo/viewer/ImageViewer'
 import {RepoEmptyState} from '@/features/repo/RepoEmptyState'
+import {RepoError} from '@/features/repo/RepoError'
 import {useGridPositionStore} from '@/features/repo/gridPositionStore'
 
 import {useDisplaySettings} from '@/shared/stores/settingStore'
@@ -48,7 +48,7 @@ export default function RepoPage() {
   useFilterSync()
 
   // Load repository data
-  const {isLoadRef, isLoadImagePaths} = useRepoLoading()
+  const {isLoadRef, isLoadImagePaths, retry} = useRepoLoading()
 
   // Get state from repoStore
   const imageFiles = useRepoStore(state => state.imageFiles)
@@ -85,57 +85,16 @@ export default function RepoPage() {
         gridBackground === 'black' && 'bg-black',
         gridBackground === 'transparent' && 'bg-transparent-grid',
       )}>
-      <div className="sticky top-(--header-offset) z-40 flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm transition-[top] duration-200 sm:flex-row sm:items-center sm:gap-3">
-        <div className="flex-1 sm:order-2">
-          <FilterInput />
-        </div>
-        <FilterToolbar />
-      </div>
-
-      {error && (
-        <div
-          role="alert"
-          className="flex flex-col items-center gap-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-center text-sm text-destructive-foreground">
-          <p className="text-base font-semibold">
-            Something went wrong while loading images.
-          </p>
-          <p className="max-w-xl text-xs text-muted-foreground">
-            {error.message}
-          </p>
-          <div className="flex flex-col items-center gap-2 text-xs text-muted-foreground">
-            {error.message.includes('403') ? (
-              <>
-                <span>· You have hit the GitHub API rate limit.</span>
-                <span>
-                  · Please wait a moment and try again, or add a GitHub Personal
-                  Access Token in settings.
-                </span>
-              </>
-            ) : error.message.includes('404') ? (
-              <>
-                <span>
-                  · Check that the repository URL is valid and public.
-                </span>
-                <span>· The repository may not exist or may be private.</span>
-              </>
-            ) : (
-              <>
-                <span>
-                  · Check that the repository URL is valid and public.
-                </span>
-                <span>· You may have hit the GitHub API rate limit.</span>
-              </>
-            )}
+      {!error && (
+        <div className="sticky top-(--header-offset) z-40 flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm transition-[top] duration-200 sm:flex-row sm:items-center sm:gap-3">
+          <div className="flex-1 sm:order-2">
+            <FilterInput />
           </div>
-          <Button
-            size="sm"
-            variant="outline"
-            onClick={() => window.location.reload()}
-            className="mt-1">
-            Try again
-          </Button>
+          <FilterToolbar />
         </div>
       )}
+
+      {error && <RepoError error={error} onRetry={retry} />}
 
       {isLoadRef ||
       isLoadImagePaths ||

@@ -16,8 +16,20 @@ function HomeButton() {
 
 function RepoInfo(props: React.ComponentProps<'div'>) {
   const repo = useRepoStore(state => state.repo)
+  const error = useRepoStore(state => state.error)
 
   if (!repo.owner) return null
+
+  // A repository that failed to load may not exist, so don't link to it
+  if (error) {
+    return (
+      <div {...props}>
+        <span className="text-xs sm:text-sm text-muted-foreground">
+          {repo.displayName}
+        </span>
+      </div>
+    )
+  }
 
   return (
     <div {...props}>

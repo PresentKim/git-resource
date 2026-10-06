@@ -58,12 +58,12 @@ export function SettingButton() {
   })
 
   // Settings dialog
-  const {handleOpenChange} = useSettingsDialog({
+  const {isOpen, handleOpenChange} = useSettingsDialog({
     onOpen: loadInitialValues,
   })
 
   return (
-    <Dialog onOpenChange={handleOpenChange} modal={false}>
+    <Dialog open={isOpen} onOpenChange={handleOpenChange} modal={false}>
       <DialogTrigger
         render={
           <Button aria-label="Settings" variant="ghost">

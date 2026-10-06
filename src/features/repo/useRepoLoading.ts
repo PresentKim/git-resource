@@ -57,8 +57,19 @@ export function useRepoLoading() {
     }
   }, [ref, defaultBranch.data, defaultBranch.error, setError])
 
+  /** Clear the error and ask the query that failed for its data again */
+  const retry = () => {
+    setError(null)
+    if (ref) {
+      void imageFileTree.refetch()
+    } else {
+      void defaultBranch.refetch()
+    }
+  }
+
   return {
     isLoadRef: defaultBranch.isLoading,
     isLoadImagePaths: imageFileTree.isLoading,
+    retry,
   }
 }
