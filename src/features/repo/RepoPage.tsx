@@ -6,6 +6,7 @@ import {ImageCell} from '@/features/repo/image-cell/ImageCell'
 import {FilterToolbar} from '@/features/repo/filter/FilterToolbar'
 import {FilterInput} from '@/features/repo/filter/FilterInput'
 import {ImageViewer} from '@/features/repo/viewer/ImageViewer'
+import {useViewerRoute} from '@/features/repo/viewer/viewerRoute'
 import {RepoEmptyState} from '@/features/repo/RepoEmptyState'
 import {RepoError} from '@/features/repo/RepoError'
 import {useGridPositionStore} from '@/features/repo/gridPositionStore'
@@ -19,22 +20,21 @@ import {cn} from '@/shared/utils'
 import {Loader as LoaderIcon} from 'lucide-react'
 
 /**
- * Owns the viewer state subscription so that opening/closing the viewer or
- * changing the current image does not re-render the (large) gallery.
+ * Owns the viewer route so that opening/closing the viewer or changing the
+ * current image does not re-render the (large) gallery.
  */
 function RepoImageViewer({images}: {images: string[]}) {
-  const viewerState = useRepoStore(state => state.viewerState)
-  const setViewerState = useRepoStore(state => state.setViewerState)
+  const {open, currentIndex, goTo, close} = useViewerRoute(images)
 
   return (
     <ImageViewer
-      open={viewerState.open}
-      onOpenChange={open => setViewerState({...viewerState, open})}
+      open={open}
+      onOpenChange={nextOpen => {
+        if (!nextOpen) close()
+      }}
       images={images}
-      currentIndex={viewerState.currentIndex}
-      onIndexChange={index =>
-        setViewerState({...viewerState, currentIndex: index})
-      }
+      currentIndex={currentIndex}
+      onIndexChange={goTo}
     />
   )
 }

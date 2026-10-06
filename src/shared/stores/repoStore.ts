@@ -106,7 +106,6 @@ interface RepoStore {
   /** Number of images excluding .mcmeta files, computed once per file list */
   totalImageCount: number
   error: Error | null
-  viewerState: {open: boolean; currentIndex: number}
   isFiltering: boolean
 
   // Actions
@@ -114,7 +113,6 @@ interface RepoStore {
   setImageFiles: (files: GithubImageFileTree | null) => void
   updateFilteredImages: (filter: string) => void
   setError: (error: Error | null) => void
-  setViewerState: (state: {open: boolean; currentIndex: number}) => void
   resetRepoState: () => void
 }
 
@@ -134,7 +132,6 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   mcmetaPaths: new Set<string>(),
   totalImageCount: 0,
   error: null,
-  viewerState: {open: false, currentIndex: 0},
   isFiltering: false,
 
   setRepo: (repo: GithubRepo) => {
@@ -222,10 +219,6 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     set({error})
   },
 
-  setViewerState: (state: {open: boolean; currentIndex: number}) => {
-    set({viewerState: state})
-  },
-
   resetRepoState: () => {
     set({
       imageFiles: null,
@@ -234,7 +227,6 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
       mcmetaPaths: new Set<string>(),
       totalImageCount: 0,
       error: null,
-      viewerState: {open: false, currentIndex: 0},
       isFiltering: false,
     })
   },
