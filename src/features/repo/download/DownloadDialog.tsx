@@ -1,5 +1,5 @@
 import {useMemo} from 'react'
-import {AlertTriangle, Loader as LoaderIcon} from 'lucide-react'
+import {AlertTriangle, Check, Loader as LoaderIcon} from 'lucide-react'
 
 import {Button} from '@/shared/components/ui/button'
 import {
@@ -120,51 +120,56 @@ export function DownloadDialog({
           </DialogDescription>
         </DialogHeader>
 
-        <fieldset className="space-y-2" disabled={isDownloading}>
+        {/* min-w-0: a fieldset is min-content wide by default, so a long path
+            would stretch it (and its cards) past the dialog */}
+        <fieldset className="min-w-0 space-y-2" disabled={isDownloading}>
           <legend className="mb-2 text-xs font-semibold">
             Folder structure
           </legend>
           {FLATTEN_OPTIONS.map(({mode, label, description}) => {
             const renamed = renamedCounts?.[mode] ?? 0
             return (
+              // The whole card is the choice. The radio input stays in the
+              // DOM for keyboard and screen reader use but is not drawn; the
+              // selected card is shown by its border, ring, tint and check.
               <label
                 key={mode}
                 className={cn(
-                  'block cursor-pointer rounded-lg border border-border/60 p-3 transition-colors',
-                  'hover:bg-muted/50 has-checked:border-ring has-checked:bg-accent/40',
-                  'has-focus-visible:ring-2 has-focus-visible:ring-ring/50',
+                  'group relative block min-w-0 cursor-pointer rounded-lg border border-border/60 bg-card/30 p-3 pr-10 transition-colors',
+                  'hover:border-foreground/30 hover:bg-muted/40',
+                  'has-checked:border-primary has-checked:bg-primary/10 has-checked:ring-1 has-checked:ring-primary',
+                  'has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-ring',
                   'has-disabled:cursor-not-allowed has-disabled:opacity-60',
                 )}>
-                <span className="flex items-start gap-2">
-                  <input
-                    type="radio"
-                    name="download-flatten-mode"
-                    value={mode}
-                    checked={flattenMode === mode}
-                    onChange={() => onFlattenModeChange(mode)}
-                    className="mt-0.5 accent-current"
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block text-sm font-medium">{label}</span>
-                    <span className="block text-xs text-muted-foreground">
-                      {description}
-                    </span>
-                    {samplePath && (
-                      <span
-                        className="mt-1.5 block truncate font-mono text-[11px] text-muted-foreground"
-                        title={transformPath(samplePath, mode)}>
-                        {transformPath(samplePath, mode)}
-                      </span>
-                    )}
-                    {renamed > 0 && (
-                      <span className="mt-1 block text-[11px] text-chart-5">
-                        {renamed.toLocaleString()}{' '}
-                        {renamed === 1 ? 'file shares' : 'files share'} a name
-                        and will be numbered (-1, -2, …)
-                      </span>
-                    )}
-                  </span>
+                <input
+                  type="radio"
+                  name="download-flatten-mode"
+                  value={mode}
+                  checked={flattenMode === mode}
+                  onChange={() => onFlattenModeChange(mode)}
+                  className="sr-only"
+                />
+                <span
+                  aria-hidden="true"
+                  className="absolute top-3 right-3 grid size-5 place-items-center rounded-full bg-primary text-primary-foreground opacity-0 transition-opacity group-has-checked:opacity-100">
+                  <Check className="size-3.5" />
                 </span>
+                <span className="block text-sm font-medium">{label}</span>
+                <span className="block text-xs text-muted-foreground">
+                  {description}
+                </span>
+                {samplePath && (
+                  <span className="mt-1.5 block font-mono text-[11px] leading-snug break-all text-muted-foreground group-has-checked:text-foreground/80">
+                    {transformPath(samplePath, mode)}
+                  </span>
+                )}
+                {renamed > 0 && (
+                  <span className="mt-1 block text-[11px] text-chart-5">
+                    {renamed.toLocaleString()}{' '}
+                    {renamed === 1 ? 'file shares' : 'files share'} a name and
+                    will be numbered (-1, -2, …)
+                  </span>
+                )}
               </label>
             )
           })}
