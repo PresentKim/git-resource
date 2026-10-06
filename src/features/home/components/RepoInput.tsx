@@ -80,8 +80,8 @@ export function RepoInput() {
           </Tooltip>
         )}
         <InputGroupButton
-          aria-label="Clear repository URL"
-          title="Clear repository URL"
+          aria-label="Open repository"
+          title="Open repository"
           variant="ghost"
           onClick={handleSend}
           disabled={!repoInput || !!error}>
