@@ -1,6 +1,7 @@
 import {NavLink} from 'react-router-dom'
 
-import {Button} from '@/shared/components/ui/button'
+import {Button, buttonVariants} from '@/shared/components/ui/button'
+import {cn} from '@/shared/utils'
 import {useSettingsDialogStore} from '@/shared/stores/settingsDialogStore'
 
 interface RepoErrorProps {
@@ -57,13 +58,11 @@ export function RepoError({error, onRetry}: RepoErrorProps) {
           </Button>
         )}
         {isNotFound && (
-          <Button
-            size="sm"
-            variant="secondary"
-            nativeButton={false}
-            render={<NavLink to="/" />}>
+          <NavLink
+            to="/"
+            className={cn(buttonVariants({size: 'sm', variant: 'secondary'}))}>
             Back to home
-          </Button>
+          </NavLink>
         )}
       </div>
     </div>
