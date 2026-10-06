@@ -138,6 +138,7 @@ async function loadImage(url: string): Promise<{
     throw new Error(
       `Failed to load image: ${url}. ` +
         `${error instanceof Error ? error.message : String(error)}`,
+      {cause: error},
     )
   }
 }

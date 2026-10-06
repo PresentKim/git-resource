@@ -170,6 +170,7 @@ export const downloadImagesAsZip = async (
       `Failed to load required libraries: ${
         error instanceof Error ? error.message : String(error)
       }`,
+      {cause: error},
     )
   }
 
@@ -211,6 +212,8 @@ export const downloadImagesAsZip = async (
   } catch (error) {
     if (error instanceof NothingDownloadedError) throw error
     const errorMessage = error instanceof Error ? error.message : String(error)
-    throw new Error(`Failed to create zip file: ${errorMessage}`)
+    throw new Error(`Failed to create zip file: ${errorMessage}`, {
+      cause: error,
+    })
   }
 }

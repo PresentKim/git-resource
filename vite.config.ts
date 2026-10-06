@@ -1,6 +1,7 @@
 import path from 'path'
 import {defineConfig, loadEnv} from 'vite'
-import react from '@vitejs/plugin-react'
+import react, {reactCompilerPreset} from '@vitejs/plugin-react'
+import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(({mode}) => {
@@ -8,17 +9,14 @@ export default defineConfig(({mode}) => {
 
   return {
     plugins: [
-      react({
-        babel: {
-          plugins: [['babel-plugin-react-compiler']],
-        },
-      }),
+      react(),
+      babel({presets: [reactCompilerPreset()]}),
       tailwindcss(),
     ],
     base: env.VITE_BASE_URL || '/',
     resolve: {
       alias: {
-        '@': path.resolve(__dirname, 'src'),
+        '@': path.resolve(import.meta.dirname, 'src'),
       },
     },
     server: {
@@ -55,10 +53,6 @@ export default defineConfig(({mode}) => {
               if (id.includes('react-router')) {
                 return 'router-vendor'
               }
-              // Radix UI components (depends on React)
-              if (id.includes('@radix-ui')) {
-                return 'radix-vendor'
-              }
               // Zustand
               if (id.includes('zustand')) {
                 return 'zustand-vendor'
@@ -81,8 +75,6 @@ export default defineConfig(({mode}) => {
       sourcemap: false,
       // Optimize chunk size
       chunkSizeWarningLimit: 1000,
-      // Minification
-      minify: 'esbuild',
       // Target modern browsers for smaller bundle
       target: 'esnext',
     },
