@@ -1,4 +1,4 @@
-import {useEffect} from 'react'
+import {useEffect, useEffectEvent} from 'react'
 import {useGithubDefaultBranch} from '@/shared/api/github/hooks/useGithubDefaultBranch'
 import {useGithubImageFileTree} from '@/shared/api/github/hooks/useGithubImageFileTree'
 import {useRepoPath} from '@/features/repo/useRepoPath'
@@ -15,6 +15,11 @@ export function useRepoLoading() {
   const setError = useRepoStore(state => state.setError)
 
   const ref = repoPath.ref?.trim()
+
+  const applyDefaultBranch = useEffectEvent((branch: string) => {
+    setRepoPath(repoPath.owner, repoPath.name, branch)
+    setRepo({...repoPath, ref: branch})
+  })
 
   // No ref provided, need to fetch default branch
   const defaultBranch = useGithubDefaultBranch(repoPath, !ref)
@@ -48,19 +53,9 @@ export function useRepoLoading() {
       setError(defaultBranch.error)
     } else if (defaultBranch.data) {
       setError(null)
-      setRepoPath(repoPath.owner, repoPath.name, defaultBranch.data)
-      setRepo({...repoPath, ref: defaultBranch.data})
+      applyDefaultBranch(defaultBranch.data)
     }
-    // setRepoPath is recreated every render and only wraps navigate
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [
-    ref,
-    repoPath,
-    defaultBranch.data,
-    defaultBranch.error,
-    setRepo,
-    setError,
-  ])
+  }, [ref, defaultBranch.data, defaultBranch.error, setError])
 
   return {
     isLoadRef: defaultBranch.isLoading,
