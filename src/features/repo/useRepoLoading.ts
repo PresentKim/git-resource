@@ -2,7 +2,6 @@ import {useEffect} from 'react'
 import {useGithubDefaultBranch} from '@/shared/api/github/hooks/useGithubDefaultBranch'
 import {useGithubImageFileTree} from '@/shared/api/github/hooks/useGithubImageFileTree'
 import {useRepoPath} from '@/features/repo/useRepoPath'
-import {usePromise} from '@/shared/hooks/usePromise'
 import {useRepoStore} from '@/shared/stores/repoStore'
 
 /**
@@ -11,53 +10,60 @@ import {useRepoStore} from '@/shared/stores/repoStore'
  */
 export function useRepoLoading() {
   const [repoPath, setRepoPath] = useRepoPath()
-  const isLoadRef = usePromise(useGithubDefaultBranch())[0]
-  const getDefaultBranch = usePromise(useGithubDefaultBranch())[1]
-  const isLoadImagePaths = usePromise(useGithubImageFileTree())[0]
-  const getImagePaths = usePromise(useGithubImageFileTree())[1]
   const setRepo = useRepoStore(state => state.setRepo)
   const setImageFiles = useRepoStore(state => state.setImageFiles)
   const setError = useRepoStore(state => state.setError)
 
-  useEffect(() => {
-    const ref = repoPath.ref?.trim()
+  const ref = repoPath.ref?.trim()
 
-    // Get image files if ref is provided in URL
-    if (ref) {
-      setRepo(repoPath)
-      getImagePaths(repoPath)
-        .then(imageFileTree => {
-          setError(null)
-          setImageFiles(imageFileTree)
-        })
-        .catch(err => {
-          setError(err instanceof Error ? err : new Error(String(err)))
-        })
-      return
-    } else {
-      // No ref provided, need to fetch default branch
-      getDefaultBranch(repoPath)
-        .then(defaultBranch => {
-          setError(null)
-          setRepoPath(repoPath.owner, repoPath.name, defaultBranch)
-          setRepo({...repoPath, ref: defaultBranch})
-        })
-        .catch(err => {
-          setError(err instanceof Error ? err : new Error(String(err)))
-        })
+  // No ref provided, need to fetch default branch
+  const defaultBranch = useGithubDefaultBranch(repoPath, !ref)
+  // Get image files if ref is provided in URL
+  const imageFileTree = useGithubImageFileTree(repoPath, !!ref)
+
+  useEffect(() => {
+    if (!ref) return
+
+    setRepo(repoPath)
+    if (imageFileTree.error) {
+      setError(imageFileTree.error)
+    } else if (imageFileTree.data) {
+      setError(null)
+      setImageFiles(imageFileTree.data)
     }
   }, [
+    ref,
     repoPath,
-    getDefaultBranch,
-    getImagePaths,
-    setRepoPath,
-    setError,
-    setImageFiles,
+    imageFileTree.data,
+    imageFileTree.error,
     setRepo,
+    setImageFiles,
+    setError,
+  ])
+
+  useEffect(() => {
+    if (ref) return
+
+    if (defaultBranch.error) {
+      setError(defaultBranch.error)
+    } else if (defaultBranch.data) {
+      setError(null)
+      setRepoPath(repoPath.owner, repoPath.name, defaultBranch.data)
+      setRepo({...repoPath, ref: defaultBranch.data})
+    }
+    // setRepoPath is recreated every render and only wraps navigate
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    ref,
+    repoPath,
+    defaultBranch.data,
+    defaultBranch.error,
+    setRepo,
+    setError,
   ])
 
   return {
-    isLoadRef,
-    isLoadImagePaths,
+    isLoadRef: defaultBranch.isLoading,
+    isLoadImagePaths: imageFileTree.isLoading,
   }
 }
