@@ -7,7 +7,8 @@ function useHeight(targetRef: React.RefObject<HTMLElement | null>) {
   // Update height using ResizeObserver
   useEffect(() => {
     return observerResize(targetRef.current, entry => {
-      setHeight(entry.contentRect.height)
+      // Border box, so a border on the element is part of its height
+      setHeight(entry.borderBoxSize?.[0]?.blockSize ?? entry.contentRect.height)
     })
   }, [targetRef])
 
