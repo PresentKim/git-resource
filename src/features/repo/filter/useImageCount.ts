@@ -1,24 +1,14 @@
-import {useMemo} from 'react'
 import {useRepoStore} from '@/shared/stores/repoStore'
-import {isMcmetaFile} from '@/shared/utils'
 
 /**
- * Hook for calculating image counts
+ * Hook for reading image counts
  * Returns filtered count and total count (excluding mcmeta files)
  */
 export function useImageCount() {
-  const filteredImageFiles = useRepoStore(state => state.filteredImageFiles)
-  const imageFiles = useRepoStore(state => state.imageFiles)
-
-  const filteredCount = useMemo(
-    () => filteredImageFiles?.length ?? 0,
-    [filteredImageFiles],
+  const filteredCount = useRepoStore(
+    state => state.filteredImageFiles?.length ?? 0,
   )
-
-  const totalCount = useMemo(() => {
-    if (!imageFiles) return 0
-    return imageFiles.filter(path => !isMcmetaFile(path)).length
-  }, [imageFiles])
+  const totalCount = useRepoStore(state => state.totalImageCount)
 
   return {
     filteredCount,

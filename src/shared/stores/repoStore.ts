@@ -103,6 +103,8 @@ interface RepoStore {
   filteredImageFiles: string[] | null
   filterCache: Map<string, string[]>
   mcmetaPaths: Set<string>
+  /** Number of images excluding .mcmeta files, computed once per file list */
+  totalImageCount: number
   error: Error | null
   viewerState: {open: boolean; currentIndex: number}
   isFiltering: boolean
@@ -130,6 +132,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   filteredImageFiles: null,
   filterCache: new Map<string, string[]>(),
   mcmetaPaths: new Set<string>(),
+  totalImageCount: 0,
   error: null,
   viewerState: {open: false, currentIndex: 0},
   isFiltering: false,
@@ -146,6 +149,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     set({
       imageFiles: files,
       mcmetaPaths,
+      totalImageCount: imageOnlyFiles?.length ?? 0,
       filterCache: new Map<string, string[]>(),
     })
 
@@ -231,6 +235,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
       filteredImageFiles: null,
       filterCache: new Map<string, string[]>(),
       mcmetaPaths: new Set<string>(),
+      totalImageCount: 0,
       error: null,
       viewerState: {open: false, currentIndex: 0},
       isFiltering: false,
