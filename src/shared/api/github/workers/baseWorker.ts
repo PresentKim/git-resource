@@ -52,10 +52,7 @@ export abstract class BaseGithubWorker<TRequest, TResponse> {
       return this.createResponse(cache.value, {limit: 0, remaining: 0})
     }
 
-    // Remove expired cache
-    if (cache && cache.expiredAt <= Date.now()) {
-      await this.storage.removeCache(cacheKey)
-    }
+    // Expired cache is kept so its ETag can be used to revalidate (304)
 
     // Build request headers
     const headers: HeadersInit = {
@@ -76,6 +73,8 @@ export abstract class BaseGithubWorker<TRequest, TResponse> {
 
       // Handle 304 Not Modified
       if (response.status === 304 && cache) {
+        // Still fresh upstream: extend the TTL and keep the ETag for next time
+        await this.storage.setCache(cacheKey, cache.etag, cache.value)
         return this.createResponse(cache.value, rateLimit)
       }
 
