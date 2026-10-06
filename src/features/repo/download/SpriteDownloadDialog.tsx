@@ -57,6 +57,7 @@ export function SpriteDownloadDialog({
 
   const actualColumnCount = spriteSettings.columns ?? displayColumnCount
 
+  const [error, setError] = useState<string | null>(null)
   const [sizeEstimate, setSizeEstimate] = useState<SpriteSizeEstimate | null>(
     null,
   )
@@ -104,8 +105,18 @@ export function SpriteDownloadDialog({
         : spriteSettings.backgroundColor,
       columns: actualColumnCount,
     }
-    await handleDownload(options)
-    onOpenChange(false)
+    setError(null)
+    try {
+      await handleDownload(options)
+      onOpenChange(false)
+    } catch (err) {
+      setError(err instanceof Error ? err.message : String(err))
+    }
+  }
+
+  const handleOpenChange = (nextOpen: boolean) => {
+    if (!nextOpen) setError(null)
+    onOpenChange(nextOpen)
   }
 
   const handleColorPresetClick = (value: string) => {
@@ -119,7 +130,7 @@ export function SpriteDownloadDialog({
   const imageCount = filteredImageFiles?.length || 0
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
           <DialogTitle>Create Sprite Image</DialogTitle>
@@ -408,10 +419,16 @@ export function SpriteDownloadDialog({
           </div>
         </div>
 
+        {error && (
+          <p role="alert" className="text-sm text-destructive">
+            Could not create the sprite: {error}
+          </p>
+        )}
+
         <DialogFooter>
           <Button
             variant="outline"
-            onClick={() => onOpenChange(false)}
+            onClick={() => handleOpenChange(false)}
             disabled={isDownloading}>
             Cancel
           </Button>
