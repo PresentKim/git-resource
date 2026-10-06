@@ -15,6 +15,7 @@ import {useRepoStore} from '@/shared/stores/repoStore'
 import {useImageCount} from '@/features/repo/filter/useImageCount'
 import {useGridPositionStore} from '@/features/repo/gridPositionStore'
 import {useImageDownload} from '@/features/repo/download/useImageDownload'
+import {DensityControl} from '@/features/repo/filter/DensityControl'
 import {SpriteDownloadDialog} from '@/features/repo/download/SpriteDownloadDialog'
 import type {FlattenMode} from '@/shared/utils'
 import {cn} from '@/shared/utils'
@@ -203,6 +204,7 @@ export const FilterToolbar = memo(function FilterToolbar() {
         firstVisibleIndex={firstVisibleIndex}
       />
       <div className="flex items-center gap-2">
+        <DensityControl />
         <SpriteButton />
         <DownloadButton />
       </div>
