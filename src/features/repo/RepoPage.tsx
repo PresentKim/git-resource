@@ -86,7 +86,21 @@ export default function RepoPage() {
         gridBackground === 'transparent' && 'bg-transparent-grid',
       )}>
       {!error && (
-        <div className="sticky top-(--header-offset) z-40 flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm transition-[top] duration-200 sm:flex-row sm:items-center sm:gap-3">
+        <div
+          className={cn(
+            'sticky top-(--header-offset) z-40 flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3',
+            // Same duration as the header's slide, so the two move together
+            'transition-[top] duration-150',
+            // Backdrop above the toolbar: while the header slides away there
+            // can be a gap between it and the toolbar, and without this the
+            // images scrolling underneath show through it
+            "before:pointer-events-none before:absolute before:-inset-x-1 sm:before:-inset-x-2 before:bottom-full before:h-screen before:content-['']",
+            gridBackground === 'white'
+              ? 'before:bg-white'
+              : gridBackground === 'black'
+                ? 'before:bg-black'
+                : 'before:bg-background',
+          )}>
           <div className="flex-1 sm:order-2">
             <FilterInput />
           </div>
