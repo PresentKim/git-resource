@@ -202,22 +202,19 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
         excludeFilters,
       )
 
-      // Use setTimeout to ensure loading state is visible for at least a brief moment
-      setTimeout(() => {
-        const {filterCache: currentCache} = get()
-        const nextCache = new Map(currentCache)
-        const MAX_CACHE_ENTRIES = 50
-        if (nextCache.size >= MAX_CACHE_ENTRIES) {
-          const oldestKey = nextCache.keys().next().value
-          if (oldestKey) nextCache.delete(oldestKey)
-        }
-        nextCache.set(cacheKey, filtered)
-        set({
-          filteredImageFiles: filtered,
-          isFiltering: false,
-          filterCache: nextCache,
-        })
-      }, 50)
+      const {filterCache: currentCache} = get()
+      const nextCache = new Map(currentCache)
+      const MAX_CACHE_ENTRIES = 50
+      if (nextCache.size >= MAX_CACHE_ENTRIES) {
+        const oldestKey = nextCache.keys().next().value
+        if (oldestKey) nextCache.delete(oldestKey)
+      }
+      nextCache.set(cacheKey, filtered)
+      set({
+        filteredImageFiles: filtered,
+        isFiltering: false,
+        filterCache: nextCache,
+      })
     })
   },
 
