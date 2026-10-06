@@ -256,7 +256,7 @@ export const FilterToolbar = memo(function FilterToolbar() {
         totalCount={totalCount}
         firstVisibleIndex={firstVisibleIndex}
       />
-      <div className="flex items-center gap-2">
+      <div className="flex flex-wrap items-center gap-2">
         <DensityControl />
         <SpriteButton />
         <DownloadButton />
