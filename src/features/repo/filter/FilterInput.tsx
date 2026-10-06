@@ -1,4 +1,4 @@
-import {useEffect, useRef, useState} from 'react'
+import {useRef, useState} from 'react'
 import {CircleHelp, Filter, X} from 'lucide-react'
 
 import {
@@ -61,13 +61,15 @@ function FilterHelpPopover() {
 
 export function FilterInput() {
   const {filter: filterQuery, setFilter: setFilterQuery} = useFilterQuery()
-  const [filterInput, setFilterInput] = useState('')
+  const [filterInput, setFilterInput] = useState(filterQuery)
   const inputRef = useRef<HTMLInputElement>(null)
 
   // Sync input with query when query changes externally
-  useEffect(() => {
+  const [syncedQuery, setSyncedQuery] = useState(filterQuery)
+  if (filterQuery !== syncedQuery) {
+    setSyncedQuery(filterQuery)
     setFilterInput(filterQuery)
-  }, [filterQuery])
+  }
 
   const handleApplyFilter = () => setFilterQuery(filterInput)
 

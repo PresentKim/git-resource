@@ -1,4 +1,4 @@
-import {useState, useEffectEvent} from 'react'
+import {useState} from 'react'
 import {
   Dialog,
   DialogContent,
@@ -58,17 +58,19 @@ export function SpriteDownloadDialog({
   const actualColumnCount = spriteSettings.columns ?? displayColumnCount
 
   const [error, setError] = useState<string | null>(null)
-  const [sizeEstimate, setSizeEstimate] = useState<SpriteSizeEstimate | null>(
-    null,
-  )
-
-  const onImageEmpty = useEffectEvent(() => setSizeEstimate(null))
+  // An estimate belongs to the list it was made for, so nothing is shown
+  // for an empty list or until the new list's estimate arrives
+  const [estimateFor, setEstimateFor] = useState<{
+    files: string[]
+    estimate: SpriteSizeEstimate
+  } | null>(null)
+  const sizeEstimate =
+    estimateFor && estimateFor.files === filteredImageFiles
+      ? estimateFor.estimate
+      : null
 
   useEffect(() => {
-    if (!filteredImageFiles || filteredImageFiles.length === 0) {
-      onImageEmpty()
-      return
-    }
+    if (!filteredImageFiles || filteredImageFiles.length === 0) return
 
     let cancelled = false
 
@@ -80,7 +82,7 @@ export function SpriteDownloadDialog({
       githubToken,
     }).then(estimate => {
       if (!cancelled) {
-        setSizeEstimate(estimate)
+        setEstimateFor({files: filteredImageFiles, estimate})
       }
     })
 
