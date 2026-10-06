@@ -72,9 +72,12 @@ export function useImageZoom({
     [minScale, maxScale],
   )
 
+  /** Back to the fitted size, centered. The image itself did not change. */
   const handleResetZoom = useCallback(() => {
-    resetZoom()
-  }, [resetZoom])
+    setScale(initialScale)
+    setTranslateX(0)
+    setTranslateY(0)
+  }, [initialScale])
 
   const setTranslate = useCallback((x: number, y: number) => {
     setTranslateX(x)

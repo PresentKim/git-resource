@@ -1,4 +1,4 @@
-import {useRef, useEffect, useEffectEvent, useState, useCallback} from 'react'
+import {useRef, useEffect, useState, useCallback} from 'react'
 import {
   Check,
   ChevronLeft,
@@ -10,7 +10,7 @@ import {
   X,
   ZoomIn,
   ZoomOut,
-  RotateCcw,
+  Maximize,
 } from 'lucide-react'
 import {
   Dialog,
@@ -54,6 +54,70 @@ interface ImageViewerProps {
 
 const MIN_ZOOM_SCALE = 0.02
 
+/**
+ * The transparency checkerboard (behind the picture) and pixel grid lines
+ * (over it). They live inside the zoomed element, so they move and scale with
+ * the picture on every frame; sizes are in unzoomed pixels, and the line
+ * width is divided by the zoom to stay one screen pixel thick.
+ */
+function PictureOverlays({
+  picture,
+  screenPixel,
+  scale,
+  checker,
+  grid,
+}: {
+  picture: {width: number; height: number; pixel: number} | null
+  /** Screen pixels per image pixel */
+  screenPixel: number
+  scale: number
+  checker: boolean
+  grid: boolean
+}) {
+  if (!picture) return null
+
+  const frame: React.CSSProperties = {
+    position: 'absolute',
+    left: '50%',
+    top: '50%',
+    width: picture.width,
+    height: picture.height,
+    transform: 'translate(-50%, -50%)',
+    pointerEvents: 'none',
+  }
+  // Squares are whole image pixels, enough of them to stay clearly visible
+  const squarePixels = Math.max(1, Math.ceil(8 / screenPixel))
+  const line = 1 / scale
+
+  return (
+    <>
+      {checker && (
+        <div
+          aria-hidden="true"
+          className="image-checker z-0"
+          style={{
+            ...frame,
+            backgroundSize: `${squarePixels * picture.pixel * 2}px ${squarePixels * picture.pixel * 2}px`,
+          }}
+        />
+      )}
+      {grid && screenPixel >= 2 && (
+        <div
+          aria-hidden="true"
+          className="z-20 opacity-30"
+          style={{
+            ...frame,
+            backgroundImage: [
+              `repeating-linear-gradient(90deg, currentColor 0 ${line}px, transparent ${line}px ${picture.pixel}px)`,
+              `repeating-linear-gradient(0deg, currentColor 0 ${line}px, transparent ${line}px ${picture.pixel}px)`,
+            ].join(','),
+          }}
+        />
+      )}
+    </>
+  )
+}
+
 export function ImageViewer({
   open,
   onOpenChange,
@@ -65,9 +129,8 @@ export function ImageViewer({
   const repo = useRepoStore(state => state.repo)
   const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
   const {pixelated, animationEnabled} = useDisplaySettings()
-  const viewerBackground = useSettingStore(state => state.viewerBackground)
+  const viewerChecker = useSettingStore(state => state.viewerChecker)
   const viewerPixelGrid = useSettingStore(state => state.viewerPixelGrid)
-  const rafRef = useRef<number | null>(null)
 
   const currentImage = images[currentIndex]
   const positionLabel = `${(currentIndex + 1).toLocaleString()} of ${images.length.toLocaleString()}`
@@ -76,24 +139,14 @@ export function ImageViewer({
     () => ({forSrc: rawSrc, url: rawSrc}),
   )
 
-  const [pixelGrid, setPixelGrid] = useState<{
-    visible: boolean
-    left: number
-    top: number
+  // Size of the media's box at zoom 1, before any transform. The checkerboard
+  // and pixel grid are drawn inside the zoomed element, so they follow every
+  // zoom and pan step with the image; this is only re-measured on resizes.
+  const mediaFrameRef = useRef<HTMLDivElement>(null)
+  const [mediaBox, setMediaBox] = useState<{
     width: number
     height: number
-    pixelSize: number
-  }>({
-    visible: false,
-    left: 0,
-    top: 0,
-    width: 0,
-    height: 0,
-    pixelSize: 0,
-  })
-
-  // Rendered size / natural size of the image; null when it cannot be measured
-  const [displayScale, setDisplayScale] = useState<number | null>(null)
+  } | null>(null)
 
   // Image metadata
   const {metadata, updateMetadata, clearMetadata} = useImageMetadata()
@@ -297,132 +350,57 @@ export function ImageViewer({
 
   useScrollLock(open)
 
-  const schedulePixelGridUpdate = useEffectEvent(() => {
-    if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
-    rafRef.current = requestAnimationFrame(() => {
-      const container = imageContainerRef.current
-      const img = imgRef.current
-      if (!open || !container || !img) {
-        setDisplayScale(null)
-        setPixelGrid(prev => (prev.visible ? {...prev, visible: false} : prev))
-        return
-      }
-
-      // The <img> box is letterboxed by object-contain, so the content size
-      // at scale 1 is the smaller of the two axis ratios. offsetWidth and
-      // offsetHeight ignore transforms, so this is not thrown off by the
-      // zoom transition the way getBoundingClientRect would be.
-      if (!shouldAnimate && !loading && !imageError && metadata?.width) {
-        const fitted = Math.min(
-          img.offsetWidth / metadata.width,
-          img.offsetHeight / metadata.height,
-        )
-        const measured = fitted * scale
-        setDisplayScale(prev =>
-          prev !== null && Math.abs(prev - measured) < 0.0005 ? prev : measured,
-        )
-      } else {
-        setDisplayScale(null)
-      }
-
-      const showGrid =
-        viewerPixelGrid &&
-        !shouldAnimate &&
-        !loading &&
-        !imageError &&
-        !!metadata?.width &&
-        !!metadata?.height
-
-      if (!showGrid) {
-        setPixelGrid(prev => (prev.visible ? {...prev, visible: false} : prev))
-        return
-      }
-
-      const containerRect = container.getBoundingClientRect()
-      const imgRect = img.getBoundingClientRect()
-
-      // The <img> box can be larger than the picture (object-contain leaves
-      // empty bands), so fit the picture's aspect ratio inside the box to find
-      // where its pixels really are.
-      const natWidth = metadata?.width ?? 0
-      const natHeight = metadata?.height ?? 0
-      const fit =
-        natWidth > 0 && natHeight > 0
-          ? Math.min(imgRect.width / natWidth, imgRect.height / natHeight)
-          : 0
-      const width = Math.max(0, natWidth * fit)
-      const height = Math.max(0, natHeight * fit)
-      const left =
-        imgRect.left - containerRect.left + (imgRect.width - width) / 2
-      const top =
-        imgRect.top - containerRect.top + (imgRect.height - height) / 2
-      const pixelSize = fit
-
-      // Avoid rendering when too small / unstable.
-      const visible =
-        width > 0 && height > 0 && Number.isFinite(pixelSize) && pixelSize >= 2
-
-      setPixelGrid(prev => {
-        // Small hysteresis to prevent state churn.
-        if (
-          prev.visible === visible &&
-          Math.abs(prev.left - left) < 0.5 &&
-          Math.abs(prev.top - top) < 0.5 &&
-          Math.abs(prev.width - width) < 0.5 &&
-          Math.abs(prev.height - height) < 0.5 &&
-          Math.abs(prev.pixelSize - pixelSize) < 0.01
-        ) {
-          return prev
-        }
-        return {visible, left, top, width, height, pixelSize}
-      })
-    })
-  })
-
-  // Keep pixel grid aligned to the actual rendered <img> rect.
   useEffect(() => {
-    schedulePixelGridUpdate()
-    return () => {
-      if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
-      rafRef.current = null
+    const frame = mediaFrameRef.current
+    if (!open || !frame) return
+
+    // The observer reports once when it starts watching, then on each resize
+    const measure = () => {
+      const media = frame.firstElementChild
+      const width = media instanceof HTMLElement ? media.offsetWidth : 0
+      const height = media instanceof HTMLElement ? media.offsetHeight : 0
+      setMediaBox(prev =>
+        prev && prev.width === width && prev.height === height
+          ? prev
+          : {width, height},
+      )
     }
-  }, [
-    open,
-    viewerPixelGrid,
-    shouldAnimate,
-    loading,
-    imageError,
-    metadata?.width,
-    metadata?.height,
-    scale,
-    translateX,
-    translateY,
-  ])
+    const ro = new ResizeObserver(measure)
+    ro.observe(frame)
+    if (frame.firstElementChild) ro.observe(frame.firstElementChild)
+    return () => ro.disconnect()
+  }, [open, currentImage, shouldAnimate, loading, imageError])
 
-  useEffect(() => {
-    const container = imageContainerRef.current
-    const img = imgRef.current
-    if (!open || !container || !img) return
-
-    schedulePixelGridUpdate()
-
-    const onWindowResize = () => schedulePixelGridUpdate()
-    window.addEventListener('resize', onWindowResize, {passive: true})
-
-    const ro = new ResizeObserver(() => schedulePixelGridUpdate())
-    ro.observe(container)
-    ro.observe(img)
-
-    return () => {
-      window.removeEventListener('resize', onWindowResize)
-      ro.disconnect()
-    }
-  }, [open, currentImage, shouldAnimate, imageContainerRef, imgRef])
+  // Where the picture's pixels are inside the media box (object-contain
+  // letterboxes it), and how big one image pixel is at zoom 1
+  const pictureSize =
+    shouldAnimate && metadata?.animatedSize
+      ? metadata.animatedSize
+      : metadata?.width && metadata.height
+        ? {width: metadata.width, height: metadata.height}
+        : null
+  const picture =
+    !loading && !imageError && pictureSize && mediaBox && mediaBox.width > 0
+      ? (() => {
+          const pixel = Math.min(
+            mediaBox.width / pictureSize.width,
+            mediaBox.height / pictureSize.height,
+          )
+          return {
+            width: pictureSize.width * pixel,
+            height: pictureSize.height * pixel,
+            pixel,
+          }
+        })()
+      : null
+  // Screen pixels per image pixel
+  const screenPixel = picture ? picture.pixel * scale : 0
 
   const githubUrl = currentImage ? createGithubBlobUrl(repo, currentImage) : ''
 
   // Real size on screen (1:1 = one image pixel per screen pixel); falls back to
   // the zoom relative to the fitted size when the image cannot be measured
+  const displayScale = !shouldAnimate && picture ? screenPixel : null
   const zoomLabel =
     displayScale !== null
       ? `${Math.round(displayScale * 100).toLocaleString()}%`
@@ -432,6 +410,8 @@ export function ImageViewer({
   const handleActualSize = () => {
     if (displayScale) setZoom(scale / displayScale)
   }
+  // Scale 1 is the largest size at which the whole image still fits
+  const isFit = scale === 1 && translateX === 0 && translateY === 0
 
   if (!currentImage) return null
 
@@ -452,8 +432,6 @@ export function ImageViewer({
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             'bg-background font-bold',
             'text-foreground',
-            viewerBackground === 'light' && 'text-black',
-            viewerBackground === 'dark' && 'text-white',
           )}>
           <div
             ref={dialogContentRef}
@@ -490,10 +468,7 @@ export function ImageViewer({
               ref={imageContainerRef}
               className={cn(
                 'relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-56 px-8 sm:pb-28 overflow-hidden',
-                viewerBackground === 'auto' && 'bg-background',
-                viewerBackground === 'light' && 'bg-white text-black',
-                viewerBackground === 'dark' && 'bg-black text-white',
-                viewerBackground === 'checker' && 'bg-transparent-grid',
+                'bg-background',
                 isDragging && 'cursor-grabbing',
                 scale > 1 && 'cursor-grab',
               )}
@@ -529,7 +504,8 @@ export function ImageViewer({
                 </div>
               ) : shouldAnimate ? (
                 <div
-                  className="w-full h-full flex items-center justify-center"
+                  ref={mediaFrameRef}
+                  className="relative w-full h-full flex items-center justify-center"
                   style={{
                     transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
                     transformOrigin: 'center center',
@@ -541,7 +517,7 @@ export function ImageViewer({
                     src={rawSrc}
                     alt={`${fileName} (${positionLabel})`}
                     className={cn(
-                      'w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
+                      'relative z-10 w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
                       loading && 'opacity-0',
                     )}
                     pixelated={pixelated}
@@ -564,10 +540,18 @@ export function ImageViewer({
                     }}
                     onError={handleError}
                   />
+                  <PictureOverlays
+                    picture={picture}
+                    screenPixel={screenPixel}
+                    scale={scale}
+                    checker={viewerChecker}
+                    grid={viewerPixelGrid}
+                  />
                 </div>
               ) : (
                 <div
-                  className="w-full h-full flex items-center justify-center"
+                  ref={mediaFrameRef}
+                  className="relative w-full h-full flex items-center justify-center"
                   style={{
                     transform: `translate(${translateX}px, ${translateY}px) scale(${scale})`,
                     transformOrigin: 'center center',
@@ -577,7 +561,7 @@ export function ImageViewer({
                     src={displayStaticSrc}
                     alt={`${fileName} (${positionLabel})`}
                     className={cn(
-                      'w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
+                      'relative z-10 w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
                       loading && 'opacity-0',
                     )}
                     pixelated={pixelated}
@@ -592,29 +576,14 @@ export function ImageViewer({
                     }}
                     onError={handleError}
                   />
+                  <PictureOverlays
+                    picture={picture}
+                    screenPixel={screenPixel}
+                    scale={scale}
+                    checker={viewerChecker}
+                    grid={viewerPixelGrid}
+                  />
                 </div>
-              )}
-
-              {pixelGrid.visible && (
-                <div
-                  aria-hidden="true"
-                  className="absolute pointer-events-none z-20"
-                  style={{
-                    left: pixelGrid.left,
-                    top: pixelGrid.top,
-                    width: pixelGrid.width,
-                    height: pixelGrid.height,
-                    // The lines take the text color, which is always readable
-                    // on the current background (white on dark, black on light)
-                    backgroundImage: [
-                      // vertical lines
-                      `repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px ${pixelGrid.pixelSize}px)`,
-                      // horizontal lines
-                      `repeating-linear-gradient(0deg, currentColor 0 1px, transparent 1px ${pixelGrid.pixelSize}px)`,
-                    ].join(','),
-                    opacity: 0.3,
-                  }}
-                />
               )}
             </div>
 
@@ -709,18 +678,17 @@ export function ImageViewer({
                     disabled={displayScale === null || isActualSize}>
                     1:1
                   </Button>
-                  {scale !== 1 && (
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="px-2 py-1 text-sm font-semibold"
-                      onClick={handleResetZoom}
-                      aria-label="Fit to screen"
-                      title="Fit to screen">
-                      <RotateCcw className="h-3.5 w-3.5" />
-                    </Button>
-                  )}
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="px-2 py-1 text-sm font-semibold"
+                    onClick={handleResetZoom}
+                    aria-label="Largest size that fits the screen"
+                    title="Largest size that fits the screen"
+                    disabled={isFit}>
+                    <Maximize className="h-3.5 w-3.5" />
+                  </Button>
                 </div>
                 <ViewerDisplayControls />
                 <Button
@@ -825,18 +793,17 @@ export function ImageViewer({
                     disabled={displayScale === null || isActualSize}>
                     1:1
                   </Button>
-                  {scale !== 1 && (
-                    <Button
-                      type="button"
-                      size="icon"
-                      variant="outline"
-                      className="size-11"
-                      onClick={handleResetZoom}
-                      aria-label="Fit to screen"
-                      title="Fit to screen">
-                      <RotateCcw className="size-5" />
-                    </Button>
-                  )}
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="size-11"
+                    onClick={handleResetZoom}
+                    aria-label="Largest size that fits the screen"
+                    title="Largest size that fits the screen"
+                    disabled={isFit}>
+                    <Maximize className="size-5" />
+                  </Button>
                 </div>
                 <ViewerDisplayControls
                   large

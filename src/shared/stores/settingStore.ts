@@ -2,15 +2,6 @@ import {create} from 'zustand'
 import {useMemo} from 'react'
 
 export type Theme = 'system' | 'light' | 'dark'
-/** What the image viewer shows behind the image */
-export type ViewerBackground = 'auto' | 'light' | 'dark' | 'checker'
-const VIEWER_BACKGROUNDS: readonly ViewerBackground[] = [
-  'auto',
-  'light',
-  'dark',
-  'checker',
-]
-
 export interface SpriteSettings {
   gap: number
   backgroundColor: string
@@ -40,10 +31,11 @@ interface SettingsStore {
   theme: Theme
   setTheme: (theme: Theme) => void
 
-  viewerBackground: ViewerBackground
-  setViewerBackground: (background: ViewerBackground) => void
+  /** Transparency checkerboard behind the image in the viewer */
+  viewerChecker: boolean
+  setViewerChecker: (visible: boolean) => void
 
-  /** Pixel grid lines over the image in the viewer; independent of the background */
+  /** Pixel grid lines over the image in the viewer; independent of the checkerboard */
   viewerPixelGrid: boolean
   setViewerPixelGrid: (visible: boolean) => void
 
@@ -58,7 +50,7 @@ const STORAGE_KEYS = {
   PIXELATED: 'settings.pixelated',
   ANIMATION_ENABLED: 'settings.animationEnabled',
   THEME: 'settings.theme',
-  VIEWER_BACKGROUND: 'settings.viewerBackground',
+  VIEWER_CHECKER: 'settings.viewerChecker',
   VIEWER_PIXEL_GRID: 'settings.viewerPixelGrid',
   SPRITE_SETTINGS: 'settings.spriteSettings',
 } as const
@@ -101,8 +93,10 @@ const getBooleanFromStorage = (key: string, defaultValue: boolean): boolean => {
   return stored !== 'false'
 }
 
-// The gallery background setting was removed; drop its stored value
+// Removed settings (gallery background, viewer background color); drop their
+// stored values
 localStorage.removeItem('settings.gridBackground')
+localStorage.removeItem('settings.viewerBackground')
 
 export const useSettingStore = create<SettingsStore>((set, get) => ({
   githubToken: localStorage.getItem(STORAGE_KEYS.GITHUB_TOKEN) || '',
@@ -145,14 +139,10 @@ export const useSettingStore = create<SettingsStore>((set, get) => ({
     localStorage.setItem(STORAGE_KEYS.THEME, theme)
   },
 
-  viewerBackground:
-    VIEWER_BACKGROUNDS.find(
-      background =>
-        background === localStorage.getItem(STORAGE_KEYS.VIEWER_BACKGROUND),
-    ) ?? 'auto',
-  setViewerBackground: (background: ViewerBackground) => {
-    set({viewerBackground: background})
-    localStorage.setItem(STORAGE_KEYS.VIEWER_BACKGROUND, background)
+  viewerChecker: getBooleanFromStorage(STORAGE_KEYS.VIEWER_CHECKER, false),
+  setViewerChecker: (viewerChecker: boolean) => {
+    set({viewerChecker})
+    localStorage.setItem(STORAGE_KEYS.VIEWER_CHECKER, viewerChecker.toString())
   },
 
   viewerPixelGrid: getBooleanFromStorage(STORAGE_KEYS.VIEWER_PIXEL_GRID, false),
