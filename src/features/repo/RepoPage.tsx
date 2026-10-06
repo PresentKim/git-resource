@@ -94,6 +94,11 @@ export default function RepoPage() {
             // the header hidden it slides up by the header's height, leaving
             // the band's top padding as the gap above the card.
             'transition-transform duration-200 ease-out in-data-[header=hidden]:-translate-y-(--header-height)',
+            // On phones the toolbar is a lot of the screen, so it leaves with
+            // the header while scrolling down and returns on scrolling up. It
+            // stays while something in it has focus (the on-screen keyboard
+            // would otherwise scroll it away mid-typing).
+            'max-sm:in-data-[header=hidden]:[&:not(:focus-within)]:-translate-y-[calc(100%+var(--header-height))]',
             'bg-background',
           )}>
           <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3">
