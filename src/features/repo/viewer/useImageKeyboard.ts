@@ -30,9 +30,11 @@ export function useImageKeyboard({
       }
     }
 
-    window.addEventListener('keydown', handleKeyDown)
+    // Listen in the capture phase: arrow keys pressed while focus is inside
+    // the dialog never bubble up to window, so a bubble listener missed them
+    window.addEventListener('keydown', handleKeyDown, true)
     return () => {
-      window.removeEventListener('keydown', handleKeyDown)
+      window.removeEventListener('keydown', handleKeyDown, true)
     }
   }, [enabled, onPrevious, onNext, onClose])
 
