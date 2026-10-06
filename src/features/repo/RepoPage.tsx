@@ -86,27 +86,31 @@ export default function RepoPage() {
         gridBackground === 'transparent' && 'bg-transparent-grid',
       )}>
       {!error && (
+        // A full-width band that holds the toolbar card. It is opaque, so when
+        // it sticks, images scroll away cleanly under a straight edge across
+        // the whole screen (the same way they do under the header) instead of
+        // showing around a card-sized patch. The negative margins cancel the
+        // section's padding so the band reaches the screen edges and takes no
+        // extra room in the layout; its own padding is the gap around the card.
         <div
           className={cn(
-            'sticky top-[calc(var(--header-height)+0.5rem)] z-40 flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3',
+            'sticky top-(--header-height) z-40 -mx-1 -mt-2 -mb-2 px-1 pt-2 pb-2 sm:-mx-2 sm:px-2',
             // Moves with the header using the same transform transition. With
-            // the header hidden it slides up by the header's height, which
-            // leaves the same 0.5rem gap to the top that it has below the
-            // header, instead of sitting flush against the edge
+            // the header hidden it slides up by the header's height, leaving
+            // the band's top padding as the gap above the card.
             'transition-transform duration-200 ease-out in-data-[header=hidden]:-translate-y-(--header-height)',
-            // Backdrop above the toolbar, so images scrolling underneath never
-            // show through the strip between it and the top of the screen
-            "before:pointer-events-none before:absolute before:-inset-x-1 sm:before:-inset-x-2 before:bottom-full before:h-16 before:content-['']",
             gridBackground === 'white'
-              ? 'before:bg-white'
+              ? 'bg-white'
               : gridBackground === 'black'
-                ? 'before:bg-black'
-                : 'before:bg-background',
+                ? 'bg-black'
+                : 'bg-background',
           )}>
-          <div className="flex-1 sm:order-2">
-            <FilterInput />
+          <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3">
+            <div className="flex-1 sm:order-2">
+              <FilterInput />
+            </div>
+            <FilterToolbar />
           </div>
-          <FilterToolbar />
         </div>
       )}
 
