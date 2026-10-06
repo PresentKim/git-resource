@@ -108,10 +108,15 @@ export abstract class BaseGithubWorker<TRequest, TResponse> {
           await this.storage.setCache(cacheKey, '', responseData)
           return this.createResponse(responseData, {limit: 0, remaining: 0})
         } catch (fallbackError) {
-          const errorMessage =
+          const fallbackMessage =
             fallbackError instanceof Error
               ? fallbackError.message
               : String(fallbackError)
+          // Keep the original 403 visible: it means the rate limit was hit,
+          // which the UI uses to offer adding a token
+          const errorMessage = isForbiddenError(error)
+            ? `${(error as Error).message} (fallback failed: ${fallbackMessage})`
+            : fallbackMessage
           return this.createErrorResponse(errorMessage)
         }
       }
