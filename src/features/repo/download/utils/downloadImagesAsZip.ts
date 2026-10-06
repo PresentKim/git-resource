@@ -7,7 +7,8 @@ import {
 } from '@/shared/utils'
 
 // Constants
-const LARGE_DOWNLOAD_THRESHOLD = 2000
+/** Above this many images the UI asks for confirmation before downloading */
+export const LARGE_DOWNLOAD_THRESHOLD = 2000
 const BATCH_SIZE = 50
 const MAX_CONCURRENT_DOWNLOADS = 4 // Limit concurrent downloads to reduce memory usage
 
@@ -48,6 +49,7 @@ async function processWithConcurrencyLimit(
   repo: GithubRepo,
   imagePaths: string[],
   pathMap: Map<string, string>,
+  failures: string[],
   onProgress?: (completed: number, total: number) => void,
 ): Promise<void> {
   let completed = 0
@@ -61,8 +63,9 @@ async function processWithConcurrencyLimit(
       try {
         await downloadImageToZip(zip, repo, originalPath, zipPath)
       } catch {
-        // Error already logged in downloadImageToZip
-        // Continue with other images
+        // Already logged in downloadImageToZip; remember it so the caller
+        // can report it, and continue with the other images
+        failures.push(originalPath)
       } finally {
         completed += 1
         onProgress?.(completed, total)
@@ -102,44 +105,50 @@ async function processBatch(
   repo: GithubRepo,
   batch: string[],
   pathMap: Map<string, string>,
+  failures: string[],
   currentCompleted: number,
   total: number,
   onProgress?: (completed: number, total: number) => void,
 ): Promise<number> {
-  await processWithConcurrencyLimit(zip, repo, batch, pathMap, completed => {
-    // Adjust progress to account for current batch offset
-    onProgress?.(currentCompleted + completed, total)
-  })
+  await processWithConcurrencyLimit(
+    zip,
+    repo,
+    batch,
+    pathMap,
+    failures,
+    completed => {
+      // Adjust progress to account for current batch offset
+      onProgress?.(currentCompleted + completed, total)
+    },
+  )
 
   return currentCompleted + batch.length
+}
+
+/** Every requested image failed, so there is nothing worth saving */
+class NothingDownloadedError extends Error {}
+
+export interface ZipDownloadResult {
+  total: number
+  /** Original paths of images that could not be fetched */
+  failed: string[]
 }
 
 /**
  * Dynamically import jszip and file-saver only when needed
  * This reduces initial bundle size significantly
+ *
+ * Images that fail to download are skipped and reported in the result. If
+ * none could be downloaded, it throws instead of saving an empty ZIP.
  */
 export const downloadImagesAsZip = async (
   repo: GithubRepo,
   imagePaths: string[],
   onProgress?: (completed: number, total: number) => void,
   flattenMode: FlattenMode = 'original',
-): Promise<void> => {
+): Promise<ZipDownloadResult> => {
   if (!imagePaths.length) {
     throw new Error('No images to download')
-  }
-
-  // Simple safety guard for very large downloads
-  if (
-    imagePaths.length > LARGE_DOWNLOAD_THRESHOLD &&
-    typeof window !== 'undefined'
-  ) {
-    const confirmed = window.confirm(
-      `You are about to download ${imagePaths.length.toLocaleString()} images.\n` +
-        'This may take a long time and use a lot of memory. Continue?',
-    )
-    if (!confirmed) {
-      throw new Error('Download cancelled by user')
-    }
   }
 
   // Resolve path transformations and duplicates
@@ -166,6 +175,7 @@ export const downloadImagesAsZip = async (
 
   const zip = new JSZipClass()
   const total = imagePaths.length
+  const failures: string[] = []
   let completed = 0
 
   try {
@@ -177,6 +187,7 @@ export const downloadImagesAsZip = async (
         repo,
         batch,
         pathMap,
+        failures,
         completed,
         total,
         onProgress,
@@ -186,11 +197,19 @@ export const downloadImagesAsZip = async (
       await new Promise(resolve => requestAnimationFrame(resolve))
     }
 
+    if (failures.length === total) {
+      throw new NothingDownloadedError(
+        `None of the ${total.toLocaleString()} images could be downloaded`,
+      )
+    }
+
     // Generate and save the zip file
     const content = await zip.generateAsync({type: 'blob'})
     const fileName = `${repo.owner}-${repo.name}.zip`
     saveAs(content, fileName)
+    return {total, failed: failures}
   } catch (error) {
+    if (error instanceof NothingDownloadedError) throw error
     const errorMessage = error instanceof Error ? error.message : String(error)
     throw new Error(`Failed to create zip file: ${errorMessage}`)
   }
