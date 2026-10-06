@@ -20,9 +20,6 @@ function ImagePathOverlay({path}: {path: string}) {
     return null
   }
 
-  // Get full path for tooltip/title
-  const fullPath = path
-
   return (
     <div
       className={cn(
@@ -30,23 +27,19 @@ function ImagePathOverlay({path}: {path: string}) {
         'bg-linear-to-t from-black/90 via-black/80 to-transparent',
         'dark:from-black/95 dark:via-black/85',
         'px-2 py-1.5',
-        'opacity-0 group-hover:opacity-100',
+        'opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100',
         'transition-[opacity,transform] duration-200 ease-out',
-        'transform translate-y-1 group-hover:translate-y-0',
+        'transform translate-y-1 group-hover:translate-y-0 group-focus-visible:translate-y-0',
         'pointer-events-none',
       )}
-      title={fullPath}>
+      aria-hidden="true">
       <div className="flex flex-col gap-0.5 min-w-0">
         {directory && (
-          <div
-            className="text-[10px] text-white/80 dark:text-white/70 truncate font-medium"
-            title={directory}>
+          <div className="text-[10px] text-white/80 dark:text-white/70 truncate font-medium">
             {directory}
           </div>
         )}
-        <div
-          className="text-xs text-white dark:text-white font-semibold truncate leading-tight"
-          title={filename}>
+        <div className="text-xs text-white dark:text-white font-semibold line-clamp-2 break-all leading-tight">
           {filename}
         </div>
       </div>
@@ -143,7 +136,7 @@ const ImageCell = memo(function ImageCell({
       onClick={onClick}
       onKeyDown={handleKeyDown}
       aria-label={`View image: ${path}`}
-      aria-pressed={false}>
+      title={path}>
       <>
         {loading && (
           <div
