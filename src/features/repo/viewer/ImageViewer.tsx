@@ -1,4 +1,4 @@
-import {useRef, useEffect, useState, useCallback} from 'react'
+import {useRef, useEffect, useEffectEvent, useState, useCallback} from 'react'
 import {
   ChevronLeft,
   ChevronRight,
@@ -255,9 +255,7 @@ export function ImageViewer({
 
   useScrollLock(open)
 
-  if (!currentImage) return null
-
-  const schedulePixelGridUpdate = () => {
+  const schedulePixelGridUpdate = useEffectEvent(() => {
     if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
     rafRef.current = requestAnimationFrame(() => {
       const container = imageContainerRef.current
@@ -292,10 +290,7 @@ export function ImageViewer({
 
       // Avoid rendering when too small / unstable.
       const visible =
-        width > 0 &&
-        height > 0 &&
-        Number.isFinite(pixelSize) &&
-        pixelSize >= 2
+        width > 0 && height > 0 && Number.isFinite(pixelSize) && pixelSize >= 2
 
       setPixelGrid(prev => {
         // Small hysteresis to prevent state churn.
@@ -312,7 +307,7 @@ export function ImageViewer({
         return {visible, left, top, width, height, pixelSize}
       })
     })
-  }
+  })
 
   // Keep pixel grid aligned to the actual rendered <img> rect.
   useEffect(() => {
@@ -321,7 +316,6 @@ export function ImageViewer({
       if (rafRef.current != null) cancelAnimationFrame(rafRef.current)
       rafRef.current = null
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     open,
     gridBackground,
@@ -353,8 +347,9 @@ export function ImageViewer({
       window.removeEventListener('resize', onWindowResize)
       ro.disconnect()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [open, currentImage, shouldAnimate])
+  }, [open, currentImage, shouldAnimate, imageContainerRef, imgRef])
+
+  if (!currentImage) return null
 
   const imageTitleId = 'image-viewer-title'
 
@@ -364,8 +359,9 @@ export function ImageViewer({
         <DialogContent
           aria-labelledby={imageTitleId}
           className={cn(
-            'fixed z-50',
-            'w-screen h-dvh',
+            // Override DialogContent's centered, max-w-sm defaults to cover the viewport
+            'fixed inset-0 z-50 translate-x-0 translate-y-0',
+            'w-screen h-dvh max-w-none sm:max-w-none',
             'p-0 border-0 rounded-none',
             'data-[state=open]:animate-in data-[state=closed]:animate-out',
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
