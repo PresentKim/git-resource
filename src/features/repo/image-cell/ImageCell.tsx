@@ -1,4 +1,4 @@
-import {useCallback, memo} from 'react'
+import {useCallback, useEffect, useState, memo} from 'react'
 import {cn} from '@/shared/utils'
 import type {GithubRepo} from '@/shared/utils'
 import {ImageMedia} from './ImageMedia'
@@ -54,6 +54,13 @@ function ImagePathOverlay({path}: {path: string}) {
   )
 }
 
+/**
+ * How long a cell must stay mounted before its image is requested.
+ * Rows that fly past during a fast scroll unmount before this elapses, so
+ * they never create an <img> or hit the network.
+ */
+const IMAGE_LOAD_DELAY_MS = 100
+
 interface ImageCellProps {
   path: string
   index: number
@@ -78,6 +85,12 @@ const ImageCell = memo(function ImageCell({
   onSelect,
 }: ImageCellProps) {
   const onClick = useCallback(() => onSelect(index), [onSelect, index])
+
+  const [imageRequested, setImageRequested] = useState(false)
+  useEffect(() => {
+    const timer = setTimeout(() => setImageRequested(true), IMAGE_LOAD_DELAY_MS)
+    return () => clearTimeout(timer)
+  }, [])
 
   // Image URL
   const {imageUrl} = useImageUrl({repo, imagePath: path})
@@ -138,18 +151,22 @@ const ImageCell = memo(function ImageCell({
             aria-hidden="true"
           />
         )}
-        <ImageMedia
-          src={imageUrl}
-          alt={
-            shouldAnimate ? `Animated image from ${path}` : `Image from ${path}`
-          }
-          className={cn('size-full object-contain peer', loading && 'hidden')}
-          shouldAnimate={shouldAnimate}
-          pixelated={false}
-          imgRef={handleImageRef}
-          onLoad={() => handleLoad()}
-          onError={handleError}
-        />
+        {imageRequested && (
+          <ImageMedia
+            src={imageUrl}
+            alt={
+              shouldAnimate
+                ? `Animated image from ${path}`
+                : `Image from ${path}`
+            }
+            className={cn('size-full object-contain peer', loading && 'hidden')}
+            shouldAnimate={shouldAnimate}
+            pixelated={false}
+            imgRef={handleImageRef}
+            onLoad={() => handleLoad()}
+            onError={handleError}
+          />
+        )}
       </>
       <ImagePathOverlay path={path} />
     </div>
