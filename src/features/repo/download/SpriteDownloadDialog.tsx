@@ -289,7 +289,10 @@ export function SpriteDownloadDialog({
             {spriteSettings.scale > 1 && (
               <div className="flex items-center justify-between pt-2 border-t">
                 <div className="flex flex-col gap-1">
-                  <Label htmlFor="image-smoothing" className="text-sm">
+                  <Label
+                    id="image-smoothing-label"
+                    htmlFor="image-smoothing"
+                    className="text-sm">
                     Image Interpolation
                   </Label>
                   <span className="text-xs text-muted-foreground">
@@ -298,8 +301,11 @@ export function SpriteDownloadDialog({
                       : 'Pixel preservation (for pixel art)'}
                   </span>
                 </div>
+                {/* The id lands on the hidden checkbox, so the switch itself
+                    is named through aria-labelledby */}
                 <Switch
                   id="image-smoothing"
+                  aria-labelledby="image-smoothing-label"
                   checked={spriteSettings.imageSmoothing}
                   onCheckedChange={e =>
                     setSpriteSettings({

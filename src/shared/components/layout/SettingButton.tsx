@@ -153,11 +153,17 @@ export function SettingButton() {
               data-slot="pixelated-toggle"
               className="space-y-1.5 rounded-lg border border-border/60 bg-background/40 p-3">
               <div className="flex items-center justify-between gap-2">
-                <Label htmlFor="pixelated" className="text-sm font-medium">
+                <Label
+                  id="pixelated-label"
+                  htmlFor="pixelated"
+                  className="text-sm font-medium">
                   Pixelated images
                 </Label>
+                {/* The id lands on the hidden checkbox, so the switch itself is
+                    named through aria-labelledby */}
                 <Switch
                   id="pixelated"
+                  aria-labelledby="pixelated-label"
                   checked={pixelated}
                   onCheckedChange={setPixelated}
                 />
@@ -172,12 +178,14 @@ export function SettingButton() {
               className="space-y-1.5 rounded-lg border border-border/60 bg-background/40 p-3">
               <div className="flex items-center justify-between gap-2">
                 <Label
+                  id="animationEnabled-label"
                   htmlFor="animationEnabled"
                   className="text-sm font-medium">
                   Animate .mcmeta textures
                 </Label>
                 <Switch
                   id="animationEnabled"
+                  aria-labelledby="animationEnabled-label"
                   checked={animationEnabled}
                   onCheckedChange={setAnimationEnabled}
                 />
