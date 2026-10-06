@@ -1,6 +1,11 @@
 export {cn} from './cn'
 export {observerResize, observeIntersection} from './observe'
-export {createGithubRepo, parseGithubUrl, createRawImageUrl} from './github'
+export {
+  createGithubRepo,
+  parseGithubUrl,
+  createRawImageUrl,
+  createGithubBlobUrl,
+} from './github'
 export type {GithubRepo} from './github'
 export {
   parseMcmeta,

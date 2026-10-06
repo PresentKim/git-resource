@@ -1,8 +1,11 @@
 import {useRef, useEffect, useEffectEvent, useState, useCallback} from 'react'
 import {
+  Check,
   ChevronLeft,
   ChevronRight,
   Download,
+  ExternalLink,
+  Link2,
   LoaderCircleIcon,
   X,
   ZoomIn,
@@ -15,9 +18,10 @@ import {
   DialogPortal,
   DialogTitle,
 } from '@/shared/components/ui/dialog'
-import {Button} from '@/shared/components/ui/button'
+import {Button, buttonVariants} from '@/shared/components/ui/button'
 import {
   cn,
+  createGithubBlobUrl,
   createRawImageUrl,
   getCachedObjectUrl,
   preloadImage,
@@ -218,6 +222,30 @@ export function ImageViewer({
     enabled: open,
   })
 
+  // Copy a link to the open image (the address bar holds ?image=<path>)
+  const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>(
+    'idle',
+  )
+  const handleCopyLink = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText(window.location.href)
+      setCopyState('copied')
+    } catch {
+      setCopyState('failed')
+    }
+  }, [])
+  useEffect(() => {
+    if (copyState === 'idle') return
+    const timer = setTimeout(() => setCopyState('idle'), 1500)
+    return () => clearTimeout(timer)
+  }, [copyState])
+  const copyLabel =
+    copyState === 'copied'
+      ? 'Link copied'
+      : copyState === 'failed'
+        ? 'Could not copy link'
+        : 'Copy link to this image'
+
   // Image download
   const {fileName} = useImagePath({imagePath: currentImage})
   const {handleDownload: handleDownloadCurrent} = useImageDownload({
@@ -378,6 +406,8 @@ export function ImageViewer({
     }
   }, [open, currentImage, shouldAnimate, imageContainerRef, imgRef])
 
+  const githubUrl = currentImage ? createGithubBlobUrl(repo, currentImage) : ''
+
   // Real size on screen (1:1 = one image pixel per screen pixel); falls back to
   // the zoom relative to the fitted size when the image cannot be measured
   const zoomLabel =
@@ -446,7 +476,7 @@ export function ImageViewer({
               id="image-viewer-content"
               ref={imageContainerRef}
               className={cn(
-                'relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-28 px-8 overflow-hidden',
+                'relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-56 px-8 sm:pb-28 overflow-hidden',
                 gridBackground === 'auto' && 'bg-background',
                 gridBackground === 'white' && 'bg-white',
                 gridBackground === 'black' && 'bg-black',
@@ -690,6 +720,32 @@ export function ImageViewer({
                   <Download className="mr-1 h-3.5 w-3.5" />
                   DOWNLOAD
                 </Button>
+                <Button
+                  type="button"
+                  size="sm"
+                  variant="outline"
+                  className="px-2 py-1"
+                  onClick={handleCopyLink}
+                  aria-label={copyLabel}
+                  title={copyLabel}>
+                  {copyState === 'copied' ? (
+                    <Check className="h-3.5 w-3.5" />
+                  ) : (
+                    <Link2 className="h-3.5 w-3.5" />
+                  )}
+                </Button>
+                <a
+                  href={githubUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={cn(
+                    buttonVariants({size: 'sm', variant: 'outline'}),
+                    'px-2 py-1',
+                  )}
+                  aria-label="Open on GitHub"
+                  title="Open on GitHub">
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
               </div>
               <div className="flex flex-col items-center gap-2 sm:hidden w-full">
                 <div className="flex items-center gap-4 w-full">
@@ -722,64 +778,89 @@ export function ImageViewer({
                     </Button>
                   )}
                 </div>
-                <div className="flex items-center gap-2 px-2 w-full">
-                  <div className="flex-1 flex items-center justify-center gap-1 rounded-md px-3 py-2">
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="h-8 px-2 py-1 text-sm font-semibold"
-                      onClick={() => handleZoom(-0.2)}
-                      aria-label="Zoom out"
-                      disabled={scale <= minScale}>
-                      <ZoomOut className="size-4" />
-                    </Button>
-                    <span className="px-1 text-sm min-w-10 text-center">
-                      {zoomLabel}
-                    </span>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="h-8 px-2 py-1 text-sm font-semibold"
-                      onClick={() => handleZoom(0.2)}
-                      aria-label="Zoom in"
-                      disabled={scale >= maxScale}>
-                      <ZoomIn className="size-4" />
-                    </Button>
-                    <Button
-                      type="button"
-                      size="sm"
-                      variant="outline"
-                      className="h-8 px-2 py-1 text-sm font-semibold"
-                      onClick={handleActualSize}
-                      aria-label="Actual size (1:1)"
-                      title="Actual size (1:1)"
-                      disabled={displayScale === null || isActualSize}>
-                      1:1
-                    </Button>
-                    {scale !== 1 && (
-                      <Button
-                        type="button"
-                        size="sm"
-                        variant="outline"
-                        className="h-8 px-2 py-1 text-sm font-semibold"
-                        onClick={handleResetZoom}
-                        aria-label="Fit to screen"
-                        title="Fit to screen">
-                        <RotateCcw className="size-4" />
-                      </Button>
-                    )}
-                  </div>
+                <div className="flex items-center justify-center gap-1 px-2 w-full">
                   <Button
                     type="button"
-                    size="sm"
+                    size="icon"
                     variant="outline"
-                    className="h-8 px-3 py-1 text-sm font-semibold shrink-0"
+                    className="size-11"
+                    onClick={() => handleZoom(-0.2)}
+                    aria-label="Zoom out"
+                    disabled={scale <= minScale}>
+                    <ZoomOut className="size-5" />
+                  </Button>
+                  <span className="px-1 text-sm min-w-14 text-center">
+                    {zoomLabel}
+                  </span>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="size-11"
+                    onClick={() => handleZoom(0.2)}
+                    aria-label="Zoom in"
+                    disabled={scale >= maxScale}>
+                    <ZoomIn className="size-5" />
+                  </Button>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="h-11 min-w-11 px-2 text-sm font-semibold"
+                    onClick={handleActualSize}
+                    aria-label="Actual size (1:1)"
+                    title="Actual size (1:1)"
+                    disabled={displayScale === null || isActualSize}>
+                    1:1
+                  </Button>
+                  {scale !== 1 && (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      className="size-11"
+                      onClick={handleResetZoom}
+                      aria-label="Fit to screen"
+                      title="Fit to screen">
+                      <RotateCcw className="size-5" />
+                    </Button>
+                  )}
+                </div>
+                <div className="flex items-center justify-center gap-2 px-2 w-full">
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="size-11"
                     onClick={handleDownloadCurrent}
                     aria-label="Download current image">
-                    <Download className="size-4" />
+                    <Download className="size-5" />
                   </Button>
+                  <Button
+                    type="button"
+                    size="icon"
+                    variant="outline"
+                    className="size-11"
+                    onClick={handleCopyLink}
+                    aria-label={copyLabel}
+                    title={copyLabel}>
+                    {copyState === 'copied' ? (
+                      <Check className="size-5" />
+                    ) : (
+                      <Link2 className="size-5" />
+                    )}
+                  </Button>
+                  <a
+                    href={githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      buttonVariants({size: 'icon', variant: 'outline'}),
+                      'size-11',
+                    )}
+                    aria-label="Open on GitHub"
+                    title="Open on GitHub">
+                    <ExternalLink className="size-5" />
+                  </a>
                 </div>
               </div>
             </div>

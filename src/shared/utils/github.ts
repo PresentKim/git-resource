@@ -97,3 +97,11 @@ export function parseGithubUrl(url: string): GithubRepo | null {
 export function createRawImageUrl(repo: GithubRepo, path: string): string {
   return `https://raw.githubusercontent.com/${repo.owner}/${repo.name}/${repo.ref}/${path}`
 }
+
+/**
+ * Create the github.com page URL of a file in the repository
+ */
+export function createGithubBlobUrl(repo: GithubRepo, path: string): string {
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/')
+  return `https://github.com/${repo.owner}/${repo.name}/blob/${repo.ref}/${encodedPath}`
+}
