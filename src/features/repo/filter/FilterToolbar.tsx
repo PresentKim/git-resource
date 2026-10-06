@@ -252,7 +252,7 @@ export const FilterToolbar = memo(function FilterToolbar() {
   )
 
   return (
-    <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start">
+    <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start xl:flex-none">
       <ImageCountBadge
         filteredCount={filteredCount}
         totalCount={totalCount}
