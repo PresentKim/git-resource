@@ -2,6 +2,11 @@ import {create} from 'zustand'
 import type {GithubRepo} from '@/shared/utils/github'
 import type {GithubImageFileTree} from '@/shared/api/github/types'
 import {isMcmetaFile} from '@/shared/utils'
+import {
+  DEFAULT_SORT_MODE,
+  sortImagePaths,
+  type SortMode,
+} from '@/shared/utils/sortImagePaths'
 
 /**
  * Parse filter string into include and exclude filters
@@ -111,7 +116,7 @@ interface RepoStore {
   // Actions
   setRepo: (repo: GithubRepo) => void
   setImageFiles: (files: GithubImageFileTree | null) => void
-  updateFilteredImages: (filter: string) => void
+  updateFilteredImages: (filter: string, sort?: SortMode) => void
   setError: (error: Error | null) => void
   resetRepoState: () => void
 }
@@ -158,7 +163,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     }
   },
 
-  updateFilteredImages: (filter: string) => {
+  updateFilteredImages: (filter: string, sort = DEFAULT_SORT_MODE) => {
     const {imageFiles, filterCache} = get()
     if (!imageFiles) {
       // Don't set isFiltering to false if images haven't loaded yet
@@ -167,7 +172,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
       return
     }
 
-    const cacheKey = filter.toLowerCase()
+    const cacheKey = `${sort}|${filter.toLowerCase()}`
     const cached = filterCache.get(cacheKey)
     if (cached) {
       set({filteredImageFiles: cached, isFiltering: false})
@@ -193,10 +198,9 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
       }
 
       const {includeFilters, excludeFilters} = parseFilters(filter)
-      const filtered = filterImagePaths(
-        imageOnlyFiles,
-        includeFilters,
-        excludeFilters,
+      const filtered = sortImagePaths(
+        filterImagePaths(imageOnlyFiles, includeFilters, excludeFilters),
+        sort,
       )
 
       const {filterCache: currentCache} = get()

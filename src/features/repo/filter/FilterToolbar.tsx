@@ -27,6 +27,7 @@ import {
 } from '@/shared/components/ui/dialog'
 import {DensityControl} from '@/features/repo/filter/DensityControl'
 import {FolderBrowser} from '@/features/repo/filter/FolderBrowser'
+import {SortControl} from '@/features/repo/filter/SortControl'
 import {SpriteDownloadDialog} from '@/features/repo/download/SpriteDownloadDialog'
 import type {FlattenMode} from '@/shared/utils'
 import {cn} from '@/shared/utils'
@@ -259,6 +260,7 @@ export const FilterToolbar = memo(function FilterToolbar() {
       />
       <div className="flex flex-wrap items-center gap-2">
         <FolderBrowser />
+        <SortControl />
         <DensityControl />
         <SpriteButton />
         <DownloadButton />
