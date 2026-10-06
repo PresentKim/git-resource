@@ -26,10 +26,10 @@ interface ImageCountBadgeProps {
 const ImageCountBadge = memo(
   function ImageCountBadge({filteredCount, totalCount}: ImageCountBadgeProps) {
     return (
-      <span className="rounded-full bg-background/70 px-2 py-1">
+      <span className="whitespace-nowrap rounded-full bg-background/70 px-2 py-1">
         Showing{' '}
         <span className="font-semibold text-accent-foreground">
-          {filteredCount}
+          {filteredCount.toLocaleString()}
         </span>
         {' of '}
         {totalCount.toLocaleString()} images
@@ -178,7 +178,7 @@ export const FilterToolbar = memo(function FilterToolbar() {
   const {filteredCount, totalCount} = useImageCount()
 
   return (
-    <div className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start">
+    <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start">
       <ImageCountBadge filteredCount={filteredCount} totalCount={totalCount} />
       <div className="flex items-center gap-2">
         <SpriteButton />
