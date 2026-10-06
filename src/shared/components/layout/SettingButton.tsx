@@ -1,5 +1,4 @@
-import {Settings as SettingsIcon, Info} from 'lucide-react'
-import {IconBrightness2, IconCircleHalf2, IconMoon} from '@tabler/icons-react'
+import {Settings as SettingsIcon, Info, Monitor, Moon, Sun} from 'lucide-react'
 
 import {
   Dialog,
@@ -74,7 +73,7 @@ export function SettingButton() {
       <DialogContent className="max-h-[calc(100vh-4rem)] w-[min(100vw-1.5rem,40rem)] overflow-y-auto border-border/70 bg-card shadow-xl shadow-black/40 sm:max-w-2xl">
         <DialogHeader className="space-y-1 border-b border-border/60 pb-3">
           <DialogTitle className="flex items-center justify-between text-lg font-semibold">
-            <span>Viewer settings</span>
+            <span>Settings</span>
           </DialogTitle>
           <DialogDescription className="text-xs text-muted-foreground">
             Configure how images are loaded and rendered. These settings are
@@ -110,14 +109,17 @@ export function SettingButton() {
               </div>
               <Input
                 id="githubToken"
+                type="password"
+                autoComplete="off"
+                spellCheck={false}
                 value={githubToken}
                 onChange={e => setGithubToken(e.target.value)}
-                placeholder="github_pat_1234567890"
+                placeholder="Paste a personal access token (optional)"
                 className="h-9 text-xs"
               />
               <p className="text-xs text-muted-foreground">
                 Used to increase GitHub API rate limits and access private
-                repositories.
+                repositories. Stored unencrypted in this browser only.
               </p>
             </div>
 
@@ -146,26 +148,72 @@ export function SettingButton() {
                 automatically fit the screen width.
               </p>
             </div>
+
+            <div
+              data-slot="pixelated-toggle"
+              className="space-y-1.5 rounded-lg border border-border/60 bg-background/40 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <Label htmlFor="pixelated" className="text-sm font-medium">
+                  Pixelated images
+                </Label>
+                <Switch
+                  id="pixelated"
+                  checked={pixelated}
+                  onCheckedChange={setPixelated}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Render images with crisp pixels, ideal for pixel-art textures.
+              </p>
+            </div>
+
+            <div
+              data-slot="animation-toggle"
+              className="space-y-1.5 rounded-lg border border-border/60 bg-background/40 p-3">
+              <div className="flex items-center justify-between gap-2">
+                <Label
+                  htmlFor="animationEnabled"
+                  className="text-sm font-medium">
+                  Animate .mcmeta textures
+                </Label>
+                <Switch
+                  id="animationEnabled"
+                  checked={animationEnabled}
+                  onCheckedChange={setAnimationEnabled}
+                />
+              </div>
+              <p className="text-xs text-muted-foreground">
+                Play Minecraft-style animations for textures that include a
+                corresponding{' '}
+                <span className="font-mono text-accent-foreground">
+                  .mcmeta
+                </span>{' '}
+                file.
+              </p>
+            </div>
           </div>
 
           <div className="space-y-4 rounded-lg border border-border/60 bg-background/40 p-3 min-w-0">
             <div data-slot="theme-selector" className="space-y-2 min-w-0">
               <Label className="text-sm font-medium">Theme</Label>
-              <div className="flex gap-2 w-full min-w-0">
+              <div className="flex gap-1.5 w-full min-w-0">
                 {(
                   [
-                    ['system', IconCircleHalf2],
-                    ['light', IconBrightness2],
-                    ['dark', IconMoon],
+                    ['system', 'System', Monitor],
+                    ['light', 'Light', Sun],
+                    ['dark', 'Dark', Moon],
                   ] as const
-                ).map(([themeValue, ThemeIcon]) => (
+                ).map(([themeValue, themeLabel, ThemeIcon]) => (
                   <Button
                     key={themeValue}
                     type="button"
                     variant={themeValue === theme ? 'default' : 'outline'}
-                    className="flex-1"
+                    size="sm"
+                    className="min-w-0 flex-1 gap-1 px-1.5"
+                    aria-pressed={themeValue === theme}
                     onClick={() => setTheme(themeValue as Theme)}>
-                    <ThemeIcon className="size-5" />
+                    <ThemeIcon className="size-3.5 shrink-0" />
+                    <span className="text-xs">{themeLabel}</span>
                   </Button>
                 ))}
               </div>
@@ -225,49 +273,6 @@ export function SettingButton() {
               </p>
             </div>
 
-            <div
-              data-slot="pixelated-toggle"
-              className="space-y-1.5 border-t border-border/50 pt-3">
-              <div className="flex items-center justify-between gap-2">
-                <Label htmlFor="pixelated" className="text-sm font-medium">
-                  Pixelated images
-                </Label>
-                <Switch
-                  id="pixelated"
-                  checked={pixelated}
-                  onCheckedChange={setPixelated}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Render images with crisp pixels, ideal for pixel-art textures.
-              </p>
-            </div>
-
-            <div
-              data-slot="animation-toggle"
-              className="space-y-1.5 border-t border-border/50 pt-3">
-              <div className="flex items-center justify-between gap-2">
-                <Label
-                  htmlFor="animationEnabled"
-                  className="text-sm font-medium">
-                  Animate .mcmeta textures
-                </Label>
-                <Switch
-                  id="animationEnabled"
-                  checked={animationEnabled}
-                  onCheckedChange={setAnimationEnabled}
-                />
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Play Minecraft-style animations for textures that include a
-                corresponding{' '}
-                <span className="font-mono text-accent-foreground">
-                  .mcmeta
-                </span>{' '}
-                file.
-              </p>
-            </div>
-
             <p className="pt-1 text-xs text-muted-foreground/80">
               Changes are applied per browser and do not affect the underlying
               repositories.
@@ -276,20 +281,21 @@ export function SettingButton() {
         </div>
 
         <DialogFooter className="mt-1 border-t border-border/60 pt-3">
-          <DialogClose>
-            <Button type="button" variant="outline" size="sm">
-              Cancel
-            </Button>
+          <DialogClose
+            render={<Button type="button" variant="outline" size="sm" />}>
+            Cancel
           </DialogClose>
-          <DialogClose>
-            <Button
-              type="button"
-              variant={hasChanges ? 'default' : 'secondary'}
-              size="sm"
-              className="font-bold"
-              onClick={handleSave}>
-              Apply settings
-            </Button>
+          <DialogClose
+            render={
+              <Button
+                type="button"
+                variant={hasChanges ? 'default' : 'secondary'}
+                size="sm"
+                className="font-bold"
+              />
+            }
+            onClick={handleSave}>
+            Apply settings
           </DialogClose>
         </DialogFooter>
       </DialogContent>
