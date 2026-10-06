@@ -61,7 +61,7 @@ function FolderList({tree}: FolderListProps) {
         <Button
           size="sm"
           variant="ghost"
-          className="h-6 px-1.5 text-xs"
+          className="h-6 px-1.5 text-xs text-muted-foreground aria-[current=location]:bg-muted aria-[current=location]:font-semibold aria-[current=location]:text-foreground"
           aria-current={currentPath === '' ? 'location' : undefined}
           onClick={() => goTo('')}>
           All
@@ -74,7 +74,7 @@ function FolderList({tree}: FolderListProps) {
               <Button
                 size="sm"
                 variant="ghost"
-                className="h-6 max-w-32 truncate px-1.5 text-xs"
+                className="h-6 max-w-32 truncate px-1.5 text-xs text-muted-foreground aria-[current=location]:bg-muted aria-[current=location]:font-semibold aria-[current=location]:text-foreground"
                 aria-current={path === currentPath ? 'location' : undefined}
                 title={path}
                 onClick={() => goTo(path)}>
@@ -99,7 +99,7 @@ function FolderList({tree}: FolderListProps) {
           <li key={child.path}>
             <button
               type="button"
-              className="flex w-full items-center gap-2 rounded px-1.5 py-1.5 text-left text-xs hover:bg-muted"
+              className="flex w-full items-center gap-2 rounded px-1.5 py-1.5 text-left text-xs outline-none hover:bg-muted focus-visible:bg-muted focus-visible:ring-2 focus-visible:ring-ring"
               onClick={() => goTo(child.path)}>
               <Folder className="size-4 shrink-0 text-muted-foreground" />
               <span className="min-w-0 flex-1 truncate" title={child.path}>

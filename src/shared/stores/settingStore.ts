@@ -8,7 +8,6 @@ export interface SpriteSettings {
   customColor: string
   useCustomColor: boolean
   scale: number
-  imageSmoothing: boolean
   columns: number | null
 }
 
@@ -170,7 +169,6 @@ export const useSettingStore = create<SettingsStore>((set, get) => ({
       customColor: '#ffffff',
       useCustomColor: false,
       scale: 1,
-      imageSmoothing: true,
       columns: null, // null = use current grid column count
     }
   })(),

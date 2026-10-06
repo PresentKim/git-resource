@@ -135,7 +135,7 @@ const ImageCell = memo(function ImageCell({
     <div
       role="button"
       tabIndex={0}
-      className="group relative aspect-square size-full ring-foreground transition-transform duration-200 ease-out active:ring-2 active:rounded-xs focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-offset-background focus:ring-ring hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40"
+      className="group relative aspect-square size-full ring-foreground transition-transform duration-200 ease-out active:ring-2 active:rounded-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:ring-foreground hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40"
       onClick={onClick}
       onKeyDown={handleKeyDown}
       aria-label={`View image: ${path}`}

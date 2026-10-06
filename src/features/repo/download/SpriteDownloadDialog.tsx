@@ -1,4 +1,5 @@
 import {useState} from 'react'
+import {ChoiceCard} from '@/shared/components/ChoiceCard'
 import {
   Dialog,
   DialogContent,
@@ -43,8 +44,11 @@ export function SpriteDownloadDialog({
   const repo = useRepoStore(state => state.repo)
   const filteredImageFiles = useRepoStore(state => state.filteredImageFiles)
   const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
-  const {columnCount: displayColumnCount, animationEnabled} =
-    useDisplaySettings()
+  const {
+    columnCount: displayColumnCount,
+    animationEnabled,
+    pixelated,
+  } = useDisplaySettings()
   const {spriteSettings, setSpriteSettings} = useSettingStore()
   const githubToken = useSettingStore(state => state.githubToken)
   const {isDownloading, downloadProgress, handleDownload} = useSpriteDownload({
@@ -56,6 +60,11 @@ export function SpriteDownloadDialog({
   })
 
   const actualColumnCount = spriteSettings.columns ?? displayColumnCount
+
+  // Smoothing follows the Pixelated setting (pixel art stays crisp) until it
+  // is changed here; the choice lasts only until the dialog is closed
+  const [smoothingChoice, setSmoothingChoice] = useState<boolean | null>(null)
+  const imageSmoothing = smoothingChoice ?? !pixelated
 
   const [error, setError] = useState<string | null>(null)
   // An estimate belongs to the list it was made for, so nothing is shown
@@ -106,6 +115,7 @@ export function SpriteDownloadDialog({
         ? spriteSettings.customColor
         : spriteSettings.backgroundColor,
       columns: actualColumnCount,
+      imageSmoothing,
     }
     setError(null)
     try {
@@ -117,7 +127,10 @@ export function SpriteDownloadDialog({
   }
 
   const handleOpenChange = (nextOpen: boolean) => {
-    if (!nextOpen) setError(null)
+    if (!nextOpen) {
+      setError(null)
+      setSmoothingChoice(null)
+    }
     onOpenChange(nextOpen)
   }
 
@@ -222,8 +235,9 @@ export function SpriteDownloadDialog({
                 <Button
                   key={value}
                   type="button"
-                  variant="outline"
+                  variant={spriteSettings.gap === value ? 'default' : 'outline'}
                   size="sm"
+                  aria-pressed={spriteSettings.gap === value}
                   onClick={() =>
                     setSpriteSettings({
                       ...spriteSettings,
@@ -231,11 +245,7 @@ export function SpriteDownloadDialog({
                     })
                   }
                   disabled={isDownloading}
-                  className={cn(
-                    'text-xs',
-                    spriteSettings.gap === value &&
-                      'bg-accent text-accent-foreground',
-                  )}>
+                  className="text-xs">
                   {value}px
                 </Button>
               ))}
@@ -269,8 +279,11 @@ export function SpriteDownloadDialog({
                 <Button
                   key={value}
                   type="button"
-                  variant="outline"
+                  variant={
+                    spriteSettings.scale === value ? 'default' : 'outline'
+                  }
                   size="sm"
+                  aria-pressed={spriteSettings.scale === value}
                   onClick={() =>
                     setSpriteSettings({
                       ...spriteSettings,
@@ -278,11 +291,7 @@ export function SpriteDownloadDialog({
                     })
                   }
                   disabled={isDownloading}
-                  className={cn(
-                    'text-xs',
-                    spriteSettings.scale === value &&
-                      'bg-accent text-accent-foreground',
-                  )}>
+                  className="text-xs">
                   {value}x
                 </Button>
               ))}
@@ -298,7 +307,7 @@ export function SpriteDownloadDialog({
                     Image Interpolation
                   </Label>
                   <span className="text-xs text-muted-foreground">
-                    {spriteSettings.imageSmoothing
+                    {imageSmoothing
                       ? 'Smooth interpolation (for regular images)'
                       : 'Pixel preservation (for pixel art)'}
                   </span>
@@ -308,13 +317,8 @@ export function SpriteDownloadDialog({
                 <Switch
                   id="image-smoothing"
                   aria-labelledby="image-smoothing-label"
-                  checked={spriteSettings.imageSmoothing}
-                  onCheckedChange={e =>
-                    setSpriteSettings({
-                      ...spriteSettings,
-                      imageSmoothing: e,
-                    })
-                  }
+                  checked={imageSmoothing}
+                  onCheckedChange={setSmoothingChoice}
                   disabled={isDownloading}
                 />
               </div>
@@ -346,21 +350,22 @@ export function SpriteDownloadDialog({
           {/* Background color setting */}
           <div className="space-y-3">
             <Label>Background Color</Label>
-            <div className="grid grid-cols-4 gap-2">
+            <div
+              role="radiogroup"
+              aria-label="Background color"
+              className="grid grid-cols-2 gap-2 sm:grid-cols-4">
               {PRESET_COLORS.map(({label, value}) => (
-                <button
+                <ChoiceCard
                   key={value}
-                  type="button"
-                  onClick={() => handleColorPresetClick(value)}
-                  disabled={isDownloading}
-                  className={cn(
-                    'rounded-md border-2 p-2 text-xs transition-colors',
+                  name="sprite-background"
+                  value={value}
+                  checked={
                     spriteSettings.backgroundColor === value &&
-                      !spriteSettings.useCustomColor
-                      ? 'border-accent bg-accent/10'
-                      : 'border-border hover:bg-muted',
-                    isDownloading && 'opacity-50 cursor-not-allowed',
-                  )}>
+                    !spriteSettings.useCustomColor
+                  }
+                  onChange={() => handleColorPresetClick(value)}
+                  disabled={isDownloading}
+                  className="p-2 pr-2 text-center text-xs">
                   <div
                     className={cn(
                       'mx-auto mb-1 h-6 w-full rounded',
@@ -374,26 +379,28 @@ export function SpriteDownloadDialog({
                     }
                   />
                   {label}
-                </button>
+                </ChoiceCard>
               ))}
             </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
+            <div className="flex items-center justify-between">
+              <Label
+                id="custom-color-label"
+                htmlFor="custom-color"
+                className="text-sm">
+                Custom Color
+              </Label>
+              <Switch
                 id="custom-color"
+                aria-labelledby="custom-color-label"
                 checked={spriteSettings.useCustomColor}
-                onChange={e =>
+                onCheckedChange={checked =>
                   setSpriteSettings({
                     ...spriteSettings,
-                    useCustomColor: e.target.checked,
+                    useCustomColor: checked,
                   })
                 }
                 disabled={isDownloading}
-                className="h-4 w-4 rounded border-border"
               />
-              <Label htmlFor="custom-color" className="text-sm">
-                Custom Color
-              </Label>
             </div>
             {spriteSettings.useCustomColor && (
               <div className="flex items-center gap-2">

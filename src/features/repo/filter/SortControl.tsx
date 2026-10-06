@@ -40,10 +40,11 @@ export const SortControl = memo(function SortControl() {
               aria-checked={sort === mode}
               onClick={() => setSort(mode)}
               className={cn(
-                'flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors',
+                'flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors outline-none',
+                'focus-visible:ring-2 focus-visible:ring-ring',
                 sort === mode
-                  ? 'bg-accent text-accent-foreground'
-                  : 'text-muted-foreground hover:bg-muted',
+                  ? 'bg-primary font-semibold text-primary-foreground'
+                  : 'text-muted-foreground hover:bg-muted hover:text-foreground',
               )}>
               <span>{sortModeLabels[mode]}</span>
               {sort === mode && <Check className="size-3.5" />}
