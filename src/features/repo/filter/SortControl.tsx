@@ -26,7 +26,7 @@ export const SortControl = memo(function SortControl() {
             variant="outline"
             className="text-xs font-semibold">
             <ArrowDownUp className="size-4" />
-            <span>SORT</span>
+            <span className="hidden sm:inline">SORT</span>
           </Button>
         }
       />

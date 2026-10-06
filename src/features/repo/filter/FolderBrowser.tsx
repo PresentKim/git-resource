@@ -142,7 +142,7 @@ export const FolderBrowser = memo(function FolderBrowser() {
             disabled={!hasFolders}
             className="text-xs font-semibold">
             <FolderTree className="size-4" />
-            <span>FOLDERS</span>
+            <span className="hidden sm:inline">FOLDERS</span>
           </Button>
         }
       />
