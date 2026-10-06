@@ -1,5 +1,5 @@
 import {useState} from 'react'
-import {IconSend2, IconAlertCircle} from '@tabler/icons-react'
+import {CircleAlert, Send} from 'lucide-react'
 
 import {
   InputGroup,
@@ -73,8 +73,8 @@ export function RepoInput() {
       <InputGroupAddon align="inline-end">
         {error && (
           <Tooltip>
-            <TooltipTrigger>
-              <IconAlertCircle title="Error" className="size-5" />
+            <TooltipTrigger aria-label="Error">
+              <CircleAlert className="size-5" />
             </TooltipTrigger>
             <TooltipContent>{error}</TooltipContent>
           </Tooltip>
@@ -85,7 +85,7 @@ export function RepoInput() {
           variant="ghost"
           onClick={handleSend}
           disabled={!repoInput || !!error}>
-          <IconSend2 title="Open repository" className="size-5" />
+          <Send className="size-5" />
         </InputGroupButton>
       </InputGroupAddon>
     </InputGroup>

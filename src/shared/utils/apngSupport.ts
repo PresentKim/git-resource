@@ -58,10 +58,3 @@ export function detectAPNGSupportSync(): boolean {
   // Default: assume support for modern browsers, fallback to async detection
   return true
 }
-
-/**
- * Get cached APNG support status
- */
-export function getCachedAPNGSupport(): boolean | null {
-  return apngSupportCache
-}

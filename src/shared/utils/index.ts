@@ -19,18 +19,15 @@ export type {McmetaData, McmetaFrame, ParsedMcmetaAnimation} from './mcmeta'
 export {formatFileSize, parseImagePath} from './imageViewer'
 export {
   getCachedObjectUrl,
-  clearImageCache,
   getCachedImageMetadata,
   setCachedImageMetadata,
   preloadImage,
 } from './imageCache'
-export {parseImagePath as parseImagePathForCell} from './imageCell'
 export {resolveDuplicatePaths, transformPath} from './pathFlatten'
 export type {FlattenMode} from './pathFlatten'
 export {
   detectAPNGSupport,
   detectAPNGSupportSync,
-  getCachedAPNGSupport,
 } from './apngSupport'
 export {
   convertSpriteToAPNG,

@@ -28,12 +28,6 @@ export async function getCachedObjectUrl(src: string): Promise<string> {
   return promise
 }
 
-export function clearImageCache() {
-  objectUrlCache.clear()
-  metadataCache.clear()
-  preloadCache.clear()
-}
-
 export function getCachedImageMetadata(src: string) {
   if (!src) return undefined
   return metadataCache.get(src)

@@ -1,4 +1,4 @@
-import {IconFilterOff} from '@tabler/icons-react'
+import {FilterX} from 'lucide-react'
 
 import {Button} from '@/shared/components/ui/button'
 import {RandomMessageLoader} from '@/shared/components/RandomMessageLoader'
@@ -21,7 +21,7 @@ export function RepoEmptyState() {
   if (totalCount > 0 && filter.trim()) {
     return (
       <div role="status" className={containerClass}>
-        <IconFilterOff className="size-10 text-muted-foreground" />
+        <FilterX className="size-10 text-muted-foreground" />
         <div className="space-y-1">
           <h2 className="text-lg font-semibold">No images match your filter</h2>
           <p className="text-sm text-muted-foreground">

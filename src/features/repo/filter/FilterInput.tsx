@@ -1,5 +1,5 @@
 import {useEffect, useRef, useState} from 'react'
-import {IconFilter, IconHelpCircle, IconX} from '@tabler/icons-react'
+import {CircleHelp, Filter, X} from 'lucide-react'
 
 import {
   InputGroup,
@@ -23,7 +23,7 @@ function FilterHelpPopover() {
         aria-label="Filter syntax help"
         render={
           <Button variant="ghost">
-            <IconHelpCircle className="size-5" />
+            <CircleHelp className="size-5" />
           </Button>
         }
       />
@@ -109,7 +109,7 @@ export function FilterInput() {
             aria-label="Clear filter"
             title="Clear filter (Esc)"
             onClick={handleClearFilter}>
-            <IconX className="size-5" />
+            <X className="size-5" />
           </InputGroupButton>
         )}
         <FilterHelpPopover />
@@ -118,7 +118,7 @@ export function FilterInput() {
           title="Apply filter (Enter)"
           onClick={handleApplyFilter}
           disabled={isApplied}>
-          <IconFilter className="size-5" />
+          <Filter className="size-5" />
         </InputGroupButton>
       </InputGroupAddon>
     </InputGroup>

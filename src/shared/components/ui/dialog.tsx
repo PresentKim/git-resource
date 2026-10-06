@@ -3,7 +3,7 @@ import { Dialog as DialogPrimitive } from "@base-ui/react/dialog"
 
 import { cn } from "@/shared/utils"
 import { Button } from "@/shared/components/ui/button"
-import { IconX } from "@tabler/icons-react"
+import { X } from "lucide-react"
 
 function Dialog({ ...props }: DialogPrimitive.Root.Props) {
   return <DialogPrimitive.Root data-slot="dialog" {...props} />
@@ -65,8 +65,7 @@ function DialogContent({
               />
             }
           >
-            <IconX
-            />
+            <X />
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}
