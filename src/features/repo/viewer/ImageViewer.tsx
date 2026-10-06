@@ -358,6 +358,7 @@ export function ImageViewer({
       <DialogPortal>
         <DialogContent
           aria-labelledby={imageTitleId}
+          showCloseButton={false}
           className={cn(
             // Override DialogContent's centered, max-w-sm defaults to cover the viewport
             'fixed inset-0 z-50 translate-x-0 translate-y-0',
