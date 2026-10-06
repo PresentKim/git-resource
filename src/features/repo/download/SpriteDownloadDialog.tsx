@@ -133,10 +133,10 @@ export function SpriteDownloadDialog({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Create Sprite Image</DialogTitle>
+          <DialogTitle>Screenshot</DialogTitle>
           <DialogDescription>
             Combine {imageCount.toLocaleString()} currently displayed images
-            into a single sprite image.
+            into a single image.
           </DialogDescription>
         </DialogHeader>
 
@@ -421,7 +421,7 @@ export function SpriteDownloadDialog({
 
         {error && (
           <p role="alert" className="text-sm text-destructive">
-            Could not create the sprite: {error}
+            Could not create the screenshot: {error}
           </p>
         )}
 
@@ -446,7 +446,7 @@ export function SpriteDownloadDialog({
                 </span>
               </div>
             ) : (
-              'Create Sprite'
+              'Save screenshot'
             )}
           </Button>
         </DialogFooter>

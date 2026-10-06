@@ -9,7 +9,7 @@ import {
   Download as DownloadIcon,
   Loader as LoaderIcon,
   ChevronDown,
-  Grid3x3 as SpriteIcon,
+  Camera as ScreenshotIcon,
 } from 'lucide-react'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {useImageCount} from '@/features/repo/filter/useImageCount'
@@ -224,21 +224,22 @@ const DownloadButton = memo(function DownloadButton() {
   )
 })
 
-const SpriteButton = memo(function SpriteButton() {
+const ScreenshotButton = memo(function ScreenshotButton() {
   const {filteredCount} = useImageCount()
   const [dialogOpen, setDialogOpen] = useState(false)
 
   return (
     <>
       <Button
-        aria-label="Create sprite image from filtered images"
+        aria-label="Take a screenshot of the filtered images"
+        title="Screenshot"
         disabled={!filteredCount}
         onClick={() => setDialogOpen(true)}
         size="sm"
         variant="outline"
         className="text-xs font-semibold flex items-center gap-1">
-        <SpriteIcon className="size-4" />
-        <span>SPRITE</span>
+        <ScreenshotIcon className="size-4" />
+        <span className="hidden sm:inline">SCREENSHOT</span>
       </Button>
       <SpriteDownloadDialog open={dialogOpen} onOpenChange={setDialogOpen} />
     </>
@@ -262,7 +263,7 @@ export const FilterToolbar = memo(function FilterToolbar() {
         <FolderBrowser />
         <SortControl />
         <DensityControl />
-        <SpriteButton />
+        <ScreenshotButton />
         <DownloadButton />
       </div>
     </div>
