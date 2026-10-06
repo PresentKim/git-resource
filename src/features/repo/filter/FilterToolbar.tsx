@@ -13,6 +13,7 @@ import {
 } from 'lucide-react'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {useImageCount} from '@/features/repo/filter/useImageCount'
+import {useGridPositionStore} from '@/features/repo/gridPositionStore'
 import {useImageDownload} from '@/features/repo/download/useImageDownload'
 import {SpriteDownloadDialog} from '@/features/repo/download/SpriteDownloadDialog'
 import type {FlattenMode} from '@/shared/utils'
@@ -21,10 +22,16 @@ import {cn} from '@/shared/utils'
 interface ImageCountBadgeProps {
   filteredCount: number
   totalCount: number
+  /** Index of the first image at the top of the screen; hidden at the top */
+  firstVisibleIndex: number
 }
 
 const ImageCountBadge = memo(
-  function ImageCountBadge({filteredCount, totalCount}: ImageCountBadgeProps) {
+  function ImageCountBadge({
+    filteredCount,
+    totalCount,
+    firstVisibleIndex,
+  }: ImageCountBadgeProps) {
     return (
       <span className="whitespace-nowrap rounded-full bg-background/70 px-2 py-1">
         Showing{' '}
@@ -33,13 +40,21 @@ const ImageCountBadge = memo(
         </span>
         {' of '}
         {totalCount.toLocaleString()} images
+        {firstVisibleIndex > 0 && (
+          <span
+            className="text-muted-foreground"
+            title="First image at the top of the screen">
+            {' · '}from #{(firstVisibleIndex + 1).toLocaleString()}
+          </span>
+        )}
       </span>
     )
   },
   (prevProps, nextProps) => {
     return (
       prevProps.filteredCount === nextProps.filteredCount &&
-      prevProps.totalCount === nextProps.totalCount
+      prevProps.totalCount === nextProps.totalCount &&
+      prevProps.firstVisibleIndex === nextProps.firstVisibleIndex
     )
   },
 )
@@ -176,10 +191,17 @@ const SpriteButton = memo(function SpriteButton() {
 
 export const FilterToolbar = memo(function FilterToolbar() {
   const {filteredCount, totalCount} = useImageCount()
+  const firstVisibleIndex = useGridPositionStore(
+    state => state.firstVisibleIndex,
+  )
 
   return (
     <div className="mt-1 flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground sm:order-1 sm:mt-0 sm:flex-1 sm:justify-start">
-      <ImageCountBadge filteredCount={filteredCount} totalCount={totalCount} />
+      <ImageCountBadge
+        filteredCount={filteredCount}
+        totalCount={totalCount}
+        firstVisibleIndex={firstVisibleIndex}
+      />
       <div className="flex items-center gap-2">
         <SpriteButton />
         <DownloadButton />

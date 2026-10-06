@@ -8,6 +8,7 @@ import {FilterInput} from '@/features/repo/filter/FilterInput'
 import {Button} from '@/shared/components/ui/button'
 import {ImageViewer} from '@/features/repo/viewer/ImageViewer'
 import {RepoEmptyState} from '@/features/repo/RepoEmptyState'
+import {useGridPositionStore} from '@/features/repo/gridPositionStore'
 
 import {useDisplaySettings} from '@/shared/stores/settingStore'
 import {useRepoStore} from '@/shared/stores/repoStore'
@@ -55,6 +56,9 @@ export default function RepoPage() {
   const error = useRepoStore(state => state.error)
   const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
   const isFiltering = useRepoStore(state => state.isFiltering)
+  const setFirstVisibleIndex = useGridPositionStore(
+    state => state.setFirstVisibleIndex,
+  )
 
   // Image click handler (stable, shared by all cells)
   const {handleImageClick} = useImageClickHandler()
@@ -81,7 +85,7 @@ export default function RepoPage() {
         gridBackground === 'black' && 'bg-black',
         gridBackground === 'transparent' && 'bg-transparent-grid',
       )}>
-      <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3">
+      <div className="sticky top-(--header-offset) z-40 flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm transition-[top] duration-200 sm:flex-row sm:items-center sm:gap-3">
         <div className="flex-1 sm:order-2">
           <FilterInput />
         </div>
@@ -183,6 +187,7 @@ export default function RepoPage() {
               columnCount={columnCount}
               gap={8}
               render={itemRenderer}
+              onFirstVisibleIndexChange={setFirstVisibleIndex}
               className={pixelated ? 'pixelated' : ''}
             />
           </div>

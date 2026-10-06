@@ -1,4 +1,4 @@
-import {useRef, useMemo} from 'react'
+import {useEffect, useRef, useMemo} from 'react'
 import {useVisibleHeight} from '@/shared/hooks/useVisibleHeight'
 import {useScrollOffset} from '@/shared/hooks/useScrollOffset'
 import {useVirtualGrid} from '@/shared/hooks/useVirtualGrid'
@@ -14,6 +14,8 @@ interface VirtualizedFlexGridProps<T> {
   gap?: number
   className?: string
   overscan?: number // Manual override for overscan (in rows). Defaults to 5 rows
+  /** Called with the index of the first item in the top visible row */
+  onFirstVisibleIndexChange?: (index: number) => void
 }
 
 const DEFAULT_GAP = 10
@@ -30,6 +32,7 @@ function VirtualizedFlexGrid<T>({
   gap = DEFAULT_GAP,
   render,
   className,
+  onFirstVisibleIndexChange,
 }: VirtualizedFlexGridProps<T>) {
   const wrapperRef = useRef<HTMLDivElement>(null)
   const containerRef = useRef<HTMLDivElement>(null)
@@ -42,6 +45,40 @@ function VirtualizedFlexGrid<T>({
   )
 
   const overscan = manualOverscan ?? DEFAULT_OVERSCAN
+
+  // scrollOffset only changes when a row boundary is crossed, so this runs
+  // once per row rather than on every scroll event. The result can lag the
+  // exact position by less than a row.
+  const itemCount = items.length
+  useEffect(() => {
+    if (!onFirstVisibleIndexChange) return
+    const wrapper = wrapperRef.current
+    if (!wrapper || itemSize <= 0 || itemCount === 0) {
+      onFirstVisibleIndexChange(0)
+      return
+    }
+    // Use the live scroll position: scrollOffset is rounded down to a row
+    // boundary and would report a row too early
+    const gridTop = wrapper.getBoundingClientRect().top + window.scrollY
+    const row = Math.max(
+      0,
+      Math.floor((window.scrollY - gridTop) / (itemSize + gap)),
+    )
+    onFirstVisibleIndexChange(Math.min(itemCount - 1, row * columnCount))
+  }, [
+    onFirstVisibleIndexChange,
+    scrollOffset,
+    itemSize,
+    gap,
+    columnCount,
+    itemCount,
+  ])
+
+  // Reset the reported position when the grid goes away (e.g. empty result)
+  useEffect(
+    () => () => onFirstVisibleIndexChange?.(0),
+    [onFirstVisibleIndexChange],
+  )
 
   const {totalHeight, offsetTop, visibleIndexs} = useVirtualGrid(
     items.length,
