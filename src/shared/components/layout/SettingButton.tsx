@@ -37,8 +37,6 @@ export function SettingButton() {
     setAnimationEnabled,
     theme,
     setTheme,
-    gridBackground,
-    setGridBackground,
     loadInitialValues,
     hasChanges,
   } = useSettingsForm()
@@ -51,7 +49,6 @@ export function SettingButton() {
       pixelated,
       animationEnabled,
       theme,
-      gridBackground,
     },
     setInitialValues: loadInitialValues,
   })
@@ -227,57 +224,6 @@ export function SettingButton() {
               </div>
               <p className="text-xs text-muted-foreground">
                 Choose your preferred color theme.
-              </p>
-            </div>
-
-            <div
-              data-slot="grid-background-selector"
-              className="space-y-2 border-t border-border/50 pt-3">
-              <Label className="text-sm font-medium">Grid background</Label>
-              <div className="grid grid-cols-2 gap-2">
-                <Button
-                  type="button"
-                  variant={gridBackground === 'auto' ? 'secondary' : 'outline'}
-                  size="sm"
-                  className="gap-1.5 justify-start"
-                  onClick={() => setGridBackground('auto')}>
-                  <div className="h-4 w-4 rounded border border-border shrink-0 flex items-center justify-center text-xs font-semibold">
-                    A
-                  </div>
-                  <span className="text-xs">Auto</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant={
-                    gridBackground === 'transparent' ? 'secondary' : 'outline'
-                  }
-                  size="sm"
-                  className="gap-1.5 justify-start"
-                  onClick={() => setGridBackground('transparent')}>
-                  <div className="h-4 w-4 rounded border border-border shrink-0 bg-transparent-grid" />
-                  <span className="text-xs">Grid</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant={gridBackground === 'white' ? 'secondary' : 'outline'}
-                  size="sm"
-                  className="gap-1.5 justify-start"
-                  onClick={() => setGridBackground('white')}>
-                  <div className="h-4 w-4 rounded border border-border shrink-0 bg-white" />
-                  <span className="text-xs">White</span>
-                </Button>
-                <Button
-                  type="button"
-                  variant={gridBackground === 'black' ? 'secondary' : 'outline'}
-                  size="sm"
-                  className="gap-1.5 justify-start"
-                  onClick={() => setGridBackground('black')}>
-                  <div className="h-4 w-4 rounded border border-border shrink-0 bg-black" />
-                  <span className="text-xs">Black</span>
-                </Button>
-              </div>
-              <p className="text-xs text-muted-foreground">
-                Background color for the image grid.
               </p>
             </div>
 

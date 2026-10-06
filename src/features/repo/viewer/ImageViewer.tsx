@@ -29,7 +29,8 @@ import {
 import {useScrollLock} from '@/shared/hooks/useScrollLock'
 import {ImageMedia} from '../image-cell/ImageMedia'
 import {formatFileSize} from '@/shared/utils/imageViewer'
-import {useDisplaySettings} from '@/shared/stores/settingStore'
+import {useDisplaySettings, useSettingStore} from '@/shared/stores/settingStore'
+import {ViewerDisplayControls} from '@/features/repo/viewer/ViewerDisplayControls'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {useImageMetadata} from '@/features/repo/viewer/useImageMetadata'
 import {useImageLoading} from '@/features/repo/image-cell/useImageLoading'
@@ -63,7 +64,9 @@ export function ImageViewer({
   const dialogContentRef = useRef<HTMLDivElement>(null)
   const repo = useRepoStore(state => state.repo)
   const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
-  const {pixelated, animationEnabled, gridBackground} = useDisplaySettings()
+  const {pixelated, animationEnabled} = useDisplaySettings()
+  const viewerBackground = useSettingStore(state => state.viewerBackground)
+  const viewerPixelGrid = useSettingStore(state => state.viewerPixelGrid)
   const rafRef = useRef<number | null>(null)
 
   const currentImage = images[currentIndex]
@@ -323,7 +326,7 @@ export function ImageViewer({
       }
 
       const showGrid =
-        gridBackground === 'transparent' &&
+        viewerPixelGrid &&
         !shouldAnimate &&
         !loading &&
         !imageError &&
@@ -338,12 +341,22 @@ export function ImageViewer({
       const containerRect = container.getBoundingClientRect()
       const imgRect = img.getBoundingClientRect()
 
-      const width = Math.max(0, imgRect.width)
-      const height = Math.max(0, imgRect.height)
-      const left = imgRect.left - containerRect.left
-      const top = imgRect.top - containerRect.top
-      const pixelSize =
-        metadata && metadata.width > 0 ? width / metadata.width : 0
+      // The <img> box can be larger than the picture (object-contain leaves
+      // empty bands), so fit the picture's aspect ratio inside the box to find
+      // where its pixels really are.
+      const natWidth = metadata?.width ?? 0
+      const natHeight = metadata?.height ?? 0
+      const fit =
+        natWidth > 0 && natHeight > 0
+          ? Math.min(imgRect.width / natWidth, imgRect.height / natHeight)
+          : 0
+      const width = Math.max(0, natWidth * fit)
+      const height = Math.max(0, natHeight * fit)
+      const left =
+        imgRect.left - containerRect.left + (imgRect.width - width) / 2
+      const top =
+        imgRect.top - containerRect.top + (imgRect.height - height) / 2
+      const pixelSize = fit
 
       // Avoid rendering when too small / unstable.
       const visible =
@@ -375,7 +388,7 @@ export function ImageViewer({
     }
   }, [
     open,
-    gridBackground,
+    viewerPixelGrid,
     shouldAnimate,
     loading,
     imageError,
@@ -439,8 +452,8 @@ export function ImageViewer({
             'data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0',
             'bg-background font-bold',
             'text-foreground',
-            gridBackground === 'white' && 'text-black',
-            gridBackground === 'black' && 'text-white',
+            viewerBackground === 'light' && 'text-black',
+            viewerBackground === 'dark' && 'text-white',
           )}>
           <div
             ref={dialogContentRef}
@@ -477,10 +490,10 @@ export function ImageViewer({
               ref={imageContainerRef}
               className={cn(
                 'relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-56 px-8 sm:pb-28 overflow-hidden',
-                gridBackground === 'auto' && 'bg-background',
-                gridBackground === 'white' && 'bg-white',
-                gridBackground === 'black' && 'bg-black',
-                gridBackground === 'transparent' && 'bg-transparent-grid',
+                viewerBackground === 'auto' && 'bg-background',
+                viewerBackground === 'light' && 'bg-white text-black',
+                viewerBackground === 'dark' && 'bg-black text-white',
+                viewerBackground === 'checker' && 'bg-transparent-grid',
                 isDragging && 'cursor-grabbing',
                 scale > 1 && 'cursor-grab',
               )}
@@ -591,16 +604,15 @@ export function ImageViewer({
                     top: pixelGrid.top,
                     width: pixelGrid.width,
                     height: pixelGrid.height,
+                    // The lines take the text color, which is always readable
+                    // on the current background (white on dark, black on light)
                     backgroundImage: [
                       // vertical lines
-                      `repeating-linear-gradient(90deg, rgba(0,0,0,0.25) 0 1px, rgba(0,0,0,0) 1px ${pixelGrid.pixelSize}px)`,
+                      `repeating-linear-gradient(90deg, currentColor 0 1px, transparent 1px ${pixelGrid.pixelSize}px)`,
                       // horizontal lines
-                      `repeating-linear-gradient(0deg, rgba(0,0,0,0.25) 0 1px, rgba(0,0,0,0) 1px ${pixelGrid.pixelSize}px)`,
+                      `repeating-linear-gradient(0deg, currentColor 0 1px, transparent 1px ${pixelGrid.pixelSize}px)`,
                     ].join(','),
-                    // When the background is dark, black lines are too subtle.
-                    mixBlendMode:
-                      gridBackground === 'black' ? 'screen' : 'multiply',
-                    opacity: 0.7,
+                    opacity: 0.3,
                   }}
                 />
               )}
@@ -710,6 +722,7 @@ export function ImageViewer({
                     </Button>
                   )}
                 </div>
+                <ViewerDisplayControls />
                 <Button
                   type="button"
                   size="sm"
@@ -825,6 +838,10 @@ export function ImageViewer({
                     </Button>
                   )}
                 </div>
+                <ViewerDisplayControls
+                  large
+                  className="justify-center px-2 w-full"
+                />
                 <div className="flex items-center justify-center gap-2 px-2 w-full">
                   <Button
                     type="button"

@@ -40,8 +40,7 @@ function RepoImageViewer({images}: {images: string[]}) {
 }
 
 export default function RepoPage() {
-  const {gridBackground, columnCount, pixelated, animationEnabled} =
-    useDisplaySettings()
+  const {columnCount, pixelated, animationEnabled} = useDisplaySettings()
   const repo = useRepoStore(state => state.repo)
 
   // Sync filter changes
@@ -79,11 +78,7 @@ export default function RepoPage() {
     <section
       aria-label="Repository image viewer"
       className={cn(
-        'flex w-full flex-col gap-3 sm:gap-4 px-1 py-2 sm:px-2',
-        gridBackground === 'auto' && 'bg-background',
-        gridBackground === 'white' && 'bg-white',
-        gridBackground === 'black' && 'bg-black',
-        gridBackground === 'transparent' && 'bg-transparent-grid',
+        'flex w-full flex-col gap-3 sm:gap-4 bg-background px-1 py-2 sm:px-2',
       )}>
       {!error && (
         // A full-width band that holds the toolbar card. It is opaque, so when
@@ -99,11 +94,7 @@ export default function RepoPage() {
             // the header hidden it slides up by the header's height, leaving
             // the band's top padding as the gap above the card.
             'transition-transform duration-200 ease-out in-data-[header=hidden]:-translate-y-(--header-height)',
-            gridBackground === 'white'
-              ? 'bg-white'
-              : gridBackground === 'black'
-                ? 'bg-black'
-                : 'bg-background',
+            'bg-background',
           )}>
           <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3">
             <div className="flex-1 sm:order-2">

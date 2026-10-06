@@ -2,7 +2,14 @@ import {create} from 'zustand'
 import {useMemo} from 'react'
 
 export type Theme = 'system' | 'light' | 'dark'
-export type GridBackground = 'auto' | 'white' | 'black' | 'transparent'
+/** What the image viewer shows behind the image */
+export type ViewerBackground = 'auto' | 'light' | 'dark' | 'checker'
+const VIEWER_BACKGROUNDS: readonly ViewerBackground[] = [
+  'auto',
+  'light',
+  'dark',
+  'checker',
+]
 
 export interface SpriteSettings {
   gap: number
@@ -33,8 +40,12 @@ interface SettingsStore {
   theme: Theme
   setTheme: (theme: Theme) => void
 
-  gridBackground: GridBackground
-  setGridBackground: (background: GridBackground) => void
+  viewerBackground: ViewerBackground
+  setViewerBackground: (background: ViewerBackground) => void
+
+  /** Pixel grid lines over the image in the viewer; independent of the background */
+  viewerPixelGrid: boolean
+  setViewerPixelGrid: (visible: boolean) => void
 
   spriteSettings: SpriteSettings
   setSpriteSettings: (settings: SpriteSettings) => void
@@ -47,7 +58,8 @@ const STORAGE_KEYS = {
   PIXELATED: 'settings.pixelated',
   ANIMATION_ENABLED: 'settings.animationEnabled',
   THEME: 'settings.theme',
-  GRID_BACKGROUND: 'settings.gridBackground',
+  VIEWER_BACKGROUND: 'settings.viewerBackground',
+  VIEWER_PIXEL_GRID: 'settings.viewerPixelGrid',
   SPRITE_SETTINGS: 'settings.spriteSettings',
 } as const
 
@@ -88,6 +100,9 @@ const getBooleanFromStorage = (key: string, defaultValue: boolean): boolean => {
   if (stored === null) return defaultValue
   return stored !== 'false'
 }
+
+// The gallery background setting was removed; drop its stored value
+localStorage.removeItem('settings.gridBackground')
 
 export const useSettingStore = create<SettingsStore>((set, get) => ({
   githubToken: localStorage.getItem(STORAGE_KEYS.GITHUB_TOKEN) || '',
@@ -130,12 +145,23 @@ export const useSettingStore = create<SettingsStore>((set, get) => ({
     localStorage.setItem(STORAGE_KEYS.THEME, theme)
   },
 
-  gridBackground:
-    (localStorage.getItem(STORAGE_KEYS.GRID_BACKGROUND) as GridBackground) ||
-    'auto',
-  setGridBackground: (background: GridBackground) => {
-    set({gridBackground: background})
-    localStorage.setItem(STORAGE_KEYS.GRID_BACKGROUND, background)
+  viewerBackground:
+    VIEWER_BACKGROUNDS.find(
+      background =>
+        background === localStorage.getItem(STORAGE_KEYS.VIEWER_BACKGROUND),
+    ) ?? 'auto',
+  setViewerBackground: (background: ViewerBackground) => {
+    set({viewerBackground: background})
+    localStorage.setItem(STORAGE_KEYS.VIEWER_BACKGROUND, background)
+  },
+
+  viewerPixelGrid: getBooleanFromStorage(STORAGE_KEYS.VIEWER_PIXEL_GRID, false),
+  setViewerPixelGrid: (viewerPixelGrid: boolean) => {
+    set({viewerPixelGrid})
+    localStorage.setItem(
+      STORAGE_KEYS.VIEWER_PIXEL_GRID,
+      viewerPixelGrid.toString(),
+    )
   },
 
   spriteSettings: (() => {
@@ -177,7 +203,6 @@ export type DisplaySettings = {
   columnCount: number
   pixelated: boolean
   animationEnabled: boolean
-  gridBackground: GridBackground
 }
 
 /**
@@ -188,15 +213,13 @@ export function useDisplaySettings(): DisplaySettings {
   const columnCount = useSettingStore(state => state.filledColumnCount)
   const pixelated = useSettingStore(state => state.pixelated)
   const animationEnabled = useSettingStore(state => state.animationEnabled)
-  const gridBackground = useSettingStore(state => state.gridBackground)
 
   return useMemo(
     () => ({
       columnCount,
       pixelated,
       animationEnabled,
-      gridBackground,
     }),
-    [columnCount, pixelated, animationEnabled, gridBackground],
+    [columnCount, pixelated, animationEnabled],
   )
 }

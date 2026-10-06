@@ -23,7 +23,6 @@ export function useSettingsSave({
     settings.setPixelated(formValues.pixelated)
     settings.setAnimationEnabled(formValues.animationEnabled)
     settings.setTheme(formValues.theme)
-    settings.setGridBackground(formValues.gridBackground)
     // Update initial values after saving
     setInitialValues(formValues)
   }, [formValues, setInitialValues, settings])
