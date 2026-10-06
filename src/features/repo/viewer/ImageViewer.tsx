@@ -661,9 +661,9 @@ export function ImageViewer({
                   </div>
                   {hasNext && (
                     <Button
-                      variant="ghost"
+                      variant="outline"
                       size="icon"
-                      className="size-14 min-w-14 overlay-button shrink-0"
+                      className="size-14 min-w-14 shrink-0"
                       onClick={handleNext}
                       aria-label="Next image">
                       <ChevronRight className="size-10" />
