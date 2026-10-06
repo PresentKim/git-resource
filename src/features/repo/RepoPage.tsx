@@ -7,9 +7,8 @@ import {FilterToolbar} from '@/features/repo/filter/FilterToolbar'
 import {FilterInput} from '@/features/repo/filter/FilterInput'
 import {Button} from '@/shared/components/ui/button'
 import {ImageViewer} from '@/features/repo/viewer/ImageViewer'
+import {RepoEmptyState} from '@/features/repo/RepoEmptyState'
 
-import {generateNoImagesMessage} from '@/shared/utils/randomMessages'
-import {RandomMessageLoader} from '@/shared/components/RandomMessageLoader'
 import {useDisplaySettings} from '@/shared/stores/settingStore'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {useFilterSync} from '@/features/repo/filter/useFilterSync'
@@ -175,16 +174,7 @@ export default function RepoPage() {
       ) : !error &&
         imageFiles !== null &&
         (!filteredImageFiles || !filteredImageFiles.length) ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border/60 bg-card/40 p-6 text-center">
-          <RandomMessageLoader provider={generateNoImagesMessage} />
-          <div className="space-y-2 text-xs text-muted-foreground">
-            <p>No images were found for this repository and filter.</p>
-            <ul className="space-y-1 text-left">
-              <li>· Make sure the repo contains PNG/JPEG/GIF/SVG images.</li>
-              <li>· Check that the filter does not exclude everything.</li>
-            </ul>
-          </div>
-        </div>
+        <RepoEmptyState />
       ) : !error && filteredImageFiles && filteredImageFiles.length > 0 ? (
         <>
           <div role="region" aria-label="Image gallery" aria-live="polite">
