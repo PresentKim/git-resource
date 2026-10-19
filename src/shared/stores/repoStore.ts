@@ -121,6 +121,12 @@ interface RepoStore {
   resetRepoState: () => void
 }
 
+/**
+ * Incremented on every filter request and reset, so a filter pass scheduled
+ * earlier cannot overwrite the result of a newer request when it runs later
+ */
+let filterRequestId = 0
+
 const initialRepo: GithubRepo = {
   owner: '',
   name: '',
@@ -164,6 +170,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   },
 
   updateFilteredImages: (filter: string, sort = DEFAULT_SORT_MODE) => {
+    const requestId = ++filterRequestId
     const {imageFiles, filterCache} = get()
     if (!imageFiles) {
       // Don't set isFiltering to false if images haven't loaded yet
@@ -185,6 +192,8 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     // Use requestAnimationFrame to allow UI to update before filtering
     // This ensures the loading state is visible
     requestAnimationFrame(() => {
+      if (requestId !== filterRequestId) return
+
       const {imageFiles: currentImageFiles} = get()
       if (!currentImageFiles) {
         set({filteredImageFiles: null, isFiltering: false})
@@ -224,6 +233,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   },
 
   resetRepoState: () => {
+    filterRequestId++
     set({
       imageFiles: null,
       filteredImageFiles: null,
