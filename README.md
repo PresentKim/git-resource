@@ -1,136 +1,133 @@
 # Git Resource Viewer
 
-A single-page web app for previewing image files from a GitHub repository URL
+A single-page web app for browsing every image in a GitHub repository, from
+just its URL.
 
-[Live Demo](https://gitresource.com)
+[Live demo](https://gitresource.com)
 
 ## Features
 
-- **GitHub Repository Image Retrieval**  
-  Fetch and display all image files from public or private GitHub repositories. Automatically detects the default branch.
-
-- **Image Filtering**  
-  Filter images by including or excluding specific keywords (e.g., `keyword -exclude` format).
-
-- **Image ZIP Download**  
-  Download all filtered images as a ZIP file in bulk.
-
-- **Image Viewer**  
-  Click any image to view it in full-screen. Navigate with arrow keys or mouse wheel, and download individual images.
-
-- **Minecraft Animation Support**  
-  Supports `.mcmeta` sprite sheet animations from Minecraft resource packs with canvas-based rendering.
-
-- **Custom Virtual Scrolling**  
-  Optimized rendering performance for thousands of images using a custom virtual scrolling system with IntersectionObserver.
-
-- **GitHub API Caching**  
-  Hybrid caching strategy using IndexedDB and localStorage to prevent API rate limit issues. ETag-based HTTP 304 response handling minimizes API calls.
-
-- **GitHub Personal Access Token Support**  
-  Enter your GitHub personal access token to access private repositories and increase API request limits.
-
-- **User Settings**  
-  Customize grid column count (auto/manual), pixelated rendering, and Minecraft animation settings.
-
-- **URL Sharing**  
-  Share filtered views with others through URL query parameters.
-
-- **Responsive UI**  
-  Optimized user experience across different screen sizes.
+- **Every image in a repository, in one grid.** Enter a repository and the app
+  finds its default branch, lists all PNG, JPEG, GIF, WebP and SVG files, and
+  shows them in a virtualized grid that stays smooth with tens of thousands of
+  images.
+- **Filter, browse folders and sort.** Filter paths with keywords (`sword -old`
+  keeps paths containing "sword" and drops those containing "old"), step
+  through folders, and sort by path or file name in either direction.
+- **Full-screen viewer.** Open any image to see it large, with its size and
+  format. Move between images with the arrow buttons or keys, zoom with the
+  buttons, Ctrl/Cmd + wheel or a pinch, drag to pan, and switch to 1:1 or to
+  the largest size that fits. A transparency checkerboard and a pixel grid can
+  be turned on. Each image can be downloaded or opened on GitHub.
+- **Download as ZIP.** Download all filtered images at once, keeping the
+  original folders, only the last folder, or no folders (duplicate names are
+  numbered).
+- **Screenshot (sprite sheet).** Combine the filtered images into one PNG,
+  with a chosen gap, background, scale and column count.
+- **Minecraft texture animation.** Textures with a `.mcmeta` file play their
+  animation in the grid and in the viewer.
+- **Shareable views.** The filter, the sort order and the open image are kept
+  in the URL, so a link reopens the same view.
+- **Settings.** Light, dark or system theme, pixelated rendering, animation on
+  or off, and an optional GitHub personal access token. The grid density is
+  set from the toolbar.
 
 ## Usage
 
-1. Enter a GitHub repository URL in the input field (e.g., `https://github.com/owner/repo`).
-2. Or select one of the example repositories.
-3. The app automatically detects the default branch and fetches all image files.
-4. Use the filter input to include/exclude images by keywords.
-5. Click on any image to view it in full-screen viewer.
-6. Use arrow keys or mouse wheel to navigate between images in the viewer.
-7. Click "Download Filtered" to download all filtered images as a ZIP file.
-8. Adjust settings (gear icon) to customize your experience (grid columns, pixelated rendering, animations).
+1. Paste a repository into the input on the home page, or pick an example.
+   These forms all work:
+   - `owner/repo`, `owner/repo@ref` or `owner/repo/ref`
+   - `https://github.com/owner/repo`, including `/tree/<ref>` and
+     `/commit/<sha>` links
+   - `git@github.com:owner/repo.git`
+2. Without a ref, the default branch is used. A branch, a tag or a commit SHA
+   can be given as the ref.
+3. Filter, sort or browse folders from the toolbar, then click an image (or
+   focus it and press Enter) to open the viewer.
 
-## Technologies
+### URL parameters
 
-### Frontend
+| Parameter | Example          | Meaning                                              |
+| --------- | ---------------- | ---------------------------------------------------- |
+| `filter`  | `?filter=gui`    | Keywords to include, and `-keyword` to exclude       |
+| `sort`    | `?sort=name`     | `path` (default), `path-desc`, `name` or `name-desc` |
+| `image`   | `?image=a/b.png` | The image open in the viewer                         |
 
-- **React** (`^19.0.0`) – Modern UI library with concurrent rendering
-- **TypeScript** (`~5.7.2`) – Static type checking
-- **Vite** (`^6.1.0`) – Fast build tool with HMR
+### Viewer keys
 
-### State Management & Routing
+| Key              | Action                |
+| ---------------- | --------------------- |
+| ← / →            | Previous / next image |
+| Esc              | Close the viewer      |
+| Ctrl/Cmd + wheel | Zoom at the pointer   |
 
-- **Zustand** (`^5.0.3`) – Lightweight state management
-- **nuqs** (`^2.4.0`) – URL query parameter state management
-- **React Router** (`^7.1.5`) – Client-side routing
+## GitHub API and rate limits
 
-### Styling
+The image list comes from the GitHub REST API, which allows 60 requests per
+hour without a token. To stay within that:
 
-- **Tailwind CSS** (`^4.0.6`) – Utility-first CSS framework
-- **tailwind-merge** (`^3.0.1`) – Smart class merging
-- **clsx** (`^2.1.1`) – Conditional class names
+- Each response is cached in IndexedDB. For an hour the cached list is used
+  without asking GitHub at all; after that it is revalidated with its ETag,
+  and an unchanged list is reused instead of downloaded again.
+- If the API refuses a request (rate limit) or returns a truncated tree (very
+  large repositories), the app falls back to the repository's ZIP archive,
+  and to the repository page for the default branch.
 
-### Performance Optimization
+Adding a personal access token in the settings raises the limit to 5,000
+requests per hour. The token is stored unencrypted in this browser only and is
+sent only to `api.github.com`.
 
-- **Web Workers** – Asynchronous processing for heavy operations
-- **IndexedDB** (via `idb-keyval`) – Large-scale caching
-- **Custom Virtual Scrolling** – Efficient rendering of thousands of images
-
-### UI Components
-
-- **Radix UI** – Accessible component primitives (Shadcn-based)
-- **Lucide React** – Icon library
-
-### Utilities
-
-- **jszip** (`^3.10.1`) – ZIP file creation
-- **file-saver** (`^2.0.5`) – File download handling
-
-### Tooling & Code Quality
-
-- **ESLint** (`^9.19.0`) – Code linting
-- **Prettier** (`^3.5.1`) – Code formatting
-- **TypeScript ESLint** (`^8.22.0`) – TypeScript linting
-
-### Deployment
-
-- **Vercel** – Static site hosting with automatic deployments
-
-## Project Overview
-
-For more details, refer to the full project overview:
-
-- [📄 PROJECT_OVERVIEW (Korean)](./PROJECT_OVERVIEW.kor.md)
-- [📄 PROJECT_OVERVIEW (English)](./PROJECT_OVERVIEW.md)
+Images themselves are loaded from `raw.githubusercontent.com`, which serves
+public repositories only, so private repositories are not supported.
 
 ## Development
 
+Requirements: Node.js 22 or later. Yarn 4 is included in the repository
+(`.yarn/releases`), and dependencies use Plug'n'Play (no `node_modules`).
+
 ```bash
-# Install dependencies
-yarn install
-
-# Start development server
-yarn dev
-
-# Build for production
-yarn build
-
-# Preview production build
-yarn preview
-
-# Lint code
-yarn eslint:lint
-
-# Fix linting issues
-yarn eslint:fix
-
-# Check code formatting
-yarn format:lint
-
-# Format code
-yarn format:fix
+yarn install      # install dependencies
+yarn dev          # start the dev server at http://localhost:5173
+yarn build        # type-check and build to dist/
+yarn preview      # serve the production build
+yarn eslint:lint  # lint (eslint:fix to fix)
+yarn format:lint  # check formatting (format:fix to format)
 ```
+
+The Yarn cache in `.yarn/cache` is committed with the Linux native binaries
+that CI needs. On Windows or macOS, run `yarn install` once after cloning so
+Yarn fetches the binaries for your platform (Vite cannot start without them),
+and leave the extra cache files it adds uncommitted.
+
+The ZIP and `.mcmeta` fallbacks fetch from GitHub through same-origin proxy
+paths: `/proxy/github`, `/proxy/raw` and `/proxy/codeload`. The dev server
+provides them in `vite.config.ts`, and production provides them with the
+rewrites in `vercel.json`.
+
+### Project structure
+
+```text
+src/
+  features/
+    home/       Home page and repository input
+    repo/       Gallery page: grid cells, filter toolbar, viewer, downloads
+  shared/
+    api/github/ Web Workers that call the GitHub API, with caching and fallbacks
+    components/ Layout, virtualized grid and UI primitives
+    hooks/      Shared React hooks
+    stores/     Zustand stores (repository, settings, rate limit)
+    utils/      URL parsing, sorting, .mcmeta parsing, image helpers
+```
+
+## Tech stack
+
+React 19 with the React Compiler, TypeScript, Vite (Rolldown), Tailwind CSS 4,
+Base UI components in the shadcn style, Zustand, TanStack Query, nuqs, React
+Router, idb-keyval, JSZip, UPNG.js and Lucide icons. Deployed on Vercel.
+
+For the design and the problems it solves, see the project overview:
+[English](./PROJECT_OVERVIEW.md) · [한국어](./PROJECT_OVERVIEW.kor.md).
 
 ## License
 
-This project is licensed under the MIT License.
+[MIT](./LICENSE)
