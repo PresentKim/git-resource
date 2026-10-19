@@ -1,129 +1,163 @@
 ## Project Overview: Git Resource Viewer
 
-### 1. Project Introduction
+[한국어](./PROJECT_OVERVIEW.kor.md) · [README](./README.md)
 
-**Git Resource Viewer** is a **single-page web app** for previewing image files from a GitHub repository URL.
-It is deployed via Vercel and utilizes **custom virtual scrolling** and **Web Worker** techniques to efficiently explore all images within a repository.
+### 1. Introduction
+
+**Git Resource Viewer** is a single-page web app that shows every image in a
+GitHub repository from just its URL. It runs entirely in the browser and is
+deployed on Vercel, which also proxies a few GitHub endpoints that do not allow
+cross-origin requests.
+
+It was built for browsing large asset repositories, such as Minecraft mods and
+resource packs with thousands of textures, where GitHub's own file browser
+shows one folder at a time.
 
 ### 2. Key Features
 
-- **GitHub Repository Image Retrieval**  
-  Users can enter a GitHub repository URL or select an example repository to fetch and display all image files stored within that repository. The default branch is automatically detected to retrieve the image list.
+- **Repository image listing**: finds the default branch when none is given and
+  lists every image (PNG, JPEG, GIF, WebP, SVG) in the repository.
+- **Filter, folders and sort**: include and exclude keywords
+  (`keyword -exclude`), a folder browser, and sorting by path or file name.
+- **Full-screen viewer**: keyboard, wheel and touch navigation, zoom and pan,
+  1:1 and fit-to-screen, a transparency checkerboard and a pixel grid, and
+  per-image download and GitHub links.
+- **Bulk export**: a ZIP of the filtered images (original, last-folder-only or
+  flat folder layout) and a sprite-sheet PNG ("Screenshot") of them.
+- **Minecraft animation**: `.mcmeta` animations play in the grid and the viewer.
+- **Shareable state**: the filter, sort order and open image live in the URL.
+- **Settings**: theme, pixelated rendering, animation, and an optional GitHub
+  personal access token.
 
-- **URL Sharing**  
-  Routing is implemented using React Router's BrowserRouter, and filter settings are stored in query parameters through the nuqs library, allowing the same view to be recreated when sharing a URL.
+### 3. Architecture
 
-- **Image Filtering**  
-  Users can filter images by including or excluding specific keywords (case-insensitive). (Example: `keyword -exclude` format)
+```text
+URL  /owner/repo/ref?filter=…&sort=…&image=…
+ │
+ ├─ useRepoPath ─ parses the path (owner/repo, @ref, /tree/, /commit/, SSH)
+ │
+ ├─ no ref ──► default-branch worker ──► redirect to /owner/repo/<branch>
+ │
+ └─ ref ─────► image-tree worker ──► repo store ──► filter + sort ──► virtual grid
+                 │                                                    │
+                 ├─ IndexedDB cache (1 h, then ETag revalidation)     ├─ cells load from
+                 ├─ GitHub REST API (git/trees, recursive)            │  raw.githubusercontent.com
+                 └─ fallback: ZIP archive via /proxy/codeload         └─ viewer (?image=)
+```
 
-- **Image ZIP Download**  
-  All filtered images can be downloaded as a ZIP file in bulk.
+- **Workers**: each GitHub request runs in its own Web Worker that is
+  terminated when it answers or when the request is aborted, so concurrent
+  requests cannot mix up their responses. The workers share an abstract
+  `BaseGithubWorker` that handles caching, ETags, rate-limit headers and the
+  fallback path.
+- **Query layer**: TanStack Query deduplicates and shares results in memory;
+  the workers own the persistent cache, so no query persister is needed.
+- **State**: Zustand stores hold the repository, its file list and the
+  settings; nuqs keeps the filter, sort and open image in the URL.
+- **Rendering**: the grid computes which rows are on screen from the scroll
+  position and renders only those (plus a few rows of overscan). Cells take
+  everything as props and are memoized, so thousands of cells do not each
+  subscribe to a store.
 
-- **Image Viewer**  
-  Click on any image to view it in a full-screen viewer. Navigate between images using keyboard arrow keys or mouse wheel, and download individual images.
+### 4. Technology Stack and Rationale
 
-- **Minecraft Animation Support**  
-  Parses `.mcmeta` files from Minecraft resource packs to support sprite sheet animations. Canvas-based animation rendering accurately plays game textures.
+- **React 19 + React Compiler, TypeScript, Vite (Rolldown)**: lazy-loaded
+  routes keep the first load small, the compiler memoizes components
+  automatically, and strict TypeScript catches mistakes early.
+- **Tailwind CSS 4 + Base UI (shadcn-style components)**: utility classes with
+  theme tokens for light and dark themes, on accessible unstyled primitives.
+- **Zustand**: small stores with selector subscriptions, cheap enough to keep
+  re-renders of a large grid under control.
+- **nuqs + React Router**: URL query parameters as React state, so every view
+  can be shared as a link.
+- **TanStack Query**: request deduplication and loading and error state for
+  the worker calls.
+- **idb-keyval (IndexedDB)**: persistent cache that is also reachable from Web
+  Workers, with localStorage as a fallback.
+- **JSZip, file-saver, UPNG.js, Canvas API**: ZIP export, sprite-sheet PNG
+  export, and APNG encoding for Minecraft animations.
+- **Vercel**: static hosting plus rewrites that proxy `github.com`,
+  `raw.githubusercontent.com` and `codeload.github.com` for the fallbacks.
 
-- **Custom Virtual Scrolling**  
-  Instead of react-virtualized, a custom virtual scrolling system is implemented to optimize rendering performance for large numbers of images. IntersectionObserver is used to render only visible images.
+### 5. Problem-Solving Cases
 
-- **GitHub API Request Caching**  
-  A hybrid caching strategy using IndexedDB and localStorage is implemented to prevent functionality interruption due to API rate limits. ETag-based HTTP 304 response handling minimizes API calls.
+#### Rendering thousands of images
 
-- **Support for GitHub Personal Access Tokens**  
-  Users can enter their GitHub personal access token to perform authenticated requests, increasing the API request limit and enabling access to private repositories.
+**Problem**: rendering every image of a large repository made the page lag,
+and images appeared late after filtering or jumping.  
+**Solution**: a custom virtualized grid and scroll-aware image loading.
 
-- **User Settings**  
-  Customizable settings such as grid column count adjustment (auto/manual), pixelated rendering options, and Minecraft animation enable/disable are provided.
+- Only the rows in and around the viewport are rendered, computed from the
+  scroll offset and the measured row height.
+- Cells are memoized and receive stable props, so scrolling re-renders only
+  the rows that enter or leave.
+- Cells start loading their image right away unless the page is scrolling
+  faster than 2,500 px/s, in which case they wait until it slows down (at most
+  300 ms). On a mocked 30,000-image repository, filtering back to a folder
+  that was already seen went from 349 ms to 2 ms until its images were
+  complete.
 
-- **Responsive UI**  
-  The application is designed to provide an optimal user experience across different screen sizes.
+#### Keeping the main thread free
 
-### 3. Technology Stack & Justification
+**Problem**: processing the file list of very large repositories froze the
+browser (up to 30 seconds).  
+**Solution**: Web Worker-based request and processing pipeline.
 
-- **Frontend**: React 19, TypeScript, Vite  
-  Code splitting using React 19's Suspense and Lazy Loading optimizes initial loading performance, and TypeScript ensures type safety.
+- Fetching the file tree, unzipping the fallback archive and picking out the
+  image files all run in workers built on one abstract base class.
+- Each worker has its own caching and error recovery, and the main thread only
+  receives the finished list.
 
-- **Styling**: Tailwind CSS  
-  A utility-first approach enables rapid and intuitive styling, reducing redundant code and improving readability.
+#### Working within GitHub's API rate limit
 
-- **State Management**: Zustand  
-  A lightweight state management library that reduces unnecessary complexity, optimizes performance, and improves maintainability with a simple API.
+**Problem**: unauthenticated clients get 60 API requests per hour, so a few
+large repositories could stop the app.  
+**Solution**: layered caching and fallbacks that avoid the API.
 
-- **URL State Management**: nuqs  
-  Integrated with React Router, it allows easy management of URL query parameters as React state, enabling filter setting sharing functionality.
+- Responses are cached in IndexedDB for an hour and revalidated with ETags
+  afterwards (HTTP 304 keeps the cached list).
+- When the API refuses a request or returns a truncated tree, the image list
+  comes from the repository's ZIP archive instead, and the default branch from
+  the repository page's HTML.
+- `.mcmeta` files are fetched through a proxy before the API is used.
+- A personal access token can be added to raise the limit to 5,000 per hour.
 
-- **Component Library**: Radix UI (Shadcn-based)  
-  Prebuilt UI components with accessibility in mind accelerate development while ensuring consistent design.
+#### A fallback that the browser blocked
 
-- **Data Caching**: IndexedDB (idb-keyval)  
-  IndexedDB Storage is used for large-scale caching. A hybrid caching system is implemented with localStorage as a fallback for unsupported browsers.
+**Problem**: the ZIP fallback never finished. GitHub answers
+`github.com/<repo>/archive/<ref>.zip` with a redirect to
+`codeload.github.com`, which only allows cross-origin reads from GitHub's own
+domain, so the browser blocked the redirected download. The archive URL also
+only resolved branches, not tags or commits.  
+**Solution**: a dedicated `/proxy/codeload` route (Vite in development,
+Vercel rewrites in production) that requests `codeload.github.com/<repo>/zip/<ref>`
+directly. That URL needs no redirect and resolves branches, tags and full
+commit SHAs.
 
-- **Routing**: React Router (BrowserRouter)  
-  Routing is implemented for static sites through Vercel's redirect configuration.
+### 6. Achievements and Reflection
 
-- **Performance Optimization**: Custom Virtual Scrolling + Web Workers  
-  A custom virtual scrolling system is implemented instead of react-virtualized to reduce bundle size and optimize scroll performance. Web Workers are utilized to offload heavy data processing tasks from the main thread, preventing browser freezing.
+#### Technical growth
 
-- **Image Download**: jszip, file-saver  
-  Functionality to compress and download multiple images as a ZIP file is implemented.
+- Performance work with browser APIs: virtualization, Web Workers, IndexedDB
+  and image decoding.
+- Designing a client-side strategy around an external API's limits instead of
+  adding a backend.
+- Using the type system and a small number of well-defined stores to keep a
+  growing codebase stable.
 
-- **Animation Rendering**: Canvas API  
-  Parses Minecraft `.mcmeta` files to implement sprite sheet animations using Canvas API.
+#### Architecture
 
-- **Deployment**: Vercel  
-  The application is deployed as a static site via Vercel without separate server management. Automatic deployment occurs on commits through GitHub integration.
+- A worker-based asynchronous pipeline with a shared base class for caching,
+  revalidation and fallbacks.
+- A cache that works the same way from workers and the main thread.
+- Error states that name the cause (rate limit, missing repository, failed
+  image) and offer a way forward.
 
-### 4. Problem-Solving Cases
+#### Lessons
 
-#### Large-Scale Image Rendering Issue
-
-**Problem**: Browser lag when rendering thousands of images  
-**Solution**: Custom virtual scrolling system implementation
-
-- Optimize memory usage by rendering only visible images using IntersectionObserver
-- Implement responsive layout through dynamic grid size calculation
-- Provide seamless user experience during scrolling through overscan area management
-
-#### Browser Freezing Issue
-
-**Problem**: Browser freezing during processing of thousands of file lists (up to 30 seconds)  
-**Solution**: Web Worker-based asynchronous processing system implementation
-
-- Ensure reusability through abstract class-based Worker system design
-- Implement independent caching and error recovery mechanisms for each Worker
-- Design efficient communication structure between main thread and Workers
-
-#### GitHub API Rate Limit Resolution
-
-**Problem**: Service interruption risk due to 50 requests per hour API limit  
-**Solution**: Multi-layered caching strategy and rate limit bypass logic implementation
-
-- Minimize API calls through ETag-based HTTP 304 response handling
-- Build hybrid caching system using IndexedDB as primary storage with localStorage as fallback
-- Design abstracted caching interface accessible from Worker environment with the same interface
-- Implement fallback data collection logic through HTML parsing when API fails
-
-### 5. Achievements and Reflection
-
-#### Technical Growth
-
-- Gained experience in performance optimization using browser APIs
-- Enhanced ability to design stable codebase based on type systems
-- Developed skills in establishing optimization strategies for large-scale data processing
-- Improved ability to efficiently utilize external APIs with limitations and design client-side strategies to complement them
-
-#### Architecture Design Experience
-
-- Designed Worker-based asynchronous processing architecture
-- Implemented caching system utilizing multiple storage solutions
-- Designed stable system with error recovery mechanisms
-- Gained practical experience in caching strategies, state management, and asynchronous flow control in React applications
-
-#### Problem-Solving Capabilities
-
-- Learned that asynchronous processing is necessary even for data refinement tasks with large datasets
-- Established strategies to overcome API limitations through multi-layered caching
-- Implemented optimization strategies considering both performance and user experience
-- Gained experience in designing efficient communication structures between Worker environment and main thread
+- Even "simple" data refinement needs to leave the main thread once the data
+  is large.
+- A fallback path needs to be tested end to end in the browser: a redirect
+  that works with `curl` can still be blocked by CORS.
+- Performance and user experience have to be measured together; loading
+  images sooner mattered as much as rendering fewer of them.
