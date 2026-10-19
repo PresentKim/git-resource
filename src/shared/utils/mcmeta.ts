@@ -3,6 +3,8 @@
  * Based on: https://minecraft.wiki/w/Resource_pack#Animation
  */
 
+import {encodePathSegments} from './github'
+
 export interface McmetaFrame {
   /** Frame index in the sprite sheet */
   index: number
@@ -180,11 +182,16 @@ function parseGithubRawUrl(url: string): {
   if (!match) {
     return null
   }
-  return {
-    owner: match[1],
-    repo: match[2],
-    ref: match[3],
-    path: match[4],
+  try {
+    // Raw URLs are built with percent-encoded segments; keep the plain names
+    return {
+      owner: match[1],
+      repo: match[2],
+      ref: decodeURIComponent(match[3]),
+      path: decodeURIComponent(match[4]),
+    }
+  } catch {
+    return null
   }
 }
 
@@ -198,7 +205,7 @@ async function fetchViaGitHubApi(
   path: string,
   token?: string | null,
 ): Promise<McmetaData | null> {
-  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodeURIComponent(path)}?ref=${encodeURIComponent(ref)}`
+  const apiUrl = `https://api.github.com/repos/${owner}/${repo}/contents/${encodePathSegments(path)}?ref=${encodeURIComponent(ref)}`
 
   const headers: HeadersInit = {
     Accept: 'application/vnd.github.v3+json',
@@ -248,7 +255,7 @@ async function fetchViaProxy(
       const parsed = parseGithubRawUrl(url)
       if (parsed) {
         // Build relative path: /proxy/raw/owner/repo/ref/path
-        proxyUrl = `${proxyBase}${parsed.owner}/${parsed.repo}/${parsed.ref}/${parsed.path}`
+        proxyUrl = `${proxyBase}${parsed.owner}/${parsed.repo}/${encodePathSegments(parsed.ref)}/${encodePathSegments(parsed.path)}`
       } else {
         // If URL parsing fails, try next proxy
         return fetchViaProxy(url, proxyIndex + 1)

@@ -100,16 +100,23 @@ export function parseGithubUrl(url: string): GithubRepo | null {
 }
 
 /**
+ * Percent-encode each segment of a slash-separated path, keeping the slashes,
+ * so names with spaces, '#', '?' or '%' stay part of the path
+ */
+export function encodePathSegments(path: string): string {
+  return path.split('/').map(encodeURIComponent).join('/')
+}
+
+/**
  * Create a direct image URL from GitHub
  */
 export function createRawImageUrl(repo: GithubRepo, path: string): string {
-  return `https://raw.githubusercontent.com/${repo.owner}/${repo.name}/${repo.ref}/${path}`
+  return `https://raw.githubusercontent.com/${repo.owner}/${repo.name}/${encodePathSegments(repo.ref)}/${encodePathSegments(path)}`
 }
 
 /**
  * Create the github.com page URL of a file in the repository
  */
 export function createGithubBlobUrl(repo: GithubRepo, path: string): string {
-  const encodedPath = path.split('/').map(encodeURIComponent).join('/')
-  return `https://github.com/${repo.owner}/${repo.name}/blob/${repo.ref}/${encodedPath}`
+  return `https://github.com/${repo.owner}/${repo.name}/blob/${encodePathSegments(repo.ref)}/${encodePathSegments(path)}`
 }
