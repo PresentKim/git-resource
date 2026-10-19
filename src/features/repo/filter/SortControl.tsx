@@ -40,7 +40,7 @@ export const SortControl = memo(function SortControl() {
               aria-checked={sort === mode}
               onClick={() => setSort(mode)}
               className={cn(
-                'flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors outline-none',
+                'flex w-full items-center justify-between gap-2 rounded px-2 py-1.5 text-left text-xs transition-colors outline-none max-sm:py-2.5',
                 'focus-visible:ring-2 focus-visible:ring-ring',
                 sort === mode
                   ? 'bg-primary font-semibold text-primary-foreground'

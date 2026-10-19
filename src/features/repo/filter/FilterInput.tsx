@@ -22,7 +22,7 @@ function FilterHelpPopover() {
       <PopoverTrigger
         aria-label="Filter syntax help"
         render={
-          <Button variant="ghost">
+          <Button variant="ghost" className="max-sm:h-8">
             <CircleHelp className="size-5" />
           </Button>
         }
@@ -95,7 +95,8 @@ export function FilterInput() {
   const isApplied = filterInput.trim() === filterQuery.trim()
 
   return (
-    <InputGroup>
+    // Taller on phones, where the buttons are tapped
+    <InputGroup className="max-sm:h-9">
       <InputGroupInput
         ref={inputRef}
         value={filterInput}
@@ -110,6 +111,7 @@ export function FilterInput() {
           <InputGroupButton
             aria-label="Clear filter"
             title="Clear filter (Esc)"
+            className="max-sm:h-8 max-sm:px-1.5"
             onClick={handleClearFilter}>
             <X className="size-5" />
           </InputGroupButton>
@@ -118,6 +120,7 @@ export function FilterInput() {
         <InputGroupButton
           aria-label="Apply filter"
           title="Apply filter (Enter)"
+          className="max-sm:h-8 max-sm:px-1.5"
           onClick={handleApplyFilter}
           disabled={isApplied}>
           <Filter className="size-5" />

@@ -82,7 +82,7 @@ export default function HomePage() {
             type="button"
             variant="outline"
             size="sm"
-            className="flex items-center gap-1 text-xs"
+            className="flex items-center gap-1 text-xs max-sm:size-9"
             onClick={handleRerollExamples}
             disabled={isRerolling}
             aria-label="Shuffle example repositories">
@@ -116,6 +116,8 @@ export default function HomePage() {
                     'text-ellipsis whitespace-nowrap text-sm text-foreground',
                     'animate-fade-in-slide transition-all duration-150',
                     'hover:bg-accent/20 hover:text-foreground hover:scale-102',
+                    // Taller on phones, where they are tapped
+                    'max-sm:h-10',
                   )}
                   style={{
                     animationDelay: `${index * 50}ms`,

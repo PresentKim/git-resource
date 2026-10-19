@@ -8,7 +8,12 @@ import {useRepoStore} from '@/shared/stores/repoStore'
 
 function HomeButton() {
   return (
-    <NavLink to="/" aria-label="Home Button" className="select-none">
+    // The padding enlarges the tap area and the negative margin keeps the
+    // header's layout as it was
+    <NavLink
+      to="/"
+      aria-label="Home"
+      className="-m-1 rounded-md p-1 select-none">
       <LogoIcon className="size-8" />
     </NavLink>
   )

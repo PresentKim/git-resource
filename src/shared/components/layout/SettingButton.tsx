@@ -160,7 +160,12 @@ export function SettingButton() {
     <Dialog open={isOpen} onOpenChange={handleOpenChange} modal={false}>
       <DialogTrigger
         render={
-          <Button aria-label="Settings" variant="ghost">
+          // A larger tap area on phones; the negative margin keeps the
+          // header's height
+          <Button
+            aria-label="Settings"
+            variant="ghost"
+            className="max-sm:-my-1.5 max-sm:size-10">
             <SettingsIcon className="size-5" />
           </Button>
         }

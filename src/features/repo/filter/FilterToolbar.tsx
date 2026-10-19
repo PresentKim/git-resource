@@ -84,7 +84,8 @@ export const FilterToolbar = memo(function FilterToolbar() {
         totalCount={totalCount}
         firstVisibleIndex={firstVisibleIndex}
       />
-      <div className="flex flex-wrap items-center gap-2">
+      {/* Taller buttons on phones, where they are tapped */}
+      <div className="flex flex-wrap items-center gap-2 max-sm:[&>button]:h-9 max-sm:[&>button]:min-w-9">
         <FolderBrowser />
         <SortControl />
         <DensityControl />
