@@ -101,8 +101,10 @@ export default function RepoPage() {
             'max-sm:in-data-[header=hidden]:[&:not(:focus-within)]:-translate-y-[calc(100%+var(--header-height))]',
             'bg-background',
           )}>
-          <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm sm:flex-row sm:items-center sm:gap-3">
-            <div className="flex-1 sm:order-2">
+          {/* The filter sits beside the toolbar only from xl; below that the
+              toolbar needs the full width to stay on one row */}
+          <div className="flex flex-col gap-2 rounded-lg border border-border/60 bg-card p-2 shadow-sm xl:flex-row xl:items-center xl:gap-3">
+            <div className="flex-1 xl:order-2">
               <FilterInput />
             </div>
             <FilterToolbar />
