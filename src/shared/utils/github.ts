@@ -43,8 +43,13 @@ export function createGithubRepo(
 function cleanGithubUrlInput(url: string): string {
   return url
     .trim()
-    .replace(/^(?:https?:\/\/)?(?:www\.)?(git@|github\.com)?[/:]?/i, '')
-    .replace(/(\/|\?.+|\.git)$/i, '')
+    .replace(
+      /^(?:(?:https?|ssh):\/\/)?(?:git@)?(?:www\.)?(?:github\.com)?[/:]?/i,
+      '',
+    )
+    .replace(/[?#].*$/, '')
+    .replace(/\/+$/, '')
+    .replace(/\.git$/i, '')
     .trim()
 }
 
@@ -56,9 +61,12 @@ function cleanGithubUrlInput(url: string): string {
  * - owner/repo/ref
  * - owner/repo/tree/ref
  * - owner/repo/commit/ref
+ * - git@github.com:owner/repo.git
+ *
+ * Repository names may contain dots (e.g. vercel/next.js).
  */
 const GITHUB_URL_REGEX =
-  /^(?<owner>[a-z0-9_-]+)\/(?<repo>[a-z0-9_-]+)(?:\/tree\/|\/commit\/|\/?@|\/)?(?<ref>[a-z0-9/_.-]+)?$/i
+  /^(?<owner>[a-z0-9_-]+)\/(?<repo>[a-z0-9_.-]+)(?:\/tree\/|\/commit\/|\/?@|\/)?(?<ref>[a-z0-9/_.-]+)?$/i
 
 /**
  * Parse a GitHub URL into a GithubRepo object
