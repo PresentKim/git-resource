@@ -1,4 +1,4 @@
-import {useMemo} from 'react'
+import {useLayoutEffect, useMemo} from 'react'
 import {useParams, useNavigate} from 'react-router-dom'
 
 import {createGithubRepo, type GithubRepo, parseGithubUrl} from '@/shared/utils'
@@ -9,13 +9,20 @@ export function useRepoPath() {
   const navigate = useNavigate()
   const setRepo = useRepoStore(state => state.setRepo)
 
-  const repoPath: GithubRepo = useMemo(() => {
-    const currentRepo = path
-      ? (parseGithubUrl(path) ?? createGithubRepo('', '', ''))
-      : createGithubRepo('', '', '')
-    setRepo(currentRepo)
-    return currentRepo
-  }, [path, setRepo])
+  const repoPath: GithubRepo = useMemo(
+    () =>
+      path
+        ? (parseGithubUrl(path) ?? createGithubRepo('', '', ''))
+        : createGithubRepo('', '', ''),
+    [path],
+  )
+
+  // Updating the store while rendering would re-render other components
+  // (the header) mid-render. A layout effect still runs before the browser
+  // paints, so the previous repository is never shown with the new path.
+  useLayoutEffect(() => {
+    setRepo(repoPath)
+  }, [repoPath, setRepo])
 
   const setRepoPath = (
     owner: string,
