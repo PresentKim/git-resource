@@ -5,8 +5,10 @@ import {
   ChevronRight,
   Download,
   ExternalLink,
+  ImageOff,
   Link2,
   LoaderCircleIcon,
+  RotateCw,
   X,
   ZoomIn,
   ZoomOut,
@@ -188,11 +190,14 @@ export function ImageViewer({
   const {
     loading,
     error: imageError,
+    attempt: loadAttempt,
     imgRef,
     handleLoad,
     handleError,
     handleImageRef,
+    retry: retryImage,
   } = useImageLoading({
+    source: currentImage ?? '',
     onLoad: handleViewerLoad,
     onError: handleViewerError,
   })
@@ -497,10 +502,41 @@ export function ImageViewer({
               )}
               {imageError ? (
                 <div
-                  className="flex flex-col items-center justify-center"
+                  className="flex max-w-md flex-col items-center justify-center gap-3 text-center"
                   role="alert">
-                  <p className="text-lg mb-2">Failed to load image</p>
-                  <p className="text-sm opacity-70">{currentImage}</p>
+                  <ImageOff
+                    aria-hidden="true"
+                    className="size-10 text-muted-foreground"
+                  />
+                  <div className="space-y-1">
+                    <p className="text-lg">Could not load this image</p>
+                    <p className="text-sm font-normal text-muted-foreground">
+                      The connection may have dropped, or the file may have been
+                      moved or deleted.
+                    </p>
+                  </div>
+                  <div className="flex flex-wrap items-center justify-center gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="lg"
+                      className="max-sm:h-11 max-sm:px-4"
+                      onClick={retryImage}>
+                      <RotateCw />
+                      Try again
+                    </Button>
+                    <a
+                      href={githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        buttonVariants({size: 'lg', variant: 'outline'}),
+                        'max-sm:h-11 max-sm:px-4',
+                      )}>
+                      <ExternalLink />
+                      Open on GitHub
+                    </a>
+                  </div>
                 </div>
               ) : shouldAnimate ? (
                 <div
@@ -512,6 +548,7 @@ export function ImageViewer({
                     transition: isDragging ? 'none' : 'transform 0.1s ease-out',
                   }}>
                   <ImageMedia
+                    key={loadAttempt}
                     // For animated sprites, always use the original raw URL.
                     // AnimatedSprite will handle caching and mcmeta loading based on this.
                     src={rawSrc}
@@ -558,6 +595,7 @@ export function ImageViewer({
                     transition: isDragging ? 'none' : 'transform 0.1s ease-out',
                   }}>
                   <ImageMedia
+                    key={loadAttempt}
                     src={displayStaticSrc}
                     alt={`${fileName} (${positionLabel})`}
                     className={cn(

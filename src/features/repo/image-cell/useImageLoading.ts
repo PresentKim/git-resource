@@ -2,6 +2,8 @@ import {useState, useRef, useCallback} from 'react'
 import {getCachedImageMetadata, setCachedImageMetadata} from '@/shared/utils'
 
 interface UseImageLoadingProps {
+  /** What is being shown (e.g. its path); an error belongs to one source */
+  source: string
   onLoad?: (dimensions?: {width: number; height: number}) => void
   onError?: () => void
 }
@@ -10,9 +12,19 @@ interface UseImageLoadingProps {
  * Hook for managing image loading state and refs
  * Handles loading, error states, and image element ref management
  */
-export function useImageLoading({onLoad, onError}: UseImageLoadingProps) {
+export function useImageLoading({
+  source,
+  onLoad,
+  onError,
+}: UseImageLoadingProps) {
   const [loading, setLoading] = useState(true)
-  const [error, setError] = useState(false)
+  // Remembering which source failed, rather than a flag, lets a component
+  // that is reused for another image (a recycled grid cell, the viewer moving
+  // to the next image) start without the previous image's error
+  const [failedSource, setFailedSource] = useState<string | null>(null)
+  const error = failedSource !== null && failedSource === source
+  // Changed on retry to remount the media, so the browser requests it again
+  const [attempt, setAttempt] = useState(0)
   const imgRef = useRef<HTMLImageElement>(null)
 
   const handleLoad = useCallback(
@@ -36,9 +48,15 @@ export function useImageLoading({onLoad, onError}: UseImageLoadingProps) {
 
   const handleError = useCallback(() => {
     setLoading(false)
-    setError(true)
+    setFailedSource(source)
     onError?.()
-  }, [onError])
+  }, [source, onError])
+
+  const retry = useCallback(() => {
+    setFailedSource(null)
+    setLoading(true)
+    setAttempt(prev => prev + 1)
+  }, [])
 
   const handleImageRef = useCallback(
     (img: HTMLImageElement | null) => {
@@ -64,9 +82,11 @@ export function useImageLoading({onLoad, onError}: UseImageLoadingProps) {
   return {
     loading,
     error,
+    attempt,
     imgRef,
     handleLoad,
     handleError,
     handleImageRef,
+    retry,
   }
 }

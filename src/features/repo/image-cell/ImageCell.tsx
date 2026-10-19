@@ -1,4 +1,5 @@
 import {useCallback, useEffect, useState, memo} from 'react'
+import {ImageOff} from 'lucide-react'
 import {cn} from '@/shared/utils'
 import type {GithubRepo} from '@/shared/utils'
 import {ImageMedia} from './ImageMedia'
@@ -94,10 +95,12 @@ const ImageCell = memo(function ImageCell({
   // Image loading
   const {
     loading,
+    error,
     handleLoad,
     handleError,
     handleImageRef: handleImageRefFromHook,
   } = useImageLoading({
+    source: path,
     onLoad: () => {},
     onError: () => {},
   })
@@ -138,16 +141,27 @@ const ImageCell = memo(function ImageCell({
       className="group relative aspect-square size-full ring-foreground transition-transform duration-200 ease-out active:ring-2 active:rounded-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:ring-foreground hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40"
       onClick={onClick}
       onKeyDown={handleKeyDown}
-      aria-label={`View image: ${path}`}
+      aria-label={
+        error ? `View image: ${path} (failed to load)` : `View image: ${path}`
+      }
       title={path}>
       <>
+        {error && (
+          // Replaces the browser's broken-image icon and alt text, which
+          // overflowed small cells; the viewer offers a retry
+          <div
+            className="flex size-full items-center justify-center rounded-md bg-muted/40 text-muted-foreground ring-1 ring-muted-foreground/10"
+            aria-hidden="true">
+            <ImageOff className="size-1/4 max-h-8 min-h-4 max-w-8 min-w-4" />
+          </div>
+        )}
         {loading && (
           <div
             className="size-full rounded-md bg-muted/40 ring-1 ring-muted-foreground/10"
             aria-hidden="true"
           />
         )}
-        {imageRequested && (
+        {imageRequested && !error && (
           <ImageMedia
             src={imageUrl}
             alt={
