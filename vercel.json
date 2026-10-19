@@ -9,6 +9,10 @@
       "destination": "https://raw.githubusercontent.com/:path*"
     },
     {
+      "source": "/proxy/codeload/:path*",
+      "destination": "https://codeload.github.com/:path*"
+    },
+    {
       "source": "/(.*)",
       "destination": "/index.html"
     }

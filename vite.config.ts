@@ -33,6 +33,12 @@ export default defineConfig(({mode}) => {
           changeOrigin: true,
           rewrite: path => path.replace(/^\/proxy\/github/, ''),
         },
+        // Proxy for GitHub repository archives (matches Vercel rewrites)
+        '/proxy/codeload': {
+          target: 'https://codeload.github.com',
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/proxy\/codeload/, ''),
+        },
       },
     },
     worker: {

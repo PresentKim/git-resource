@@ -42,10 +42,12 @@ class ImageFileTreeWorker extends BaseGithubWorker<
     name,
     ref,
   }: ImageFileTreeRequest): Promise<GithubImageFileTree> {
-    // archive/<ref>.zip resolves branches, tags and commit SHAs alike,
-    // unlike archive/refs/heads/<ref>.zip which only finds branches
+    // Ask codeload for the zip directly: github.com/.../archive/<ref>.zip only
+    // redirects there, and codeload rejects cross-origin requests, so the
+    // browser blocks the redirected download. zip/<ref> resolves branches
+    // (with slashes too), tags and full commit SHAs alike.
     const response = await fetch(
-      `/proxy/github/${owner}/${name}/archive/${encodePathSegments(ref)}.zip`,
+      `/proxy/codeload/${owner}/${name}/zip/${encodePathSegments(ref)}`,
       {headers: {Accept: 'application/zip'}},
     )
 
