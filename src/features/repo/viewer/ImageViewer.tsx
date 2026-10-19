@@ -472,7 +472,9 @@ export function ImageViewer({
               id="image-viewer-content"
               ref={imageContainerRef}
               className={cn(
-                'relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-56 px-8 sm:pb-28 overflow-hidden',
+                // The padding keeps the fitted image clear of the title, the
+                // toolbar and (from sm) the side arrows; the image fills the rest
+                'relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-56 px-4 sm:px-16 sm:pb-28 overflow-hidden',
                 'bg-background',
                 isDragging && 'cursor-grabbing',
                 scale > 1 && 'cursor-grab',
@@ -554,7 +556,7 @@ export function ImageViewer({
                     src={rawSrc}
                     alt={`${fileName} (${positionLabel})`}
                     className={cn(
-                      'relative z-10 w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
+                      'relative z-10 w-full h-full object-contain',
                       loading && 'opacity-0',
                     )}
                     pixelated={pixelated}
@@ -599,7 +601,7 @@ export function ImageViewer({
                     src={displayStaticSrc}
                     alt={`${fileName} (${positionLabel})`}
                     className={cn(
-                      'relative z-10 w-full h-full max-w-[80vw] max-h-[60vh] object-contain',
+                      'relative z-10 w-full h-full object-contain',
                       loading && 'opacity-0',
                     )}
                     pixelated={pixelated}
