@@ -7,6 +7,13 @@ interface UseImageKeyboardProps {
   enabled?: boolean
 }
 
+function isEditable(target: EventTarget | null) {
+  return (
+    target instanceof HTMLElement &&
+    (target.isContentEditable || target.matches('input, textarea, select'))
+  )
+}
+
 /**
  * Hook for managing keyboard events (arrow keys, escape)
  * Handles navigation and close actions
@@ -21,6 +28,10 @@ export function useImageKeyboard({
     if (!enabled) return
 
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Alt+Arrow is the browser's Back/Forward, and arrows in a text field
+      // move the caret; neither should change the image
+      if (e.altKey || e.ctrlKey || e.metaKey || isEditable(e.target)) return
+
       if (e.key === 'ArrowLeft') {
         onPrevious?.()
       } else if (e.key === 'ArrowRight') {

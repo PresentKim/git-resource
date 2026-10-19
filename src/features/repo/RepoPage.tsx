@@ -156,7 +156,9 @@ export default function RepoPage() {
         <RepoEmptyState />
       ) : !error && filteredImageFiles && filteredImageFiles.length > 0 ? (
         <>
-          <div role="region" aria-label="Image gallery" aria-live="polite">
+          {/* Not a live region: cells mount and unmount while scrolling, and
+              the image count in the toolbar already reports filter results */}
+          <div role="region" aria-label="Image gallery">
             <VirtualizedFlexGrid
               items={filteredImageFiles}
               columnCount={columnCount}

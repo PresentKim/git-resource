@@ -488,8 +488,8 @@ export function ImageViewer({
               {loading && (
                 <div
                   className="absolute inset-0 flex items-center justify-center z-10"
-                  aria-live="polite"
-                  aria-label="Loading image">
+                  role="status">
+                  <span className="sr-only">Loading image</span>
                   <div
                     className="size-full flex justify-center items-center opacity-5 ring-muted-foreground ring-1 rounded-md"
                     aria-hidden="true">
@@ -676,11 +676,12 @@ export function ImageViewer({
                   </span>
                 )}
               </div>
-              <div
-                className="hidden items-center gap-3 rounded-md px-4 py-2 text-xs sm:flex"
-                aria-live="polite"
-                aria-atomic="true">
-                <span>Image {positionLabel}</span>
+              {/* Only the position is announced; a live region around the
+                  whole toolbar re-read every button on each zoom step */}
+              <div className="hidden items-center gap-3 rounded-md px-4 py-2 text-xs sm:flex">
+                <span aria-live="polite" aria-atomic="true">
+                  Image {positionLabel}
+                </span>
                 <div className="flex items-center gap-1">
                   <Button
                     type="button"
