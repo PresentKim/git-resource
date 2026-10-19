@@ -46,7 +46,6 @@ export default function HomePage() {
         Browse GitHub repository images instantly
       </div>
       <h1
-        aria-label="Hero title"
         id="hero-title"
         className={cn(
           'w-full max-w-2xl mx-auto pt-10 pb-2',
@@ -58,27 +57,26 @@ export default function HomePage() {
         </span>
       </h1>
 
-      <div
-        aria-label="Repository input"
-        className="mx-auto w-full max-w-2xl pt-12 sm:pt-16">
+      <div className="mx-auto w-full max-w-2xl pt-12 sm:pt-16">
         <h2 className="mb-3 ml-3 text-base font-semibold">
-          • Paste GitHub repository URL
+          <span aria-hidden="true">• </span>Paste GitHub repository URL
         </h2>
         <RepoInput />
       </div>
 
-      <div aria-label="Separator" className="flex items-center py-8 sm:py-10">
+      {/* Decorative: the two headings already say what each part is for */}
+      <div aria-hidden="true" className="flex items-center py-8 sm:py-10">
         <div className="h-px flex-1 bg-border" />
-        <span className="px-1 text-xs text-border">OR</span>
+        <span className="px-2 text-xs text-muted-foreground">OR</span>
         <div className="h-px flex-1 bg-border" />
       </div>
 
-      <div
-        aria-label="Example repositories"
-        className="mx-auto w-full max-w-2xl space-y-4">
+      <div className="mx-auto w-full max-w-2xl space-y-4">
         <div className="flex flex-row justify-between items-center gap-2 sm:text-left">
-          <h2 className="mb-3 ml-3 text-base font-semibold">
-            • Explore with example repositories
+          <h2
+            id="example-repositories-title"
+            className="mb-3 ml-3 text-base font-semibold">
+            <span aria-hidden="true">• </span>Explore with example repositories
           </h2>
           <Button
             type="button"
@@ -104,7 +102,7 @@ export default function HomePage() {
           className={`grid w-full grid-cols-1 gap-2 transition-opacity duration-200 ${
             isRerolling ? 'opacity-0' : 'opacity-100'
           }`}
-          aria-label="Example repositories">
+          aria-labelledby="example-repositories-title">
           {shuffledExampleRepositories.map(([owner, name, ref], index) => {
             const handleClick = () => setRepoPath(owner, name, ref)
             const displayName = `${owner}/${name}`
