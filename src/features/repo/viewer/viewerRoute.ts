@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useMemo} from 'react'
+import {useCallback, useEffect, useMemo, useState} from 'react'
 import {parseAsString, useQueryState} from 'nuqs'
 
 type ViewerOpener = (path: string) => void
@@ -51,6 +51,18 @@ export function useViewerRoute(images: string[]) {
     [images, imagePath],
   )
 
+  // The viewer stays mounted while it fades out after closing, when the URL
+  // no longer names an image. Keep showing the last image until then instead
+  // of falling back to the first one.
+  const [shownPath, setShownPath] = useState<string | null>(null)
+  if (index >= 0 && imagePath !== shownPath) {
+    setShownPath(imagePath)
+  }
+  const shownIndex = useMemo(
+    () => (index >= 0 || !shownPath ? index : images.indexOf(shownPath)),
+    [index, images, shownPath],
+  )
+
   useEffect(() => {
     setViewerOpener(path => {
       setOpenedByPush(true)
@@ -85,5 +97,5 @@ export function useViewerRoute(images: string[]) {
     }
   }, [setImagePath])
 
-  return {open: index >= 0, currentIndex: Math.max(0, index), goTo, close}
+  return {open: index >= 0, currentIndex: Math.max(0, shownIndex), goTo, close}
 }
