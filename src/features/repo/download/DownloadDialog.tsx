@@ -144,11 +144,19 @@ export function DownloadDialog({
                     {transformPath(samplePath, mode)}
                   </span>
                 )}
+                {/* Yellow text is too faint to read on the light theme, so
+                    the yellow only marks the icon */}
                 {renamed > 0 && (
-                  <span className="mt-1 block text-[11px] text-chart-5">
-                    {renamed.toLocaleString()}{' '}
-                    {renamed === 1 ? 'file shares' : 'files share'} a name and
-                    will be numbered (-1, -2, …)
+                  <span className="mt-1.5 flex items-start gap-1.5 text-xs text-foreground">
+                    <AlertTriangle
+                      aria-hidden="true"
+                      className="mt-0.5 size-3.5 shrink-0 text-chart-5"
+                    />
+                    <span>
+                      {renamed.toLocaleString()}{' '}
+                      {renamed === 1 ? 'file shares' : 'files share'} a name and
+                      will be numbered (-1, -2, …)
+                    </span>
                   </span>
                 )}
               </ChoiceCard>

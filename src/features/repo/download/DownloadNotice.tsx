@@ -5,7 +5,6 @@ import {Button} from '@/shared/components/ui/button'
 import type {DownloadOutcome} from '@/features/repo/download/useImageDownload'
 
 const SUCCESS_VISIBLE_MS = 4000
-const LISTED_FAILURES = 3
 
 interface DownloadNoticeProps {
   outcome: DownloadOutcome | null
@@ -50,12 +49,15 @@ export function DownloadNotice({outcome, onDismiss}: DownloadNoticeProps) {
               {failed.length.toLocaleString()} could not be fetched and{' '}
               {failed.length === 1 ? 'was' : 'were'} left out.
             </p>
-            <p
-              className="truncate text-xs text-muted-foreground"
-              title={failed.join('\\n')}>
-              {failed.slice(0, LISTED_FAILURES).join(', ')}
-              {failed.length > LISTED_FAILURES && ', …'}
-            </p>
+            {/* Listed in full (scrolling when long) rather than in a hover
+                title, which touch screens cannot show */}
+            <ul
+              aria-label="Images left out"
+              className="max-h-24 overflow-y-auto font-mono text-xs break-all text-muted-foreground">
+              {failed.map(path => (
+                <li key={path}>{path}</li>
+              ))}
+            </ul>
           </>
         )}
         {outcome.kind === 'error' && <p>Download failed: {outcome.message}</p>}
