@@ -24,7 +24,11 @@ export function RepoError({error, onRetry}: RepoErrorProps) {
       role="alert"
       className="flex flex-col items-center gap-3 rounded-xl border border-destructive/40 bg-destructive/10 p-4 text-center text-sm text-destructive-foreground">
       <p className="text-base font-semibold">
-        Something went wrong while loading images.
+        {isRateLimited
+          ? 'GitHub API rate limit reached'
+          : isNotFound
+            ? 'Repository not found'
+            : 'Could not load this repository'}
       </p>
       <p className="max-w-xl text-xs text-muted-foreground">{error.message}</p>
       <div className="flex flex-col items-center gap-2 text-xs text-muted-foreground">
