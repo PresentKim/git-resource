@@ -57,9 +57,10 @@ URL  /owner/repo/ref?filter=…&sort=…&image=…
 - **State**: Zustand stores hold the repository, its file list and the
   settings; nuqs keeps the filter, sort and open image in the URL.
 - **Rendering**: the grid computes which rows are on screen from the scroll
-  position and renders only those (plus a few rows of overscan). Cells take
-  everything as props and are memoized, so thousands of cells do not each
-  subscribe to a store.
+  position and mounts only the rows around them. How many stay mounted adapts
+  to the device: up to 10,000 cells while the browser keeps up, fewer when
+  frames stall. Cells take everything as props and are memoized, so
+  thousands of cells do not each subscribe to a store.
 
 ### 4. Technology Stack and Rationale
 
@@ -93,11 +94,19 @@ URL  /owner/repo/ref?filter=…&sort=…&image=…
 and images appeared late after filtering or jumping.  
 **Solution**: a custom virtualized grid and scroll-aware image loading.
 
-- Only the rows in and around the viewport are rendered, computed from the
-  scroll offset and the measured row height.
-- Cells are memoized and receive stable props, so scrolling re-renders only
-  the rows that enter or leave.
-- Cells start loading their image right away unless the page is scrolling
+- Only the rows in and around the viewport are mounted, computed from the
+  scroll offset and the measured row height. While the page is idle the
+  mounted range grows step by step (up to 10,000 cells), so rows scrolled back
+  to are still there instead of reappearing one by one. A step that makes a
+  frame slow is undone, and repeated stalls while scrolling shrink the range.
+- The range shifts in chunks rather than every row, rows are memoized and
+  each row is its own contained flex container, so a large range costs little
+  per scroll.
+- A `:has()` selector on the app root (hiding the boot spinner) made the
+  browser restyle the whole page on every DOM change, which grew with the
+  number of mounted cells. It is now a plain attribute toggle.
+- Cells start loading their image once they are within a screen of the
+  viewport, right away unless the page is scrolling
   faster than 2,500 px/s, in which case they wait until it slows down (at most
   300 ms). On a mocked 30,000-image repository, filtering back to a folder
   that was already seen went from 349 ms to 2 ms until its images were

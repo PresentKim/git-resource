@@ -1,4 +1,4 @@
-import {useCallback, useEffect, useState, memo} from 'react'
+import {useCallback, useEffect, useRef, useState, memo} from 'react'
 import {ImageOff} from 'lucide-react'
 import {cn} from '@/shared/utils'
 import type {GithubRepo} from '@/shared/utils'
@@ -11,8 +11,8 @@ import {useImageRef} from '@/features/repo/image-cell/useImageRef'
 import {parseImagePath} from '@/shared/utils/imageCell'
 import {
   hasLoaded,
-  isScrollingFast,
   rememberLoaded,
+  whenNearViewport,
   whenScrollSettles,
 } from '@/features/repo/image-cell/imageLoadGate'
 
@@ -82,15 +82,26 @@ const ImageCell = memo(function ImageCell({
   // Image URL
   const {imageUrl} = useImageUrl({repo, imagePath: path})
 
-  // Cells that appear while the page is flying past wait for the scroll to
-  // slow down before loading; otherwise they load right away
-  const [imageRequested, setImageRequested] = useState(
-    () => hasLoaded(imageUrl) || !isScrollingFast(),
-  )
+  // An image loaded before is in the browser cache and shows at once. Others
+  // wait until the cell is near the viewport (the grid mounts far more cells
+  // than are on screen), and, while the page is flying past, until the
+  // scroll slows down. The grid reuses a cell for another image when the
+  // list changes (filter, sort), so the request belongs to one URL.
+  const cellRef = useRef<HTMLDivElement>(null)
+  const [requestedUrl, setRequestedUrl] = useState<string | null>(null)
+  const imageRequested = requestedUrl === imageUrl || hasLoaded(imageUrl)
   useEffect(() => {
-    if (imageRequested) return
-    return whenScrollSettles(() => setImageRequested(true))
-  }, [imageRequested])
+    const cell = cellRef.current
+    if (imageRequested || !cell) return
+    let cancelSettle = () => {}
+    const cancelNear = whenNearViewport(cell, () => {
+      cancelSettle = whenScrollSettles(() => setRequestedUrl(imageUrl))
+    })
+    return () => {
+      cancelNear()
+      cancelSettle()
+    }
+  }, [imageRequested, imageUrl])
 
   // Image loading
   const {
@@ -136,6 +147,7 @@ const ImageCell = memo(function ImageCell({
 
   return (
     <div
+      ref={cellRef}
       role="button"
       tabIndex={0}
       className="group relative aspect-square size-full ring-foreground transition-transform duration-200 ease-out active:ring-2 active:rounded-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:ring-foreground hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40"

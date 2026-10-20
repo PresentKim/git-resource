@@ -82,12 +82,6 @@ function startListening() {
   window.addEventListener('scroll', handleScroll, {passive: true})
 }
 
-/** Whether the page is scrolling too fast for images to be worth loading */
-export function isScrollingFast(): boolean {
-  startListening()
-  return fast
-}
-
 /**
  * Calls `callback` once the scroll is no longer fast, or after a short
  * maximum wait. Returns a function that cancels the wait.
@@ -108,6 +102,46 @@ export function whenScrollSettles(callback: () => void): () => void {
   return () => {
     clearTimeout(maxWaitTimer)
     waiting.delete(run)
+  }
+}
+
+/**
+ * A mounted cell starts loading once it is this close to the viewport. The
+ * grid keeps many more cells mounted than are on screen; loading all of them
+ * at once would queue the visible images behind off-screen ones.
+ */
+const NEAR_VIEWPORT_MARGIN = '100% 0px'
+
+let nearObserver: IntersectionObserver | null = null
+const nearCallbacks = new Map<Element, () => void>()
+
+/**
+ * Calls `callback` once `element` comes within NEAR_VIEWPORT_MARGIN of the
+ * viewport. One observer serves every cell. Returns a function that cancels
+ * the wait.
+ */
+export function whenNearViewport(
+  element: Element,
+  callback: () => void,
+): () => void {
+  nearObserver ??= new IntersectionObserver(
+    entries => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue
+        const run = nearCallbacks.get(entry.target)
+        if (!run) continue
+        nearObserver?.unobserve(entry.target)
+        nearCallbacks.delete(entry.target)
+        run()
+      }
+    },
+    {rootMargin: NEAR_VIEWPORT_MARGIN},
+  )
+  nearCallbacks.set(element, callback)
+  nearObserver.observe(element)
+  return () => {
+    nearObserver?.unobserve(element)
+    nearCallbacks.delete(element)
   }
 }
 

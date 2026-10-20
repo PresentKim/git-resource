@@ -56,8 +56,11 @@
         overflow-y: scroll;
       }
 
-      /* Hide loading-spinner when root is not empty and not has loading class children */
-      #root:not(:empty):not(:has(.loading)) ~ #loading-spinner-wrapper {
+      /* Shown until the app renders; App.tsx hides it, and shows it again
+         while a lazy chunk loads. Not a :has() on #root: that is re-checked
+         on every DOM change in the app and restyled the whole page on each
+         scroll of a large image grid. */
+      #loading-spinner-wrapper[hidden] {
         display: none;
       }
 
@@ -204,7 +207,10 @@
   </head>
   <body>
     <div id="root"></div>
-    <div id="loading-spinner-wrapper">
+    <div
+      id="loading-spinner-wrapper"
+      role="status"
+      aria-label="Loading application">
       <div id="loading-spinner"></div>
     </div>
     <script type="module" src="/src/main.tsx"></script>
