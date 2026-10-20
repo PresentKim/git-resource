@@ -175,6 +175,8 @@ export const exampleRepositories: ExampleRepository[] = [
   ],
   ['Foreck1', 'foreck-textures', 'main'],
   ['Futureazoo', 'TextureRepository', 'master'],
+  ['cleannrooster', 'forg-cleannrooster-assets', 'main'],
+  ['FreneticScribbler', 'OpenTextures', 'master'],
   ['Minecraft-LightLand', 'FruitsDelight', '1.20'],
   ['Minecraft-LightLand', 'GlimmeringTales', '1.21'],
   ['Minecraft-LightLand', 'Cuisine-Delight', '1.21'],

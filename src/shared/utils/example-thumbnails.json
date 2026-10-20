@@ -1793,6 +1793,34 @@
       "futureazoo/blocks/vanilla_style/cup_ceramic.png"
     ]
   },
+  "cleannrooster/forg-cleannrooster-assets/main": {
+    "sha": "a1ca6f85e56ae4fbcca31aca3c1981b190dc31a8",
+    "description": "cleann assets",
+    "images": [
+      "item/potions/corrupted_warmth_tincture.png",
+      "item/potions/greater_iron_paste.png",
+      "item/potions/warding_tincture.png",
+      "item/spellblade/end_city_guardian_boots.png",
+      "item/spellblade/frigid_feet.png",
+      "item/spellblade/magus_feet.png",
+      "item/spellblade/phoenix_spell_book.png",
+      "item/spellblade/runeblazing_netherite_bodyarmor.png"
+    ]
+  },
+  "FreneticScribbler/OpenTextures/master": {
+    "sha": "e434b7c5b2f2d59ab69dff79b39a4b64265eee46",
+    "description": "A collection of free textures you can use in your minecraft mod :D",
+    "images": [
+      "Blocks/BlockBlueCrystalOre.png",
+      "Blocks/BlockGreenCrystalOre.png",
+      "Blocks/BlockRedCrystalOre.png",
+      "blocks/voidstone/metalborder.png",
+      "blocks/voidstone/pillar-side.png",
+      "blocks/voidstone/pillar-top.png",
+      "blocks/voidstone/quaters.png",
+      "blocks/voidstone/raw.png"
+    ]
+  },
   "Minecraft-LightLand/FruitsDelight/1.20": {
     "sha": "fc274ff5932330dfcc71dc787217207d87ef9f33",
     "images": [
