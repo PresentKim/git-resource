@@ -2,20 +2,22 @@ import {useCallback, useState} from 'react'
 import {RefreshCw} from 'lucide-react'
 
 import {Button} from '@/shared/components/ui/button'
-import {FeaturedRepositoryCard} from '@/features/home/components/FeaturedRepositoryCard'
 import {RepoInput} from '@/features/home/components/RepoInput'
-import {RepoThumbnails} from '@/features/home/components/RepoThumbnails'
+import {RepositoryCard} from '@/features/home/components/RepositoryCard'
 
 import {useRepoPath} from '@/features/repo/useRepoPath'
 import {cn, pickByPartialFisherYates} from '@/shared/utils'
 import {
   exampleRepositories,
-  featuredRepository,
+  featuredRepositories,
 } from '@/shared/utils/example-repositories'
-import {getExampleThumbnailUrls} from '@/shared/utils/example-thumbnails'
+import {
+  getFeaturedPreview,
+  getRepositoryPreview,
+} from '@/shared/utils/example-thumbnails'
 import {APP_NAME} from '@/shared/utils/routeMeta'
 
-const EXAMPLE_REPO_COUNT = 5
+const EXAMPLE_REPO_COUNT = 7
 const REROLL_ANIMATION_DURATION_MS = 200
 
 export default function HomePage() {
@@ -82,19 +84,29 @@ export default function HomePage() {
       </div>
 
       <div className="mx-auto w-full max-w-2xl pb-8 sm:pb-10">
-        <h2 className="mb-3 ml-3 text-base font-semibold">
-          <span aria-hidden="true">• </span>Start with the featured repository
+        <h2
+          id="featured-repositories-title"
+          className="mb-3 ml-3 text-base font-semibold">
+          <span aria-hidden="true">• </span>Start with a featured repository
         </h2>
-        <FeaturedRepositoryCard
-          repository={featuredRepository}
-          onOpen={() =>
-            setRepoPath(
-              featuredRepository.owner,
-              featuredRepository.name,
-              featuredRepository.ref,
+        <ul
+          className="grid w-full grid-cols-1 gap-3"
+          aria-labelledby="featured-repositories-title">
+          {featuredRepositories.map(featured => {
+            const {owner, name, ref} = featured
+            return (
+              <li key={`${owner}/${name}/${ref}`}>
+                <RepositoryCard
+                  owner={owner}
+                  name={name}
+                  {...getFeaturedPreview(featured)}
+                  featured
+                  onOpen={() => setRepoPath(owner, name, ref)}
+                />
+              </li>
             )
-          }
-        />
+          })}
+        </ul>
       </div>
 
       <div className="mx-auto w-full max-w-2xl space-y-4">
@@ -125,41 +137,22 @@ export default function HomePage() {
 
         <ul
           key={rerollKey}
-          className={`grid w-full grid-cols-1 gap-2 transition-opacity duration-200 ${
+          className={`grid w-full grid-cols-1 gap-3 transition-opacity duration-200 ${
             isRerolling ? 'opacity-0' : 'opacity-100'
           }`}
           aria-labelledby="example-repositories-title">
-          {shuffledExampleRepositories.map(([owner, name, ref], index) => {
-            const handleClick = () => setRepoPath(owner, name, ref)
-            const displayName = `${owner}/${name}`
-
-            return (
-              <li key={`${rerollKey}-${index}`}>
-                <Button
-                  variant="outline"
-                  className={cn(
-                    'flex w-full items-center justify-between gap-3 overflow-hidden border-border/60',
-                    'text-ellipsis whitespace-nowrap text-sm text-foreground',
-                    'animate-fade-in-slide transition-all duration-150',
-                    'hover:bg-accent/20 hover:text-foreground hover:scale-102',
-                    // Taller on phones, where they are tapped
-                    'max-sm:h-10',
-                  )}
-                  style={{
-                    animationDelay: `${index * 50}ms`,
-                  }}
-                  onClick={handleClick}
-                  aria-label={`Open example repository ${displayName}`}>
-                  <span className="min-w-0 truncate font-mono">
-                    {displayName}
-                  </span>
-                  <RepoThumbnails
-                    urls={getExampleThumbnailUrls(owner, name, ref)}
-                  />
-                </Button>
-              </li>
-            )
-          })}
+          {shuffledExampleRepositories.map(([owner, name, ref], index) => (
+            <li key={`${rerollKey}-${index}`}>
+              <RepositoryCard
+                owner={owner}
+                name={name}
+                {...getRepositoryPreview(owner, name, ref)}
+                onOpen={() => setRepoPath(owner, name, ref)}
+                className="animate-fade-in-slide"
+                style={{animationDelay: `${index * 50}ms`}}
+              />
+            </li>
+          ))}
         </ul>
       </div>
     </section>

@@ -95,12 +95,14 @@ yarn format:lint  # check formatting (format:fix to format)
 yarn examples:thumbnails  # pick thumbnails for new example repositories
 ```
 
-The example repositories on the home page show a few of their images without
-calling the GitHub API. `scripts/update-example-thumbnails.mjs` picks them once
-and writes `src/shared/utils/example-thumbnails.json`, pinned to a commit so the
+The featured and example repositories on the home page show their description
+and a few of their images without calling the GitHub API.
+`scripts/update-example-thumbnails.mjs` picks them once and writes
+`src/shared/utils/example-thumbnails.json`, pinned to a commit so the
 `raw.githubusercontent.com` URLs keep working when a branch moves. Run it after
-adding an example (`--all` refreshes every entry); it uses `GITHUB_TOKEN` or the
-GitHub CLI's login. An example without an entry is shown without thumbnails.
+adding a repository (`--all` refreshes every entry); it uses `GITHUB_TOKEN` or
+the GitHub CLI's login. A repository without an entry is shown with its name
+only, and a featured one can set its own description and images.
 
 The Yarn cache in `.yarn/cache` is committed with the Linux native binaries
 that CI needs. On Windows or macOS, run `yarn install` once after cloning so

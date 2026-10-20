@@ -1,7 +1,7 @@
 /**
- * Picks a few thumbnail images for every example repository and writes them to
- * src/shared/utils/example-thumbnails.json, so the home page can show them
- * without calling the GitHub API.
+ * Picks a few thumbnail images and the description of every featured and
+ * example repository and writes them to src/shared/utils/example-thumbnails.json,
+ * so the home page can show them without calling the GitHub API.
  *
  * Each entry is pinned to a commit SHA: raw.githubusercontent.com URLs for a
  * commit never change, so the thumbnails keep working when the branch moves.
@@ -12,7 +12,7 @@
  *   node scripts/update-example-thumbnails.mjs         # only repositories without thumbnails
  *   node scripts/update-example-thumbnails.mjs --all   # refresh every repository
  *
- * Needs a token for the API calls (two per repository): GITHUB_TOKEN, or the
+ * Needs a token for the API calls (three per repository): GITHUB_TOKEN, or the
  * GitHub CLI's login (`gh auth token`).
  */
 import {execSync} from 'node:child_process';
@@ -26,9 +26,9 @@ const OUTPUT_FILE = fileURLToPath(
   new URL('../src/shared/utils/example-thumbnails.json', import.meta.url)
 );
 
-const THUMBNAILS_PER_REPO = 4;
+const THUMBNAILS_PER_REPO = 8;
 /** How many candidates to download at most before giving up on a repository */
-const MAX_CANDIDATES = 24;
+const MAX_CANDIDATES = 40;
 const CONCURRENCY = 6;
 const MIN_SIZE = 8;
 const MAX_SIZE = 64;
@@ -44,16 +44,22 @@ function getToken() {
   }
 }
 
-/** The [owner, name, ref] tuples of exampleRepositories, read from the source */
-function readExampleRepositories() {
+/**
+ * The featured repositories ({owner, name, ref} objects) followed by the
+ * [owner, name, ref] tuples of exampleRepositories, read from the source
+ */
+function readRepositories() {
   const source = readFileSync(EXAMPLES_FILE, 'utf8');
-  const list = source.slice(source.indexOf('exampleRepositories'));
-  const pattern = /\[\s*'([^']+)',\s*'([^']+)',\s*'([^']+)',?\s*\]/g;
-  return [...list.matchAll(pattern)].map(([, owner, name, ref]) => ({
-    owner,
-    name,
-    ref,
-  }));
+  const examplesStart = source.indexOf('exampleRepositories:');
+  const featured = source.slice(0, examplesStart);
+  const examples = source.slice(examplesStart);
+  const objectPattern =
+    /owner: '([^']+)',\s*name: '([^']+)',\s*ref: '([^']+)'/g;
+  const tuplePattern = /\[\s*'([^']+)',\s*'([^']+)',\s*'([^']+)',?\s*\]/g;
+  return [
+    ...featured.matchAll(objectPattern),
+    ...examples.matchAll(tuplePattern),
+  ].map(([, owner, name, ref]) => ({owner, name, ref}));
 }
 
 const token = getToken();
@@ -121,6 +127,7 @@ async function isGoodThumbnail(owner, name, sha, path) {
 }
 
 async function pickThumbnails({owner, name, ref}) {
+  const {description} = await githubApi(`/repos/${owner}/${name}`);
   const sha = await githubApi(
     `/repos/${owner}/${name}/commits/${encodeURIComponent(ref)}`,
     'application/vnd.github.sha'
@@ -147,10 +154,12 @@ async function pickThumbnails({owner, name, ref}) {
     if (await isGoodThumbnail(owner, name, sha, path)) images.push(path);
     if (images.length === THUMBNAILS_PER_REPO) break;
   }
-  return {sha, images};
+  return description?.trim()
+    ? {sha, description: description.trim(), images}
+    : {sha, images};
 }
 
-const repositories = readExampleRepositories();
+const repositories = readRepositories();
 const previous = existsSync(OUTPUT_FILE)
   ? JSON.parse(readFileSync(OUTPUT_FILE, 'utf8'))
   : {};
@@ -165,7 +174,7 @@ for (const repo of repositories) {
 }
 
 console.info(
-  `${repositories.length} examples, ${todo.length} to update (${refreshAll ? 'all' : 'missing only'})`
+  `${repositories.length} repositories, ${todo.length} to update (${refreshAll ? 'all' : 'missing only'})`
 );
 
 const failures = [];
