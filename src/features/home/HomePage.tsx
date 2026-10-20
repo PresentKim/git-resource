@@ -4,6 +4,7 @@ import {RefreshCw} from 'lucide-react'
 import {Button} from '@/shared/components/ui/button'
 import {FeaturedRepositoryCard} from '@/features/home/components/FeaturedRepositoryCard'
 import {RepoInput} from '@/features/home/components/RepoInput'
+import {RepoThumbnails} from '@/features/home/components/RepoThumbnails'
 
 import {useRepoPath} from '@/features/repo/useRepoPath'
 import {cn, pickByPartialFisherYates} from '@/shared/utils'
@@ -11,6 +12,7 @@ import {
   exampleRepositories,
   featuredRepository,
 } from '@/shared/utils/example-repositories'
+import {getExampleThumbnailUrls} from '@/shared/utils/example-thumbnails'
 import {APP_NAME} from '@/shared/utils/routeMeta'
 
 const EXAMPLE_REPO_COUNT = 5
@@ -136,7 +138,7 @@ export default function HomePage() {
                 <Button
                   variant="outline"
                   className={cn(
-                    'flex w-full items-center justify-start overflow-hidden border-border/60',
+                    'flex w-full items-center justify-between gap-3 overflow-hidden border-border/60',
                     'text-ellipsis whitespace-nowrap text-sm text-foreground',
                     'animate-fade-in-slide transition-all duration-150',
                     'hover:bg-accent/20 hover:text-foreground hover:scale-102',
@@ -148,7 +150,12 @@ export default function HomePage() {
                   }}
                   onClick={handleClick}
                   aria-label={`Open example repository ${displayName}`}>
-                  <span className="font-mono">{displayName}</span>
+                  <span className="min-w-0 truncate font-mono">
+                    {displayName}
+                  </span>
+                  <RepoThumbnails
+                    urls={getExampleThumbnailUrls(owner, name, ref)}
+                  />
                 </Button>
               </li>
             )

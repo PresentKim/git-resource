@@ -1,0 +1,1720 @@
+{
+  "Mojang/bedrock-samples/main": {
+    "sha": "46ba6ea985fb5a92d79a9419198f10dda14c199d",
+    "images": [
+      "resource_pack/textures/items/acacia_chest_boat.png",
+      "resource_pack/textures/items/birch_chest_boat.png",
+      "resource_pack/textures/items/bucket_cod.png",
+      "resource_pack/textures/items/bundle_light_blue.png"
+    ]
+  },
+  "ExcessiveAmountsOfZombies/Croptopia/v3_1.21": {
+    "sha": "5241aead144d706c347955e81a3c15fd79f30a21",
+    "images": [
+      "src/main/resources/assets/croptopia/textures/item/ajvar_toast.png",
+      "src/main/resources/assets/croptopia/textures/item/avocado_toast.png",
+      "src/main/resources/assets/croptopia/textures/item/beef_stew.png",
+      "src/main/resources/assets/croptopia/textures/item/broccoli_seed.png"
+    ]
+  },
+  "Buuz135/FunctionalStorage/1.21": {
+    "sha": "05a124f2fee87724d1df99d2630a67c0af44cff7",
+    "images": [
+      "src/main/resources/assets/functionalstorage/textures/item/collector_upgrade.png",
+      "src/main/resources/assets/functionalstorage/textures/item/configuration_tool_base.png",
+      "src/main/resources/assets/functionalstorage/textures/item/configuration_tool_mode.png",
+      "src/main/resources/assets/functionalstorage/textures/item/copper_upgrade.png"
+    ]
+  },
+  "Team-EnderIO/EnderIO/1.21.1": {
+    "sha": "b59e212c99307411e4d3bb8d97da3da0761381af",
+    "images": [
+      "enderio/src/main/resources/assets/enderio/textures/item/advanced_item_filter.png",
+      "enderio/src/main/resources/assets/enderio/textures/item/conductive_alloy_nugget.png",
+      "enderio/src/main/resources/assets/enderio/textures/item/confusing_powder.png",
+      "enderio/src/main/resources/assets/enderio/textures/item/dark_steel_bow_pulling_0.png"
+    ]
+  },
+  "Creators-of-Create/Create/mc1.20.1/dev": {
+    "sha": "588124239141029c5321afd38d20c2eaf872b32b",
+    "images": [
+      "src/main/resources/assets/create/textures/item/andesite_alloy.png",
+      "src/main/resources/assets/create/textures/item/belt_connector.png",
+      "src/main/resources/assets/create/textures/item/brass_ingot.png",
+      "src/main/resources/assets/create/textures/item/cardboard_chestplate.png"
+    ]
+  },
+  "vectorwing/FarmersDelight/1.20": {
+    "sha": "e854d56d4eea8dc120650d43da0d1472711797ad",
+    "images": [
+      "src/main/resources/assets/farmersdelight/textures/item/apple_cider.png",
+      "src/main/resources/assets/farmersdelight/textures/item/bacon.png",
+      "src/main/resources/assets/farmersdelight/textures/item/black_hanging_canvas_sign.png",
+      "src/main/resources/assets/farmersdelight/textures/item/cabbage_leaf.png"
+    ]
+  },
+  "Umpaz/BrewinAndChewin/main": {
+    "sha": "8be3d1a82f51bb6efe4cd8bb050b852c17e57931",
+    "images": [
+      "src/main/resources/assets/brewinandchewin/textures/item/beer.png",
+      "src/main/resources/assets/brewinandchewin/textures/item/bloody_mary.png",
+      "src/main/resources/assets/brewinandchewin/textures/item/cocoa_fudge.png",
+      "src/main/resources/assets/brewinandchewin/textures/item/egg_grog.png"
+    ]
+  },
+  "axperty/moredelight/1.21-neoforge": {
+    "sha": "99990138009e44d1aae3b90567e423f4c401a800",
+    "images": [
+      "src/main/resources/assets/moredelight/textures/item/bread_slice.png",
+      "src/main/resources/assets/moredelight/textures/item/carrot_soup.png",
+      "src/main/resources/assets/moredelight/textures/item/chicken_sandwich_with_egg_and_tomato.png",
+      "src/main/resources/assets/moredelight/textures/item/cooked_rice_with_beef.png"
+    ]
+  },
+  "Joshcraft2002/Dumplings-Delight-Rewrapped/main": {
+    "sha": "c72f089b47a3cd4c4becd333859321aeb36c885b",
+    "images": [
+      "src/main/resources/assets/dumplings_delight/textures/item/beef_tomato_boiled_dumpling.png",
+      "src/main/resources/assets/dumplings_delight/textures/item/calamari_boiled_dumpling.png",
+      "src/main/resources/assets/dumplings_delight/textures/item/celery_seeds.png",
+      "src/main/resources/assets/dumplings_delight/textures/item/celery.png"
+    ]
+  },
+  "axperty/cratedelight/1.21.4-neoforge": {
+    "sha": "76a27a169081e932e324c1cc1f69d55046ea9c92",
+    "images": [
+      "src/main/resources/assets/cratedelight/textures/block/apple_crate_side.png",
+      "src/main/resources/assets/cratedelight/textures/block/beetroot_crate_side.png",
+      "src/main/resources/assets/cratedelight/textures/block/beetroot_seeds_bag_top.png",
+      "src/main/resources/assets/cratedelight/textures/block/berry_crate_top.png"
+    ]
+  },
+  "axperty/storagedelight/1.21.4-neoforge": {
+    "sha": "6bf71e0c1e679b0da1109bca78e7f16ae91e9a50",
+    "images": [
+      "src/main/resources/assets/storagedelight/textures/block/acacia_bookshelf_with_door_front_open.png",
+      "src/main/resources/assets/storagedelight/textures/block/acacia_cabinet_with_polished_tuff_countertop_front_open.png",
+      "src/main/resources/assets/storagedelight/textures/block/bamboo_cabinet_with_glass_doors_front_open.png",
+      "src/main/resources/assets/storagedelight/textures/block/bamboo_cabinet_with_stone_bricks_countertop_front.png"
+    ]
+  },
+  "ianm1647/expandeddelight/1.21-neo": {
+    "sha": "ea826400654702587e86c9e94544bfd74f065083",
+    "images": [
+      "src/main/resources/assets/expandeddelight/textures/item/apple_juice.png",
+      "src/main/resources/assets/expandeddelight/textures/item/asparagus_mushroom_pasta.png",
+      "src/main/resources/assets/expandeddelight/textures/item/asparagus_soup.png",
+      "src/main/resources/assets/expandeddelight/textures/item/berry_sweet_roll.png"
+    ]
+  },
+  "ianm1647/farmersknives/dd8aded3c3c4e5b3ca0ae2e54db970ca6332a84c": {
+    "sha": "dd8aded3c3c4e5b3ca0ae2e54db970ca6332a84c",
+    "images": [
+      "src/main/resources/assets/farmersknives/textures/item/adamantite_knife.png",
+      "src/main/resources/assets/farmersknives/textures/item/aeternium_knife.png",
+      "src/main/resources/assets/farmersknives/textures/item/banglum_knife.png",
+      "src/main/resources/assets/farmersknives/textures/item/carmot_knife.png"
+    ]
+  },
+  "ianm1647/better-echo-shards/master": {
+    "sha": "b05ccab8ebf0a42a825a7b5c8669111a826d2a73",
+    "images": [
+      "src/main/resources/assets/betterechoshards/textures/item/echorite_axe.png",
+      "src/main/resources/assets/betterechoshards/textures/item/echorite_chest.png",
+      "src/main/resources/assets/betterechoshards/textures/item/echorite_feet.png",
+      "src/main/resources/assets/betterechoshards/textures/item/echorite_head.png"
+    ]
+  },
+  "ianm1647/more-hammers-and-excavators/1.20.1": {
+    "sha": "126dfd020b1b25dcab5ca5cb62e8945323390cb9",
+    "images": [
+      "src/main/resources/assets/morehammersexcavators/textures/item/additionaladditions/gilded_netherite_excavator.png",
+      "src/main/resources/assets/morehammersexcavators/textures/item/additionaladditions/rose_gold_hammer.png",
+      "src/main/resources/assets/morehammersexcavators/textures/item/betterend/terminite_excavator.png",
+      "src/main/resources/assets/morehammersexcavators/textures/item/betterend/thallasium_hammer.png"
+    ]
+  },
+  "ianm1647/naturesminerals-fabric/1.20": {
+    "sha": "fabcc167200807ca341322d435b98874990ab65f",
+    "images": [
+      "src/main/resources/assets/naturesminerals/textures/item/astrite_apple.png",
+      "src/main/resources/assets/naturesminerals/textures/item/astrite_feet.png",
+      "src/main/resources/assets/naturesminerals/textures/item/astrite_ingot.png",
+      "src/main/resources/assets/naturesminerals/textures/item/astrite_paxel.png"
+    ]
+  },
+  "Minecraft-LightLand/BarbequesDelight/main": {
+    "sha": "1fdca3d3d6921304bf4965945b404c74b553e378",
+    "images": [
+      "src/main/resources/assets/barbequesdelight/textures/item/barbeque_sauce.png",
+      "src/main/resources/assets/barbequesdelight/textures/item/bibimbap.png",
+      "src/main/resources/assets/barbequesdelight/textures/item/buffalo_sauce.png",
+      "src/main/resources/assets/barbequesdelight/textures/item/burnt_skewer.png"
+    ]
+  },
+  "AlabasterLeking/Crabbers-Delight/NeoForge-1.21.1": {
+    "sha": "9093f01444959ca0197e41d3be45c9ca39bff12d",
+    "images": [
+      "src/main/resources/assets/crabbersdelight/textures/item/arid_flesh.png",
+      "src/main/resources/assets/crabbersdelight/textures/item/bisque.png",
+      "src/main/resources/assets/crabbersdelight/textures/item/bucket_of_clawster_chum.png",
+      "src/main/resources/assets/crabbersdelight/textures/item/can.png"
+    ]
+  },
+  "AlabasterLeking/Sniffers-Delight/1.20.1": {
+    "sha": "f53fdd52ca48d3cd32fbfba0c9eeb55cc03a330a",
+    "images": [
+      "src/main/resources/assets/sniffersdelight/textures/item/blazing_berry_seeds.png",
+      "src/main/resources/assets/sniffersdelight/textures/item/blazing_berry.png",
+      "src/main/resources/assets/sniffersdelight/textures/item/bucket_of_sniffer_milk.png",
+      "src/main/resources/assets/sniffersdelight/textures/item/cave_carrot.png"
+    ]
+  },
+  "brnbrd/Delightful/1.20.1": {
+    "sha": "5db304351394a3425409e52d059612ea0b75fe6f",
+    "images": [
+      "src/main/resources/assets/delightful/textures/item/acorn.png",
+      "src/main/resources/assets/delightful/textures/item/amethyst_knife.png",
+      "src/main/resources/assets/delightful/textures/item/black_opal_knife.png",
+      "src/main/resources/assets/delightful/textures/item/cactus_flesh.png"
+    ]
+  },
+  "TheGridExpert/VampiresDelight/1.21": {
+    "sha": "153ef1d31bb7b44843664581f73172407e8d7f58",
+    "images": [
+      "src/main/resources/assets/vampiresdelight/textures/item/alchemical_cocktail.png",
+      "src/main/resources/assets/vampiresdelight/textures/item/bat_taco.png",
+      "src/main/resources/assets/vampiresdelight/textures/item/black_mushroom_soup.png",
+      "src/main/resources/assets/vampiresdelight/textures/item/blood_hot_dog.png"
+    ]
+  },
+  "brnbrd/CollectorsReap/1.20.1": {
+    "sha": "8efcd0354309600ee5192e216c6988e34b5e71c8",
+    "images": [
+      "src/main/resources/assets/collectorsreap/textures/item/adzuki_gummy.png",
+      "src/main/resources/assets/collectorsreap/textures/item/big_rice_ball.png",
+      "src/main/resources/assets/collectorsreap/textures/item/carbonara_pasta.png",
+      "src/main/resources/assets/collectorsreap/textures/item/chocolate_cannoli.png"
+    ]
+  },
+  "0999312/Corn-Delight/main": {
+    "sha": "68f6bb3a1862c35440e1428199e385642aa730ae",
+    "images": [
+      "src/main/resources/assets/corn_delight/textures/item/boiled_corn.png",
+      "src/main/resources/assets/corn_delight/textures/item/caramel_popcorn.png",
+      "src/main/resources/assets/corn_delight/textures/item/classic_corn_dog.png",
+      "src/main/resources/assets/corn_delight/textures/item/corn_dog.png"
+    ]
+  },
+  "FoggyHillside/End-s-Delight/1.21.1": {
+    "sha": "5778ed081dfb18656f04cb1ba91220bf87ea2bba",
+    "images": [
+      "src/main/resources/assets/ends_delight/textures/item/assorted_salad.png",
+      "src/main/resources/assets/ends_delight/textures/item/chorus_cookie.png",
+      "src/main/resources/assets/ends_delight/textures/item/chorus_fruit_grain.png",
+      "src/main/resources/assets/ends_delight/textures/item/chorus_fruit_pie_slice.png"
+    ]
+  },
+  "FoggyHillside/ExtraDelight/main": {
+    "sha": "e0ef8e3e5dbbfcce6a6d625033bba2f78ab9ffd9",
+    "images": [
+      "src/main/resources/assets/extradelight/textures/item/agar_sheets.png",
+      "src/main/resources/assets/extradelight/textures/item/badfood.png",
+      "src/main/resources/assets/extradelight/textures/item/bell_pepper.png",
+      "src/main/resources/assets/extradelight/textures/item/carrot_jam.png"
+    ]
+  },
+  "Pursuit-of-Glowstone/Obsidimancy/master": {
+    "sha": "e96de51ff2217ecf969535de7ec010a861840e35",
+    "images": [
+      "src/main/resources/assets/obsidimancy/textures/item/ender_shard.png",
+      "src/main/resources/assets/obsidimancy/textures/item/nether_shard.png",
+      "src/main/resources/assets/obsidimancy/textures/item/obsidian_shard.png",
+      "src/main/resources/assets/obsidimancy/textures/item/overworld_shard.png"
+    ]
+  },
+  "FireMuffin303/Muffins-ThaiDelight-Fabric/master": {
+    "sha": "decd270d3450c372ba72bb0ca27fda7f3d607d19",
+    "images": [
+      "src/main/resources/assets/muffins_thaidelight/textures/item/bottle_of_blue_dragonfly.png",
+      "src/main/resources/assets/muffins_thaidelight/textures/item/bottle_of_green_dragonfly.png",
+      "src/main/resources/assets/muffins_thaidelight/textures/item/bottle_of_yellow_dragonfly.png",
+      "src/main/resources/assets/muffins_thaidelight/textures/item/cooked_flower_crab.png"
+    ]
+  },
+  "HLHT-Studios/maple-delight/master": {
+    "sha": "61bc37c27cb2f9e1fd2c9ab0c50f6f1f322632fe",
+    "images": [
+      "src/main/resources/assets/maple_delight/textures/item/big_maple_candy.png",
+      "src/main/resources/assets/maple_delight/textures/item/hazel_door.png",
+      "src/main/resources/assets/maple_delight/textures/item/maple_boat.png",
+      "src/main/resources/assets/maple_delight/textures/item/maple_candy.png"
+    ]
+  },
+  "Nyancatpig/Alexs-Delight-1.19.2/main": {
+    "sha": "bbd61a77270f79ac75738d48b48eea3236194d93",
+    "images": [
+      "src/main/resources/assets/alexsdelight/textures/item/acacia_blossom_soup.png",
+      "src/main/resources/assets/alexsdelight/textures/item/bison_burger.png",
+      "src/main/resources/assets/alexsdelight/textures/item/bison_mince.png",
+      "src/main/resources/assets/alexsdelight/textures/item/bison_patty.png"
+    ]
+  },
+  "ShangguanXi/RusticDelight-Refabricated/1.21.1": {
+    "sha": "ca934addaf5b60469b6b3f8afe1443cc79ca81c1",
+    "images": [
+      "src/main/resources/assets/rusticdelight/textures/item/baked_potato_slices.png",
+      "src/main/resources/assets/rusticdelight/textures/item/batter.png",
+      "src/main/resources/assets/rusticdelight/textures/item/bell_pepper_green.png",
+      "src/main/resources/assets/rusticdelight/textures/item/bell_pepper_red.png"
+    ]
+  },
+  "Xaidee/GloompersDelight/1.20": {
+    "sha": "cf099f2043ce850f2584bfe5bdaba59dca3b7def",
+    "images": [
+      "src/main/resources/assets/gloompersdelight/textures/item/blood_bottle.png",
+      "src/main/resources/assets/gloompersdelight/textures/item/cloggrum_knife.png",
+      "src/main/resources/assets/gloompersdelight/textures/item/cranberries.png",
+      "src/main/resources/assets/gloompersdelight/textures/item/forgotten_knife.png"
+    ]
+  },
+  "Flomik10002/DelightfulCreatorsFabric/1.19.2": {
+    "sha": "a0e2de15414088238080a3d02f2f8932a8f27d62",
+    "images": [
+      "src/main/resources/assets/delightfulcreators/textures/item/apple_cider_bucket.png",
+      "src/main/resources/assets/delightfulcreators/textures/item/beef_stew_bucket.png",
+      "src/main/resources/assets/delightfulcreators/textures/item/chicken_soup_bucket.png",
+      "src/main/resources/assets/delightfulcreators/textures/item/fish_stew_bucket.png"
+    ]
+  },
+  "Flomik10002/CulturalCreatorsFabric/fabric/1.20.1": {
+    "sha": "e0ff673e03a119ac5f8dd239c035fcc7ae3ad8ef",
+    "images": [
+      "src/main/resources/assets/culturalcreators/textures/item/creamed_corn_bucket.png",
+      "src/main/resources/assets/culturalcreators/textures/item/incomplete_beef_burrito.png",
+      "src/main/resources/assets/culturalcreators/textures/item/incomplete_chicken_taco.png",
+      "src/main/resources/assets/culturalcreators/textures/item/incomplete_eggplant_burger.png"
+    ]
+  },
+  "Flomik10002/RespiteCreatorsFabric/1.19.2": {
+    "sha": "151772cd7eec4dc516055b40355d424326e62134",
+    "images": [
+      "src/main/resources/assets/respitecreators/textures/item/black_tea_bucket.png",
+      "src/main/resources/assets/respitecreators/textures/item/blazing_chili_bucket.png",
+      "src/main/resources/assets/respitecreators/textures/item/coffee_bucket.png",
+      "src/main/resources/assets/respitecreators/textures/item/coffee_cake_coating.png"
+    ]
+  },
+  "ChefMooon/ubes-delight/1.20.1/multi": {
+    "sha": "b168a70ea97365cfcdafa9b17d4206d2379cc17c",
+    "images": [
+      "common/src/main/resources/assets/ubesdelight/textures/item/arroz_caldo.png",
+      "common/src/main/resources/assets/ubesdelight/textures/item/ensaymada_stage1.png",
+      "common/src/main/resources/assets/ubesdelight/textures/item/fish_sauce_bottle.png",
+      "common/src/main/resources/assets/ubesdelight/textures/item/hopia_munggo_stage2.png"
+    ]
+  },
+  "ChefMooon/frights-delight/main": {
+    "sha": "44e606009ba37fe66b40181db88f1a07c003155e",
+    "images": [
+      "src/main/resources/assets/frightsdelight/textures/item/apple_candy.png",
+      "src/main/resources/assets/frightsdelight/textures/item/apple_slime.png",
+      "src/main/resources/assets/frightsdelight/textures/item/bone_soul_campfire.png",
+      "src/main/resources/assets/frightsdelight/textures/item/cookie_flesh.png"
+    ]
+  },
+  "Chefs-Delight/Farmersrespite-Fabric/master": {
+    "sha": "f5eacb08b53c84583d92160545e524a722591b75",
+    "images": [
+      "src/main/resources/assets/farmersrespite/textures/item/black_cod.png",
+      "src/main/resources/assets/farmersrespite/textures/item/black_tea_leaves.png",
+      "src/main/resources/assets/farmersrespite/textures/item/black_tea.png",
+      "src/main/resources/assets/farmersrespite/textures/item/blazing_chili.png"
+    ]
+  },
+  "Looobay/chococrafts-delight/master": {
+    "sha": "55df425be2d23dda1adaefd3ede666b52772c856",
+    "images": [
+      "src/main/resources/assets/chococraftdelight/textures/item/baked_gold_gysahl.png",
+      "src/main/resources/assets/chococraftdelight/textures/item/baked_pickled_gold_gysahl.png",
+      "src/main/resources/assets/chococraftdelight/textures/item/chocobo_boots.png",
+      "src/main/resources/assets/chococraftdelight/textures/item/chocobo_burger.png"
+    ]
+  },
+  "Chefs-Delight/NethersDelight_Forge/1.20.1": {
+    "sha": "a8df2ee6296aed40fb06f7b7d9f021327fd1c5f1",
+    "images": [
+      "src/main/resources/assets/nethersdelight/textures/item/diamond_machete.png",
+      "src/main/resources/assets/nethersdelight/textures/item/golden_machete.png",
+      "src/main/resources/assets/nethersdelight/textures/item/grilled_strider.png",
+      "src/main/resources/assets/nethersdelight/textures/item/ground_strider.png"
+    ]
+  },
+  "Jasons-impart/Create-Delight-Remake/main": {
+    "sha": "3aa6a3161b9365117021725a235ed200815cafb2",
+    "images": [
+      "kubejs/assets/ae2/textures/item/advanced_card.png",
+      "kubejs/assets/ae2/textures/item/item_storage_cell_256k.png",
+      "kubejs/assets/ae2omnicells/textures/item/complex_omni_cell_64k.png",
+      "kubejs/assets/ae2omnicells/textures/item/quantum_omni_cell_256m.png"
+    ]
+  },
+  "Macck209/Fishing101/1.20.4": {
+    "sha": "cf6617927aa7ddcd1a9bed8b62d2847342a20c52",
+    "images": [
+      "src/main/resources/assets/fishing101/textures/item/anglerfish.png",
+      "src/main/resources/assets/fishing101/textures/item/chicken_broth.png",
+      "src/main/resources/assets/fishing101/textures/item/crab_claw.png",
+      "src/main/resources/assets/fishing101/textures/item/divine_jellyfish.png"
+    ]
+  },
+  "SilverAndro/lava-fishing/master": {
+    "sha": "71a83d517eea97d0a44fb8b06a2ad8ae136eaf67",
+    "images": [
+      "src/main/resources/assets/lavafishing/textures/item/crimson_salmon_cooked.png",
+      "src/main/resources/assets/lavafishing/textures/item/crimson_salmon.png",
+      "src/main/resources/assets/lavafishing/textures/item/goldfish.png",
+      "src/main/resources/assets/lavafishing/textures/item/lava_bottle.png"
+    ]
+  },
+  "MrTJP/ProjectRed/1.21.1": {
+    "sha": "e631f983c9b31c79f04deffa92ae5e68468326a0",
+    "images": [
+      "core/src/main/resources/assets/projectred_core/textures/item/anode.png",
+      "core/src/main/resources/assets/projectred_core/textures/item/bundled_plate.png",
+      "core/src/main/resources/assets/projectred_core/textures/item/electrotine_dust.png",
+      "core/src/main/resources/assets/projectred_core/textures/item/energized_silicon_chip.png"
+    ]
+  },
+  "HyperPigeon/MoreTotemsOfUndying/1.20.1": {
+    "sha": "cc0bb4cf43150fefa07e27b61d2cb14c2793a6ca",
+    "images": [
+      "common/src/main/resources/assets/moretotems/textures/item/explosive_totem_of_undying.png",
+      "common/src/main/resources/assets/moretotems/textures/item/ghastly_totem_of_undying.png",
+      "common/src/main/resources/assets/moretotems/textures/item/rotting_totem_of_undying.png",
+      "common/src/main/resources/assets/moretotems/textures/item/skeletal_totem_of_undying.png"
+    ]
+  },
+  "ProfessorFichte/More-RPG-Library/1.21.1": {
+    "sha": "ae1cc7e02edc557cb2e46257ad4346cea4a995ed",
+    "images": [
+      "common/src/main/resources/assets/mrpg_lib/textures/item/aqua_stone.png",
+      "common/src/main/resources/assets/mrpg_lib/textures/item/ascetic_upgrade_crystal.png",
+      "common/src/main/resources/assets/mrpg_lib/textures/item/general_upgrade_crystal.png",
+      "common/src/main/resources/assets/mrpg_lib/textures/item/hardened_leather.png"
+    ]
+  },
+  "ProfessorFichte/Forcemaster/1.21.1": {
+    "sha": "dcdcfe2d228539e33bd2b80a331ee940ca19b099",
+    "images": [
+      "common/src/main/resources/assets/forcemaster_rpg/textures/item/aeternium_knuckle_inventory.png",
+      "common/src/main/resources/assets/forcemaster_rpg/textures/item/aether_knuckle_inventory.png",
+      "common/src/main/resources/assets/forcemaster_rpg/textures/item/aken_chest.png",
+      "common/src/main/resources/assets/forcemaster_rpg/textures/item/aken_head.png"
+    ]
+  },
+  "ProfessorFichte/Elemental-Wizards/1.21.1": {
+    "sha": "e02bdd8d4c3cc2df0fd93b0fa30f41b67c803310",
+    "images": [
+      "common/src/main/resources/assets/elemental_wizards_rpg/textures/item/armor/aqua/kelp_chest.png",
+      "common/src/main/resources/assets/elemental_wizards_rpg/textures/item/armor/aqua/kelp_head.png",
+      "common/src/main/resources/assets/elemental_wizards_rpg/textures/item/armor/aqua/netherite_kelp_feet.png",
+      "common/src/main/resources/assets/elemental_wizards_rpg/textures/item/armor/aqua/ocean_robe_chest.png"
+    ]
+  },
+  "ProfessorFichte/Witcher/1.21.1": {
+    "sha": "580719355bd1585e12047c7cac1fb7a70b48d5b0",
+    "images": [
+      "common/src/main/resources/assets/witcher_rpg/textures/item/armor/enhanced_feline_chest.png",
+      "common/src/main/resources/assets/witcher_rpg/textures/item/armor/enhanced_griffin_legs.png",
+      "common/src/main/resources/assets/witcher_rpg/textures/item/armor/enhanced_wolven_head.png",
+      "common/src/main/resources/assets/witcher_rpg/textures/item/armor/grandmaster_feline_head.png"
+    ]
+  },
+  "ProfessorFichte/Additional-RPG-Jewelry/1.21.1": {
+    "sha": "fd686d16469831012af239396b481ad4af01e90e",
+    "images": [
+      "common/src/main/resources/assets/additional_rpg_jewelry/textures/item/aquamarine_necklace.png",
+      "common/src/main/resources/assets/additional_rpg_jewelry/textures/item/aquamarine_ring.png",
+      "common/src/main/resources/assets/additional_rpg_jewelry/textures/item/cactea_ring.png",
+      "common/src/main/resources/assets/additional_rpg_jewelry/textures/item/dark_steel_jade_ring.png"
+    ]
+  },
+  "ProfessorFichte/Archers-Expansion/1.20.1": {
+    "sha": "facf7cf60af9688153a42d85dfec86c09663beb8",
+    "images": [
+      "src/main/resources/assets/archers_expansion/textures/item/deadeye_chest.png",
+      "src/main/resources/assets/archers_expansion/textures/item/deadeye_feet.png",
+      "src/main/resources/assets/archers_expansion/textures/item/deadeye_head.png",
+      "src/main/resources/assets/archers_expansion/textures/item/deadeye_legs.png"
+    ]
+  },
+  "ProfessorFichte/Loot-N-Explore/1.20.1": {
+    "sha": "4603ecc09b1bb1a72b85ba2e8cf96913e69639d3",
+    "images": [
+      "src/main/resources/assets/loot_n_explore/textures/item/drinks/apple_juice.png",
+      "src/main/resources/assets/loot_n_explore/textures/item/drinks/beet_rootbeer.png",
+      "src/main/resources/assets/loot_n_explore/textures/item/drinks/chorus_extract.png",
+      "src/main/resources/assets/loot_n_explore/textures/item/drinks/espresso.png"
+    ]
+  },
+  "efekos/MoreCakes/master": {
+    "sha": "35958e2d840bce851b492489eb231f1e555bbe44",
+    "images": [
+      "src/main/resources/assets/minecraft/textures/item/cake_chocolate.png",
+      "src/main/resources/assets/morecakes/textures/item/huge_cake/huge_cake_cb_cg_cb.png",
+      "src/main/resources/assets/morecakes/textures/item/huge_cake/huge_cake_cb_cs_vn.png",
+      "src/main/resources/assets/morecakes/textures/item/huge_cake/huge_cake_cb_vn_vb.png"
+    ]
+  },
+  "raulsmartin/Food-Expansion/1.20": {
+    "sha": "da0d9d6e090f7ee82aca94afd8f35434d9dd1b1c",
+    "images": [
+      "src/main/resources/assets/foodexpansion/textures/item/bacon_and_egg.png",
+      "src/main/resources/assets/foodexpansion/textures/item/bacon.png",
+      "src/main/resources/assets/foodexpansion/textures/item/bat_wing.png",
+      "src/main/resources/assets/foodexpansion/textures/item/blaze_cream.png"
+    ]
+  },
+  "kanpov/Cryonic/master": {
+    "sha": "ef37158815f53280e75a4d1583770431dfee0b45",
+    "images": [
+      "src/main/resources/assets/cryonic/textures/item/overdue_almond_brittle.png",
+      "src/main/resources/assets/cryonic/textures/item/overdue_barley.png",
+      "src/main/resources/assets/cryonic/textures/item/overdue_cabbage.png",
+      "src/main/resources/assets/cryonic/textures/item/overdue_cheese.png"
+    ]
+  },
+  "Mixinors/Astromine/development-1.19.2": {
+    "sha": "d5570e67ebda7018caf69ea558373d129d7110a7",
+    "images": [
+      "src/main/resources/assets/astromine/textures/item/advanced_battery_pack.png",
+      "src/main/resources/assets/astromine/textures/item/asterite_hoe.png",
+      "src/main/resources/assets/astromine/textures/item/asteroid_lead_ore_cluster.png",
+      "src/main/resources/assets/astromine/textures/item/bronze_axe.png"
+    ]
+  },
+  "TechReborn/TechReborn/26.3": {
+    "sha": "e3a65c562b99cbe6176c90993a2ee28a54b74729",
+    "images": [
+      "src/main/resources/assets/techreborn/textures/item/armor/bronze_boots.png",
+      "src/main/resources/assets/techreborn/textures/item/armor/quantum_chestplate.png",
+      "src/main/resources/assets/techreborn/textures/item/armor/steel_leggings.png",
+      "src/main/resources/assets/techreborn/textures/item/cables/insulated_copper_cable.png"
+    ]
+  },
+  "mrh0/createaddition/1.19.2": {
+    "sha": "089ddda8c3eff80d2ea57bc404c0c9946685d1eb",
+    "images": [
+      "src/main/resources/assets/createaddition/textures/item/bioethanol_bucket.png",
+      "src/main/resources/assets/createaddition/textures/item/biomass_pellet.png",
+      "src/main/resources/assets/createaddition/textures/item/brass_rod.png",
+      "src/main/resources/assets/createaddition/textures/item/cake_base.png"
+    ]
+  },
+  "CyclopsMC/IntegratedDynamics/master-1.21": {
+    "sha": "477351ab08fdbe913df4ebfe4fb7fc91ce39730f",
+    "images": [
+      "src/main/resources/assets/integrateddynamics/textures/item/bucket_liquid_chorus.png",
+      "src/main/resources/assets/integrateddynamics/textures/item/bucket_menril_resin.png",
+      "src/main/resources/assets/integrateddynamics/textures/item/crystalized_chorus_chunk.png",
+      "src/main/resources/assets/integrateddynamics/textures/item/crystalized_menril_chunk.png"
+    ]
+  },
+  "quek04/undergarden/1.21": {
+    "sha": "6d7f02deab3e2ad44692f7edf2dea1cca3ba747f",
+    "images": [
+      "src/main/resources/assets/minecraft/textures/item/bucket_content/axolotl.png",
+      "src/main/resources/assets/minecraft/textures/item/bucket_content/tadpole.png",
+      "src/main/resources/assets/undergarden/textures/item/ancient_root_chest_boat.png",
+      "src/main/resources/assets/undergarden/textures/item/bloody_stew.png"
+    ]
+  },
+  "Infamous-Misadventures/Dungeons-Gear/1.19": {
+    "sha": "9ba0075c5b2f13ef54ec914ad1327a853ecdce6f",
+    "images": [
+      "src/main/resources/assets/dungeons_gear/textures/item/anchor.png",
+      "src/main/resources/assets/dungeons_gear/textures/item/armor/black_wolf_boots.png",
+      "src/main/resources/assets/dungeons_gear/textures/item/armor/emerald_helmet.png",
+      "src/main/resources/assets/dungeons_gear/textures/item/armor/grim_boots.png"
+    ]
+  },
+  "Infamous-Misadventures/Dungeons-Mobs/1.19": {
+    "sha": "f04b11e7b3672776599fd15ad98a61c53f63b182",
+    "images": [
+      "src/main/resources/assets/dungeons_mobs/textures/item/alpine_boots.png",
+      "src/main/resources/assets/dungeons_mobs/textures/item/alpine_leggings.png",
+      "src/main/resources/assets/dungeons_mobs/textures/item/chef_chestplate.png",
+      "src/main/resources/assets/dungeons_mobs/textures/item/cracked_netherite_piglin_helmet.png"
+    ]
+  },
+  "Juuxel/Adorn/1.21": {
+    "sha": "376dea7eb9319140681a5abc9e8926341051bec1",
+    "images": [
+      "common/src/main/resources/assets/adorn/textures/item/copper_nugget.png",
+      "common/src/main/resources/assets/adorn/textures/item/glow_berry_tea.png",
+      "common/src/main/resources/assets/adorn/textures/item/guide_book.png",
+      "common/src/main/resources/assets/adorn/textures/item/hot_chocolate.png"
+    ]
+  },
+  "MysticMods/MysticalWorld/1.18": {
+    "sha": "8ca03f2a922ab42ee90b63bf918dc92571c11841",
+    "images": [
+      "src/main/resources/assets/mysticalworld/textures/item/antler_hat.png",
+      "src/main/resources/assets/mysticalworld/textures/item/aubergine_seeds.png",
+      "src/main/resources/assets/mysticalworld/textures/item/cactus_axe.png",
+      "src/main/resources/assets/mysticalworld/textures/item/cactus_syrup.png"
+    ]
+  },
+  "MysticMods/Embers/master": {
+    "sha": "78b67143dac409318361c66aec7e39e78bf32124",
+    "images": [
+      "src/main/resources/assets/embers/textures/item/arcaic_brick.png",
+      "src/main/resources/assets/embers/textures/item/ashen_steel_ingot.png",
+      "src/main/resources/assets/embers/textures/item/caminite_blend.png",
+      "src/main/resources/assets/embers/textures/item/caminite_brick.png"
+    ]
+  },
+  "Rearth/Oritech/1.21": {
+    "sha": "225b182d0f8d2f9eb56a61220569dc32c4461f8e",
+    "images": [
+      "common/src/main/resources/assets/oritech/textures/item/adamant_dust.png",
+      "common/src/main/resources/assets/oritech/textures/item/basic_battery.png",
+      "common/src/main/resources/assets/oritech/textures/item/chainsaw.png",
+      "common/src/main/resources/assets/oritech/textures/item/copper_gem.png"
+    ]
+  },
+  "Ellpeck/ActuallyAdditions/main": {
+    "sha": "cd9d9c63254f471f966ee51b078afdf47af5f852",
+    "images": [
+      "src/main/resources/assets/actuallyadditions/textures/item/advanced_coil.png",
+      "src/main/resources/assets/actuallyadditions/textures/item/black_quartz.png",
+      "src/main/resources/assets/actuallyadditions/textures/item/coffee_beans.png",
+      "src/main/resources/assets/actuallyadditions/textures/item/diamatine_crystal_shard.png"
+    ]
+  },
+  "Ellpeck/PrettyPipes/main": {
+    "sha": "b9aa61453e83ba786ac9bda4683e6cf5a849b2a5",
+    "images": [
+      "src/main/resources/assets/prettypipes/textures/item/blank_module.png",
+      "src/main/resources/assets/prettypipes/textures/item/damage_filter_modifier.png",
+      "src/main/resources/assets/prettypipes/textures/item/filter_increase_modifier.png",
+      "src/main/resources/assets/prettypipes/textures/item/high_extraction_module.png"
+    ]
+  },
+  "Ellpeck/NaturesAura/main": {
+    "sha": "775dc1750f9fdb1cbccdcea870d747b6f6836176",
+    "images": [
+      "src/main/resources/assets/naturesaura/textures/item/ancient_stick.png",
+      "src/main/resources/assets/naturesaura/textures/item/aura_trove.png",
+      "src/main/resources/assets/naturesaura/textures/item/bottle_two_the_rebottling.png",
+      "src/main/resources/assets/naturesaura/textures/item/cave_finder.png"
+    ]
+  },
+  "TeamGalacticraft/Galacticraft/main": {
+    "sha": "d447fd6cafcff62a9af9516119213beb76b6f13f",
+    "images": [
+      "src/main/resources/assets/galacticraft/textures/item/advanced_wafer.png",
+      "src/main/resources/assets/galacticraft/textures/item/battery.png",
+      "src/main/resources/assets/galacticraft/textures/item/buggy_seat.png",
+      "src/main/resources/assets/galacticraft/textures/item/cargo_rocket_schematic.png"
+    ]
+  },
+  "AgriCraft/AgriCraft/master": {
+    "sha": "e2779f836bf47fd44bf5fd2aa7b1c9cd3bdccd95",
+    "images": [
+      "src/main/resources/assets/agricraft/textures/item/amathyllis_petal.png",
+      "src/main/resources/assets/agricraft/textures/item/clipper.png",
+      "src/main/resources/assets/agricraft/textures/item/crop_sticks_iron.png",
+      "src/main/resources/assets/agricraft/textures/item/crop_sticks_wood.png"
+    ]
+  },
+  "joshiejack/Mariculture/1.10.2": {
+    "sha": "6248487c7e4c9fc4ef891ba8c6be14543b11b679",
+    "images": [
+      "src/main/resources/assets/mariculture/textures/items/buoyancyaid.png",
+      "src/main/resources/assets/mariculture/textures/items/fishing/hook_fly.png",
+      "src/main/resources/assets/mariculture/textures/items/fishing/hook_iron.png",
+      "src/main/resources/assets/mariculture/textures/items/fishing/hook_wood.png"
+    ]
+  },
+  "AztechMC/Modern-Industrialization/1.21.x": {
+    "sha": "da1117f5ed60a4f13f30c7074289c808d51f08c3",
+    "images": [
+      "src/generated/resources/assets/modern_industrialization/textures/item/acetylene_bucket.png",
+      "src/generated/resources/assets/modern_industrialization/textures/item/annealed_copper_ingot.png",
+      "src/generated/resources/assets/modern_industrialization/textures/item/beryllium_ingot.png",
+      "src/generated/resources/assets/modern_industrialization/textures/item/bronze_ring.png"
+    ]
+  },
+  "mekanism/Mekanism/1.21.x": {
+    "sha": "bcd7a8bf594cff9614eb12238fe3776f19da24d9",
+    "images": [
+      "src/additions/resources/assets/mekanismadditions/textures/item/walkie_talkie_ch1.png",
+      "src/generators/resources/assets/mekanismgenerators/textures/item/module_geothermal_generator_unit.png",
+      "src/main/resources/assets/mekanism/textures/item/canteen.png",
+      "src/main/resources/assets/mekanism/textures/item/configurator_empty.png"
+    ]
+  },
+  "Buuz135/SushiGoCrafting/1.20": {
+    "sha": "a18d53cab55f589ee8600761c2019a01a11bbe11",
+    "images": [
+      "src/main/resources/assets/sushigocrafting/textures/item/avocado_sapling.png",
+      "src/main/resources/assets/sushigocrafting/textures/item/california/crab_california.png",
+      "src/main/resources/assets/sushigocrafting/textures/item/california/salmon_california.png",
+      "src/main/resources/assets/sushigocrafting/textures/item/california/tobiko_crab_california.png"
+    ]
+  },
+  "OneLemonyBoi/MiniUtilities/1.20.x": {
+    "sha": "853d87aa4595aed0fd340d162d8a2a4f9d768e4e",
+    "images": [
+      "src/main/resources/assets/miniutilities/textures/item/angel_ring.png",
+      "src/main/resources/assets/miniutilities/textures/item/bat_wing.png",
+      "src/main/resources/assets/miniutilities/textures/item/destruction_pickaxe.png",
+      "src/main/resources/assets/miniutilities/textures/item/emerald_opinium_core.png"
+    ]
+  },
+  "sciwhiz12/SnowyWeaponry/1.21.x": {
+    "sha": "334b728deed028b88dda25c609cfeff10d56ecdd",
+    "images": [
+      "src/main/resources/assets/snowyweaponry/textures/item/diamond_chunk.png",
+      "src/main/resources/assets/snowyweaponry/textures/item/diamond_cored_snowball.png",
+      "src/main/resources/assets/snowyweaponry/textures/item/explosive_snowball.png",
+      "src/main/resources/assets/snowyweaponry/textures/item/gold_cored_snowball.png"
+    ]
+  },
+  "CamoMano/Enriched/master": {
+    "sha": "dd57caa12e3a9450d6f43bd5333bb2e96a05059f",
+    "images": [
+      "src/main/resources/assets/enriched/textures/item/amber.png",
+      "src/main/resources/assets/enriched/textures/item/berry_juice.png",
+      "src/main/resources/assets/enriched/textures/item/bronze_chestplate.png",
+      "src/main/resources/assets/enriched/textures/item/bronze_ingot.png"
+    ]
+  },
+  "FireMuffin303/Muffins-ThaiDelight/1.21": {
+    "sha": "be3b2458883878927abfde2dce95614396a84497",
+    "images": [
+      "common/src/main/resources/assets/muffins_thaidelight/textures/item/bottle_of_blue_dragonfly.png",
+      "common/src/main/resources/assets/muffins_thaidelight/textures/item/bottle_of_green_dragonfly.png",
+      "common/src/main/resources/assets/muffins_thaidelight/textures/item/bottle_of_yellow_dragonfly.png",
+      "common/src/main/resources/assets/muffins_thaidelight/textures/item/cooked_flower_crab.png"
+    ]
+  },
+  "VIDN1TE/SalmonberryAddition/master": {
+    "sha": "54972d792553b3af06e0632b74b12e892cd4772e",
+    "images": [
+      "src/main/resources/assets/salmonberryaddition/textures/item/apple_jam.png",
+      "src/main/resources/assets/salmonberryaddition/textures/item/melon_jam.png",
+      "src/main/resources/assets/salmonberryaddition/textures/item/salmon_berry_cheesecake.png",
+      "src/main/resources/assets/salmonberryaddition/textures/item/salmonberries_jam.png"
+    ]
+  },
+  "davidjjung/irregularchef/master": {
+    "sha": "08cb7f71646d2186987e384d734775e3bb5d8145",
+    "images": [
+      "src/main/resources/assets/irregular_chef/textures/item/birds_nest_soup.png",
+      "src/main/resources/assets/irregular_chef/textures/item/charcoal_waffles.png",
+      "src/main/resources/assets/irregular_chef/textures/item/humble_pie_slice.png",
+      "src/main/resources/assets/irregular_chef/textures/item/humble_pie.png"
+    ]
+  },
+  "ryankshah/fieldtofork/main": {
+    "sha": "ede7db81c97aae7bc5f38a7af3bae6e1b60f5a1b",
+    "images": [
+      "common/src/main/resources/assets/fieldtofork/textures/item/apple_cabbage_stew.png",
+      "common/src/main/resources/assets/fieldtofork/textures/item/banana_hanging_sign.png",
+      "common/src/main/resources/assets/fieldtofork/textures/item/bananas.png",
+      "common/src/main/resources/assets/fieldtofork/textures/item/broccoli.png"
+    ]
+  },
+  "natanmaia95/ModFestProject121/main": {
+    "sha": "7a9c716b57dae4e61f9e12c214866c2a71fe81f0",
+    "images": [
+      "src/main/resources/assets/gastroarchaeology/textures/item/baked_cassava.png",
+      "src/main/resources/assets/gastroarchaeology/textures/item/beef_pacoca.png",
+      "src/main/resources/assets/gastroarchaeology/textures/item/brazilian_pizza.png",
+      "src/main/resources/assets/gastroarchaeology/textures/item/cassava_flour.png"
+    ]
+  },
+  "AurySystem/Vegant-Meat-Fields/1.19": {
+    "sha": "ed4f6a81ded5127d4c6a57875a6e38e2e7c55200",
+    "images": [
+      "src/main/resources/assets/ethicalmeatfields/textures/item/beefroot_spores.png",
+      "src/main/resources/assets/ethicalmeatfields/textures/item/boarage_seeds.png",
+      "src/main/resources/assets/ethicalmeatfields/textures/item/chickpea.png",
+      "src/main/resources/assets/ethicalmeatfields/textures/item/cod_fungi_spores.png"
+    ]
+  },
+  "keishispl/farmers-delight-expansion/1.20.1": {
+    "sha": "f480a165e5a7832a5a08502e41d3d9a386ff45ed",
+    "images": [
+      "src/main/resources/assets/farmersdelightexpansion/textures/item/blueberries.png",
+      "src/main/resources/assets/farmersdelightexpansion/textures/item/blueberry_cheesecake_slice.png",
+      "src/main/resources/assets/farmersdelightexpansion/textures/item/blueberry_cheesecake.png",
+      "src/main/resources/assets/farmersdelightexpansion/textures/item/grape_juice.png"
+    ]
+  },
+  "acikek/pescatore/main": {
+    "sha": "690963be0ef9ce2f2b9d9142f31fae9a87fffa77",
+    "images": [
+      "src/main/resources/assets/pescatore/textures/item/adept_rod_cast.png",
+      "src/main/resources/assets/pescatore/textures/item/adept_rod.png",
+      "src/main/resources/assets/pescatore/textures/item/aether_rod.png",
+      "src/main/resources/assets/pescatore/textures/item/arapaima.png"
+    ]
+  },
+  "Christofmeg/BrutalHarvest/1.20": {
+    "sha": "4c3629fb3a2378619395923d32c663ea67ced35c",
+    "images": [
+      "Common/src/main/resources/assets/brutalharvest/textures/item/beef_sandwich.png",
+      "Common/src/main/resources/assets/brutalharvest/textures/item/blueberry_toast.png",
+      "Common/src/main/resources/assets/brutalharvest/textures/item/bottled_coffee.png",
+      "Common/src/main/resources/assets/brutalharvest/textures/item/chicken_sandwich.png"
+    ]
+  },
+  "SomeMelonShark/Fish_and_Bizz/master": {
+    "sha": "2c99b4c6801d368bd509fb5bc8489313516606dc",
+    "images": [
+      "src/main/resources/assets/fishandshiz/textures/item/amazon_sword.png",
+      "src/main/resources/assets/fishandshiz/textures/item/amur_carp_fry_bucket.png",
+      "src/main/resources/assets/fishandshiz/textures/item/anubias.png",
+      "src/main/resources/assets/fishandshiz/textures/item/auratus_fry_bucket.png"
+    ]
+  },
+  "supertoady/sinister-circus-1.21/master": {
+    "sha": "3b05b7aed2dc46dd37241250eb3af021f7e9e0a1",
+    "images": [
+      "src/main/resources/assets/sinister-circus/textures/item/balloon_bomb.png",
+      "src/main/resources/assets/sinister-circus/textures/item/balloon_dog.png",
+      "src/main/resources/assets/sinister-circus/textures/item/balloon.png",
+      "src/main/resources/assets/sinister-circus/textures/item/choco_frosted_churros.png"
+    ]
+  },
+  "RandomMcSomethin/Crafty-Cuisine/main": {
+    "sha": "fc720d938003858101cad0360128b5c3b5c731a5",
+    "images": [
+      "src/main/resources/assets/craftycuisine/textures/item/apple_pie.png",
+      "src/main/resources/assets/craftycuisine/textures/item/bacon.png",
+      "src/main/resources/assets/craftycuisine/textures/item/cactus_soup.png",
+      "src/main/resources/assets/craftycuisine/textures/item/candied_chorus_fruit.png"
+    ]
+  },
+  "Polarice3/Goety-2/1.20": {
+    "sha": "02adbe7491767210f63857fa763a6f1de1262cbd",
+    "images": [
+      "src/main/resources/assets/goety/textures/item/abyss_crown.png",
+      "src/main/resources/assets/goety/textures/item/arca_compass/arca_compass_14.png",
+      "src/main/resources/assets/goety/textures/item/black_iron_leggings.png",
+      "src/main/resources/assets/goety/textures/item/command_horn.png"
+    ]
+  },
+  "Pandarix/VerdantVibes/main": {
+    "sha": "6f2cef7a0d311324c600245e95749c831b6e14f9",
+    "images": [
+      "src/main/resources/assets/verdantvibes/textures/item/candy_tuft.png",
+      "src/main/resources/assets/verdantvibes/textures/item/dragon_tree.png",
+      "src/main/resources/assets/verdantvibes/textures/item/ivy.png",
+      "src/main/resources/assets/verdantvibes/textures/item/lobelia.png"
+    ]
+  },
+  "DonovanDMC/ProjectExpansion/1.20.1": {
+    "sha": "4436aa664da9e26b63a47af9c3678631cace44b6",
+    "images": [
+      "src/main/resources/assets/projectexpansion/textures/item/advanced_alchemical_book.png",
+      "src/main/resources/assets/projectexpansion/textures/item/arcane_tablet.png",
+      "src/main/resources/assets/projectexpansion/textures/item/fuel/blue.png",
+      "src/main/resources/assets/projectexpansion/textures/item/fuel/lime.png"
+    ]
+  },
+  "FoundationGames/Sandwichable/1.20": {
+    "sha": "4cdc6d13622807e1c0f9ea228334aa0ddfc12cb7",
+    "images": [
+      "src/main/resources/assets/sandwichable/textures/item/ancient_grain_bread_slice_inner.png",
+      "src/main/resources/assets/sandwichable/textures/item/ancient_grain_seeds.png",
+      "src/main/resources/assets/sandwichable/textures/item/bread_slice.png",
+      "src/main/resources/assets/sandwichable/textures/item/candescent_cheese_culture_bottle.png"
+    ]
+  },
+  "Nova-Committee/Re-Avaritia/forge/1.20.1": {
+    "sha": "ad0bccdf4b6fb6a7aca8e14781824a8a390c136c",
+    "images": [
+      "src/main/resources/assets/avaritia/textures/item/armor/boots/layer_0.png",
+      "src/main/resources/assets/avaritia/textures/item/armor/horse/neutron_horse_armor.png",
+      "src/main/resources/assets/avaritia/textures/item/resource/crystal/diamond_lattice.png",
+      "src/main/resources/assets/avaritia/textures/item/resource/neutron/neutron_gear.png"
+    ]
+  },
+  "LordDeatHunter/HarvestScythes/master": {
+    "sha": "cd99f8c57b5655d83f5908ec335b666dc3967ba9",
+    "images": [
+      "src/main/resources/assets/harvest_scythes/textures/item/adamantite_machete.png",
+      "src/main/resources/assets/harvest_scythes/textures/item/adb_nether_scythe.png",
+      "src/main/resources/assets/harvest_scythes/textures/item/aquarium_scythe.png",
+      "src/main/resources/assets/harvest_scythes/textures/item/batet_scythe.png"
+    ]
+  },
+  "Sparkierkan7/thermite_mod/master": {
+    "sha": "3aa5f8c950e38b26b3008cf7ad0ec5c918775846",
+    "images": [
+      "src/main/resources/assets/therm/textures/item/gold_sweet_berries_noleaf.png",
+      "src/main/resources/assets/therm/textures/item/ice_juice_1.png",
+      "src/main/resources/assets/therm/textures/item/thermometer.png",
+      "src/main/resources/assets/therm/textures/item/wool_cloth_1.png"
+    ]
+  },
+  "Pitan76/item-alchemy/main": {
+    "sha": "591b7d25ddb5e9f3b7cb77993a6b3b24a456d0f0",
+    "images": [
+      "src/main/resources/assets/itemalchemy/textures/item/_alchemy_pad.png",
+      "src/main/resources/assets/itemalchemy/textures/item/_watch_of_flowing_time.png",
+      "src/main/resources/assets/itemalchemy/textures/item/alchemical_fuel.png",
+      "src/main/resources/assets/itemalchemy/textures/item/dark_matter_boots.png"
+    ]
+  },
+  "BlakeBr0/MysticalAgriculture/1.21": {
+    "sha": "4fecd23bacd41ffee3845976182e28d75d8be9da",
+    "images": [
+      "src/main/resources/assets/mysticalagriculture/textures/item/augment_0.png",
+      "src/main/resources/assets/mysticalagriculture/textures/item/essence_ingot.png",
+      "src/main/resources/assets/mysticalagriculture/textures/item/essence/coal_essence.png",
+      "src/main/resources/assets/mysticalagriculture/textures/item/essence/enderium_essence.png"
+    ]
+  },
+  "BlakeBr0/MysticalAgradditions/1.21": {
+    "sha": "fe4e81dea20458aa1959f5cfa8ef8354d2955aaa",
+    "images": [
+      "src/main/resources/assets/mysticalagradditions/textures/item/awakened_supremium_paxel.png",
+      "src/main/resources/assets/mysticalagradditions/textures/item/creative_essence.png",
+      "src/main/resources/assets/mysticalagradditions/textures/item/dragon_scale.png",
+      "src/main/resources/assets/mysticalagradditions/textures/item/essence/awakened_draconium_essence.png"
+    ]
+  },
+  "shizotoaster/thaumon/rewrite": {
+    "sha": "4b2af5a432450c018c484d55ef15d396ea97fd93",
+    "images": [
+      "common/src/main/resources/assets/thaumon/textures/item/ancient_door.png",
+      "common/src/main/resources/assets/thaumon/textures/item/cauldron.png",
+      "common/src/main/resources/assets/thaumon/textures/item/crystal_lamp_item.png",
+      "common/src/main/resources/assets/thaumon/textures/item/crystal_stand_item.png"
+    ]
+  },
+  "klikli-dev/occultism/version/1.21.1": {
+    "sha": "354da9f34c2845730a0e6ddc989d773a66d07eb7",
+    "images": [
+      "src/main/resources/assets/occultism/textures/item/advancement/bat_icon.png",
+      "src/main/resources/assets/occultism/textures/item/advancement/dragon_icon.png",
+      "src/main/resources/assets/occultism/textures/item/advancement/shub_niggurath_spawn_icon.png",
+      "src/main/resources/assets/occultism/textures/item/boo.png"
+    ]
+  },
+  "DakotaPride/ethereal-exploration/master": {
+    "sha": "c138713f8faad6494ea23b48c588eda300a036b2",
+    "images": [
+      "src/main/resources/assets/etherealexploration/textures/item/aquadine_bucket.png",
+      "src/main/resources/assets/etherealexploration/textures/item/aquadine.png",
+      "src/main/resources/assets/etherealexploration/textures/item/cooked_aquadine.png",
+      "src/main/resources/assets/etherealexploration/textures/item/cooked_dephelingus.png"
+    ]
+  },
+  "DakotaPride/Boleatte/master": {
+    "sha": "13edd12629eb211fe9ad74657cd15bb04df4de3b",
+    "images": [
+      "src/main/resources/assets/boleatte/textures/item/alphiagou_cider.png",
+      "src/main/resources/assets/boleatte/textures/item/axe_oritem.png",
+      "src/main/resources/assets/boleatte/textures/item/basolote.png",
+      "src/main/resources/assets/boleatte/textures/item/blossoming_alphiagou.png"
+    ]
+  },
+  "DakotaPride/Hibernal-Herbs/1.20.1": {
+    "sha": "db6039bd5baeb644f6bc40d6c48217e5d3a56ebc",
+    "images": [
+      "Common/src/main/resources/assets/hibernalherbs/textures/item/blend/base_blend.png",
+      "Common/src/main/resources/assets/hibernalherbs/textures/item/blend/poison.png",
+      "Common/src/main/resources/assets/hibernalherbs/textures/item/blend/smoked/fire.png",
+      "Common/src/main/resources/assets/hibernalherbs/textures/item/blend/smoked/regeneration.png"
+    ]
+  },
+  "DakotaPride/Effective-Regalia/master": {
+    "sha": "5582f470f5ad5fb3319589ffd3e25053ba6fe36b",
+    "images": [
+      "src/main/resources/assets/effectiveregalia/textures/item/regalia/gold/immune/blindness.png",
+      "src/main/resources/assets/effectiveregalia/textures/item/regalia/gold/immune/hunger.png",
+      "src/main/resources/assets/effectiveregalia/textures/item/regalia/gold/immune/poison.png",
+      "src/main/resources/assets/effectiveregalia/textures/item/regalia/gold/immune/wither.png"
+    ]
+  },
+  "DakotaPride/create-garnished/1.19.2": {
+    "sha": "86c57f14a9de2a5f098885349e7ec626945f0adb",
+    "images": [
+      "src/main/resources/assets/garnished/textures/item/aching_tenebrous_clump.png",
+      "src/main/resources/assets/garnished/textures/item/bok_choy.png",
+      "src/main/resources/assets/garnished/textures/item/chilled_apple.png",
+      "src/main/resources/assets/garnished/textures/item/cinder_flour/almond.png"
+    ]
+  },
+  "DaFuqs/Chalk/1.21": {
+    "sha": "060dd1208047a998bedf46493d1d955f978d4776",
+    "images": [
+      "src/main/resources/assets/chalk/textures/item/black_chalk.png",
+      "src/main/resources/assets/chalk/textures/item/black_glow_chalk.png",
+      "src/main/resources/assets/chalk/textures/item/blue_chalk.png",
+      "src/main/resources/assets/chalk/textures/item/brown_chalk.png"
+    ]
+  },
+  "8s2/Angling/main": {
+    "sha": "e0c99ab904cc3d0e5ece2d04a39347b5c1e346ea",
+    "images": [
+      "src/main/resources/assets/angling/textures/item/anglerfish_bucket.png",
+      "src/main/resources/assets/angling/textures/item/anomalocaris_bucket.png",
+      "src/main/resources/assets/angling/textures/item/bubble_eye_bucket.png",
+      "src/main/resources/assets/angling/textures/item/catfish_bucket.png"
+    ]
+  },
+  "izofar/bygone-nether/1.18.2": {
+    "sha": "004331724fa3f66bcd26e66709eddc82f3cb1ead",
+    "images": [
+      "src/main/resources/assets/bygonenether/textures/item/crushed_withered_debris.png",
+      "src/main/resources/assets/bygonenether/textures/item/gilded_netherite_boots.png",
+      "src/main/resources/assets/bygonenether/textures/item/gilded_netherite_chestplate.png",
+      "src/main/resources/assets/bygonenether/textures/item/gilded_netherite_helmet.png"
+    ]
+  },
+  "Globox1997/SpoiledZ/1.21": {
+    "sha": "02c36804619326fca2e50be5eeb6d243519f8c86",
+    "images": [
+      "src/main/resources/assets/spoiledz/textures/item/apple.png",
+      "src/main/resources/assets/spoiledz/textures/item/beef.png",
+      "src/main/resources/assets/spoiledz/textures/item/bread.png",
+      "src/main/resources/assets/spoiledz/textures/item/chicken.png"
+    ]
+  },
+  "Globox1997/EarlyStage/1.21": {
+    "sha": "53d138c39e3cd95ab1209418a23d46ba3bd89426",
+    "images": [
+      "src/main/resources/assets/earlystage/textures/item/acacia_bark.png",
+      "src/main/resources/assets/earlystage/textures/item/clay_bucket.png",
+      "src/main/resources/assets/earlystage/textures/item/damascus_steel_helmet.png",
+      "src/main/resources/assets/earlystage/textures/item/damascus_steel_nugget.png"
+    ]
+  },
+  "Noaaan/MythicMetals/1.21": {
+    "sha": "f85195d9843a15e78b3812d073d881833b4ace9d",
+    "images": [
+      "src/main/resources/assets/mythicmetals/textures/item/adamantite_ingot.png",
+      "src/main/resources/assets/mythicmetals/textures/item/armor/bronze_leggings.png",
+      "src/main/resources/assets/mythicmetals/textures/item/armor/hallowed_chestplate.png",
+      "src/main/resources/assets/mythicmetals/textures/item/armor/mythril_boots.png"
+    ]
+  },
+  "DragonsPlusMinecraft/CreateCentralKitchen/1.20.1/0.5.1-dev": {
+    "sha": "69af6cb7a13e7887437c363c3205958df928d890",
+    "images": [
+      "src/main/resources/assets/create_central_kitchen/textures/item/aloe_cake_slice.png",
+      "src/main/resources/assets/create_central_kitchen/textures/item/aloe_gel_bucket.png",
+      "src/main/resources/assets/create_central_kitchen/textures/item/cherry_pie_slice.png",
+      "src/main/resources/assets/create_central_kitchen/textures/item/cooking_guide.png"
+    ]
+  },
+  "wisp-forest/numismatic-overhaul/1.20.2": {
+    "sha": "1024bb6d9b57bdfa70f35075d3229cd900d4bed0",
+    "images": [
+      "src/main/resources/assets/numismatic-overhaul/textures/item/bronze_coin_0.png",
+      "src/main/resources/assets/numismatic-overhaul/textures/item/bronze_coin_1.png",
+      "src/main/resources/assets/numismatic-overhaul/textures/item/bronze_coin_2.png",
+      "src/main/resources/assets/numismatic-overhaul/textures/item/bronze_coin_3.png"
+    ]
+  },
+  "wisp-forest/things/1.20.2": {
+    "sha": "252f362ac399126147d40bd454d1469a52ba55ac",
+    "images": [
+      "src/main/resources/assets/things/textures/item/arm_extender.png",
+      "src/main/resources/assets/things/textures/item/bater_wucket.png",
+      "src/main/resources/assets/things/textures/item/broken_watch.png",
+      "src/main/resources/assets/things/textures/item/displacement_page.png"
+    ]
+  },
+  "TheWinABagel/Decorative-Blocks/1.20.1": {
+    "sha": "03fa8a3facee4b3bc447a97480d1e9aed754941f",
+    "images": [
+      "Common/src/main/resources/assets/decorative_blocks/textures/item/blockstate_copy_tool.png",
+      "Common/src/main/resources/assets/decorative_blocks/textures/item/brazier.png",
+      "Common/src/main/resources/assets/decorative_blocks/textures/item/chain.png",
+      "Common/src/main/resources/assets/decorative_blocks/textures/item/soul_brazier.png"
+    ]
+  },
+  "Pandarix/BetterArcheology/1.20": {
+    "sha": "1d592bf7d74f02368fedf04711bbe5357279f2e5",
+    "images": [
+      "src/main/resources/assets/betterarcheology/textures/item/artifact_shards.png",
+      "src/main/resources/assets/betterarcheology/textures/item/bomb.png",
+      "src/main/resources/assets/betterarcheology/textures/item/brushes/diamond_brush.png",
+      "src/main/resources/assets/betterarcheology/textures/item/brushes/iron_brush.png"
+    ]
+  },
+  "ochotonida/artifacts/26.1": {
+    "sha": "4b67278df94e4d3669119f1abb24a1c3a758afe1",
+    "images": [
+      "common/src/main/resources/assets/artifacts/textures/item/anglers_hat_broken.png",
+      "common/src/main/resources/assets/artifacts/textures/item/aqua_dashers_broken.png",
+      "common/src/main/resources/assets/artifacts/textures/item/charm_of_shrinking_broken.png",
+      "common/src/main/resources/assets/artifacts/textures/item/chorus_totem.png"
+    ]
+  },
+  "SteveKunG/FishOfThieves/1.20.1": {
+    "sha": "b8930b373c044041e05803f8102957ecc8871bfe",
+    "images": [
+      "common/src/main/resources/assets/fishofthieves/textures/item/acacia_fish_plaque.png",
+      "common/src/main/resources/assets/fishofthieves/textures/item/ancientscale_spawn_egg.png",
+      "common/src/main/resources/assets/fishofthieves/textures/item/bittersweet_battlegill.png",
+      "common/src/main/resources/assets/fishofthieves/textures/item/bright_pondie.png"
+    ]
+  },
+  "tyap-lyap/winterly/1.21": {
+    "sha": "3848ef466e3c6feb0816ed72b03f82f7e40f23a9",
+    "images": [
+      "winterly-common/src/main/resources/assets/winterly/textures/item/blue_candy_cane.png",
+      "winterly-common/src/main/resources/assets/winterly/textures/item/blue_santa_hat.png",
+      "winterly-common/src/main/resources/assets/winterly/textures/item/blue_scarf.png",
+      "winterly-common/src/main/resources/assets/winterly/textures/item/cryomarble_axe.png"
+    ]
+  },
+  "SlimeKnights/TinkersConstruct/1.19.2": {
+    "sha": "a7b433634c82a97452cf26f2679a5ded173e1ee3",
+    "images": [
+      "src/generated/resources/assets/tconstruct/textures/item/tool/armor/plate/boots/maille_broken_tconstruct_aluminum.png",
+      "src/generated/resources/assets/tconstruct/textures/item/tool/armor/plate/leggings/maille_tconstruct_electrum.png",
+      "src/generated/resources/assets/tconstruct/textures/item/tool/battlesign/head_broken_tconstruct_blazing_bone.png",
+      "src/generated/resources/assets/tconstruct/textures/item/tool/broad_axe/blade_tconstruct_whitestone.png"
+    ]
+  },
+  "refinedmods/refinedstorage/develop": {
+    "sha": "60ce906c1699b0230d3736d30ecec0894c5ea5d5",
+    "images": [
+      "src/main/resources/assets/refinedstorage/textures/item/1024k_fluid_storage_disk.png",
+      "src/main/resources/assets/refinedstorage/textures/item/16k_storage_disk.png",
+      "src/main/resources/assets/refinedstorage/textures/item/1k_storage_disk.png",
+      "src/main/resources/assets/refinedstorage/textures/item/256k_fluid_storage_disk.png"
+    ]
+  },
+  "Pandarix/Beautify/main": {
+    "sha": "4e1224098f61e745a90fa0533d0af3ae0f799eb0",
+    "images": [
+      "src/main/resources/assets/beautify/textures/items/rope.png",
+      "src/main/resources/assets/beautify/textures/blocks/acacia_frame_texture.png",
+      "src/main/resources/assets/beautify/textures/blocks/bookstack_1.png",
+      "src/main/resources/assets/beautify/textures/blocks/bookstack_6.png"
+    ]
+  },
+  "TeamDiopside/InfinityButtons/1.21.1": {
+    "sha": "52577bd1055912dee1dad76eec3d882af22b38c3",
+    "images": [
+      "common/src/main/resources/assets/infinitybuttons/textures/block/console/big_console_button_back.png",
+      "common/src/main/resources/assets/infinitybuttons/textures/block/console/console_button_broken.png",
+      "common/src/main/resources/assets/infinitybuttons/textures/block/console/large_console_button_back.png",
+      "common/src/main/resources/assets/infinitybuttons/textures/block/copper_button.png"
+    ]
+  },
+  "Scouter456/Nether_Depths_Upgrade/nether_depths_upgrade_1.21-fabric": {
+    "sha": "ffc5e80536ece6292e877f14871c10c28222f34c",
+    "images": [
+      "src/main/resources/assets/netherdepthsupgrade/textures/item/blazefish_bucket.png",
+      "src/main/resources/assets/netherdepthsupgrade/textures/item/bonefish_bucket.png",
+      "src/main/resources/assets/netherdepthsupgrade/textures/item/crimson_seagrass.png",
+      "src/main/resources/assets/netherdepthsupgrade/textures/item/eyeball.png"
+    ]
+  },
+  "DragonsPlusMinecraft/CreateEnchantmentIndustry-Fabric/1.20.1/6.0.0-2.x-dev": {
+    "sha": "db63d15b4db1b1bfecd85225e7535c5f791b8d5f",
+    "images": [
+      "src/integration/apotheosis/resources/assets/create_enchantment_industry/textures/item/apotheotic_essence_bucket.png",
+      "src/integration/apotheosis/resources/assets/create_enchantment_industry/textures/item/crystal_essence_bucket.png",
+      "src/main/resources/assets/create_enchantment_industry/textures/item/blazes_enchanting_handbook.png",
+      "src/main/resources/assets/create_enchantment_industry/textures/item/experience_bucket.png"
+    ]
+  },
+  "malcolmriley/unused-textures/master": {
+    "sha": "8b85ad732023174d9a9da74e6bf2272d6c0bef17",
+    "images": [
+      "blocks/alabaster_brick.png",
+      "blocks/concrete_paver.png",
+      "blocks/cushion_black_sides.png",
+      "blocks/device_rope_knot.png"
+    ]
+  },
+  "Foreck1/foreck-textures/main": {
+    "sha": "9f65c7eb7783bce8a4630e1e90806211d7fe677c",
+    "images": [
+      "textures/blocks/dirt.png",
+      "textures/blocks/modelingrefractory.png",
+      "textures/blocks/refracotta/refracotta_blue.png",
+      "textures/blocks/vessel_bot.png"
+    ]
+  },
+  "Futureazoo/TextureRepository/master": {
+    "sha": "c22b100f1b4c22f7793175310d42e44688ba2e98",
+    "images": [
+      "futureazoo/blocks/magic/aqua_ore.png",
+      "futureazoo/blocks/tech/bronze_sawmill_front_off.png",
+      "futureazoo/blocks/tech/durasteel_anvil_top_off.png",
+      "futureazoo/blocks/tech/iron_compressor_front.png"
+    ]
+  },
+  "Minecraft-LightLand/FruitsDelight/1.20": {
+    "sha": "fc274ff5932330dfcc71dc787217207d87ef9f33",
+    "images": [
+      "src/main/resources/assets/fruitsdelight/textures/item/apple_jam.png",
+      "src/main/resources/assets/fruitsdelight/textures/item/bayberry_jam.png",
+      "src/main/resources/assets/fruitsdelight/textures/item/blueberry_custard.png",
+      "src/main/resources/assets/fruitsdelight/textures/item/bowl_of_pineapple_fried_rice.png"
+    ]
+  },
+  "Minecraft-LightLand/GlimmeringTales/1.21": {
+    "sha": "18b24281d507bdd6a1d40efebbddf8fa0d23994c",
+    "images": [
+      "src/main/resources/assets/glimmeringtales/textures/item/amethyst_resonator.png",
+      "src/main/resources/assets/glimmeringtales/textures/item/core/crystal_of_life.png",
+      "src/main/resources/assets/glimmeringtales/textures/item/core/crystal_of_winterstorm.png",
+      "src/main/resources/assets/glimmeringtales/textures/item/crop/ocean_pop_fruit.png"
+    ]
+  },
+  "Minecraft-LightLand/Cuisine-Delight/1.21": {
+    "sha": "c49e2d7e3e421a33b94c51165474225d07d9ee09",
+    "images": [
+      "src/main/resources/assets/cuisinedelight/textures/item/fried_egg.png",
+      "src/main/resources/assets/cuisinedelight/textures/item/fried_meat_and_melon.png",
+      "src/main/resources/assets/cuisinedelight/textures/item/fried_mushroom.png",
+      "src/main/resources/assets/cuisinedelight/textures/item/fried_pasta.png"
+    ]
+  },
+  "Minecraft-LightLand/Twilight-Delight/main": {
+    "sha": "65098cd9fe2d45330101d7eafc5b35e7dc1e4df5",
+    "images": [
+      "src/main/resources/assets/twilightdelight/textures/item/aurora_cake_slice.png",
+      "src/main/resources/assets/twilightdelight/textures/item/aurora_ice_cream.png",
+      "src/main/resources/assets/twilightdelight/textures/item/book.png",
+      "src/main/resources/assets/twilightdelight/textures/item/chocolate_wafer.png"
+    ]
+  },
+  "Minecraft-LightLand/Youkai-Homecoming/main": {
+    "sha": "307993b5b4f816d260070b1807ceb6acb8387e34",
+    "images": [
+      "src/main/resources/assets/youkaishomecoming/textures/item/big_spoon.png",
+      "src/main/resources/assets/youkaishomecoming/textures/item/bowl/iron/mushroom_soup.png",
+      "src/main/resources/assets/youkaishomecoming/textures/item/bullet/ball/red.png",
+      "src/main/resources/assets/youkaishomecoming/textures/item/bullet/bubble/white.png"
+    ]
+  },
+  "Minecraft-LightLand/CurseOfPandora/main": {
+    "sha": "d44a504c8b2a7ce3fc48d9652b730485f0dafb33",
+    "images": [
+      "src/main/resources/assets/curseofpandora/textures/item/bg.png",
+      "src/main/resources/assets/curseofpandora/textures/item/pandora/angelic_descent.png",
+      "src/main/resources/assets/curseofpandora/textures/item/pandora/angelic_punishment.png",
+      "src/main/resources/assets/curseofpandora/textures/item/pandora/bless_of_snow_walker.png"
+    ]
+  },
+  "Minecraft-LightLand/Ars-Nouveau-Flavors-Delight/main": {
+    "sha": "2c9c25322ba05e92f4b8fa71abc5ca7cc113a00f",
+    "images": [
+      "src/main/resources/assets/arsdelight/textures/item/drink/activated_bastion_jam.png",
+      "src/main/resources/assets/arsdelight/textures/item/drink/bastion_hornbeer.png",
+      "src/main/resources/assets/arsdelight/textures/item/drink/bombegrante_tea.png",
+      "src/main/resources/assets/arsdelight/textures/item/drink/mendosteen_hornbeer.png"
+    ]
+  },
+  "Minecraft-LightLand/ModularGolems/1.20": {
+    "sha": "a45fdc595f9c06c3b2390a0c10e7769a440f0824",
+    "images": [
+      "src/main/resources/assets/alexscaves/textures/item/candy_construct.png",
+      "src/main/resources/assets/cataclysm/textures/item/equipments/ignis_chestplate.png",
+      "src/main/resources/assets/cataclysm/textures/item/void_cube.png",
+      "src/main/resources/assets/goety_revelation/textures/item/equipments/apocalyptium_shinguard.png"
+    ]
+  },
+  "Minecraft-LightLand/polarisRPG/main": {
+    "sha": "7f5dc315b5d06bddaacdbe1b7c962bf5566e28f2",
+    "images": [
+      "src/main/resources/assets/polaris_rpg/textures/item/backpack_open.png",
+      "src/main/resources/assets/polaris_rpg/textures/item/dim_0.png",
+      "src/main/resources/assets/polaris_rpg/textures/item/dimensional_storage_black.png",
+      "src/main/resources/assets/polaris_rpg/textures/item/dimensional_storage_cyan.png"
+    ]
+  },
+  "VazkiiMods/Quark/master": {
+    "sha": "cc4a189e330386289b4f446d7252f9f2a1e20597",
+    "images": [
+      "src/main/resources/assets/quark/textures/item/abacus_0.png",
+      "src/main/resources/assets/quark/textures/item/abacus_16.png",
+      "src/main/resources/assets/quark/textures/item/abacus_24.png",
+      "src/main/resources/assets/quark/textures/item/abacus_32.png"
+    ]
+  },
+  "Lance5057/ExtraDelight/1.21": {
+    "sha": "effd768cb8a4b8a2c56deb7d9cf071e795fffe5b",
+    "images": [
+      "src/main/resources/assets/extradelight/textures/item/aebleflaesk.png",
+      "src/main/resources/assets/extradelight/textures/item/baked_cod_serving.png",
+      "src/main/resources/assets/extradelight/textures/item/bratwurst.png",
+      "src/main/resources/assets/extradelight/textures/item/candy_green.png"
+    ]
+  },
+  "Lance5057/Compendium/1.21": {
+    "sha": "4bbd6aaa0c8e95cfe2c99701a5c7ce2ea4d6200e",
+    "images": [
+      "src/main/resources/assets/compendium/textures/item/adjustinator.png",
+      "src/main/resources/assets/compendium/textures/item/bow_base.png",
+      "src/main/resources/assets/compendium/textures/item/material/metal/copper/bow_pulling_1.png",
+      "src/main/resources/assets/compendium/textures/item/material/metal/copper/dust.png"
+    ]
+  },
+  "Lance5057/butchercraft/1.21": {
+    "sha": "4f6506db1e3aae51d530c202d1826662b5b36443",
+    "images": [
+      "src/main/resources/assets/butchercraft/textures/item/apron.png",
+      "src/main/resources/assets/butchercraft/textures/item/black_bunny_ears.png",
+      "src/main/resources/assets/butchercraft/textures/item/bonesaw.png",
+      "src/main/resources/assets/butchercraft/textures/item/butcherknife.png"
+    ]
+  },
+  "Scouter456/Oceans_Delight/master": {
+    "sha": "0eca90a651cbd6285fadd1e43a790457c3fb6838",
+    "images": [
+      "src/main/resources/assets/oceansdelight/textures/item/baked_tentacle_on_a_stick.png",
+      "src/main/resources/assets/oceansdelight/textures/item/bowl_of_guardian_soup.png",
+      "src/main/resources/assets/oceansdelight/textures/item/braised_sea_pickle.png",
+      "src/main/resources/assets/oceansdelight/textures/item/cabbage_wrapped_elder_guardian.png"
+    ]
+  },
+  "MinerArcana/Astral/develop/1.20.x": {
+    "sha": "b9cac5c0f36aa334d9e27e97e5e7ba79e12093b1",
+    "images": [
+      "src/main/resources/assets/astral/textures/item/astronomicon.png",
+      "src/main/resources/assets/astral/textures/item/crystal_chitin.png",
+      "src/main/resources/assets/astral/textures/item/dreamcord.png",
+      "src/main/resources/assets/astral/textures/item/dreamweave.png"
+    ]
+  },
+  "BlueDuckYT/Jellyfishing/master": {
+    "sha": "fa2d9c5a3cfc3adbe05dc7431e311d0c4c1fa06f",
+    "images": [
+      "src/main/resources/assets/jellyfishing/textures/item/blue_jelly_sandwich.png",
+      "src/main/resources/assets/jellyfishing/textures/item/blue_jellyfish_jelly.png",
+      "src/main/resources/assets/jellyfishing/textures/item/blue_jellyfish.png",
+      "src/main/resources/assets/jellyfishing/textures/item/bubble_wand.png"
+    ]
+  },
+  "Uraneptus/SnowPig-fabric/1.20": {
+    "sha": "61e8d81c309bf1ad270ba1cc25229e9f624fd986",
+    "images": [
+      "src/main/resources/assets/snowpig/textures/item/frozen_ham.png",
+      "src/main/resources/assets/snowpig/textures/item/frozen_porkchop.png",
+      "src/main/resources/assets/snowpig/textures/item/music_disc_frosty_snig.png"
+    ]
+  },
+  "NightKosh/Advanced-Fishing/master": {
+    "sha": "6d8fabe0f1d8adb3b499d24d4792093734e6cae1",
+    "images": [
+      "src/main/resources/assets/advanced_fishing/textures/item/chum_bucket.png",
+      "src/main/resources/assets/advanced_fishing/textures/item/cooked_fish/crucian.png",
+      "src/main/resources/assets/advanced_fishing/textures/item/cooked_fish/jellyfish.png",
+      "src/main/resources/assets/advanced_fishing/textures/item/fish/abyssal_lurker.png"
+    ]
+  },
+  "TeamMoegMC/Caupona/1.21": {
+    "sha": "2355fb9c65995b0596665462368fdcec1aae6f87",
+    "images": [
+      "src/main/resources/assets/caupona/textures/item/asafoetida_spice_jar.png",
+      "src/main/resources/assets/caupona/textures/item/aspics/hodgepodge_aspic.png",
+      "src/main/resources/assets/caupona/textures/item/aspics/stracciatella_aspic.png",
+      "src/main/resources/assets/caupona/textures/item/basalt_tesserae.png"
+    ]
+  },
+  "TeamMoegMC/Thermopolium/master": {
+    "sha": "e22f709b59879c6c1e6d71f3e2c95a0f2ab90b02",
+    "images": [
+      "src/main/resources/assets/thermopolium/textures/item/acquacotta.png",
+      "src/main/resources/assets/thermopolium/textures/item/bisque.png",
+      "src/main/resources/assets/thermopolium/textures/item/book.png",
+      "src/main/resources/assets/thermopolium/textures/item/borscht.png"
+    ]
+  },
+  "TeamMoegMC/FrostedHeart/master": {
+    "sha": "1277e4a6840f9dad94c62430d7efd34e68484726",
+    "images": [
+      "src/main/resources/assets/frostedheart/textures/item/advanced_accelerated_fertilizer.png",
+      "src/main/resources/assets/frostedheart/textures/item/bauxite_dust.png",
+      "src/main/resources/assets/frostedheart/textures/item/cast_iron_ingot.png",
+      "src/main/resources/assets/frostedheart/textures/item/condensed_ball_pyrite_ore.png"
+    ]
+  },
+  "TeamMoegMC/TheWinterRescue/1.20": {
+    "sha": "e47f7df893d9cabbe2a27e6e12a8754d9df41f7a",
+    "images": [
+      "kubejs/assets/immersiveengineering/textures/item/material_circuit_board.png",
+      "kubejs/assets/kubejs/textures/item/bound_coal_briquette.png",
+      "kubejs/assets/kubejs/textures/item/broken_robot_2.png",
+      "kubejs/assets/kubejs/textures/item/charcoal_dust.png"
+    ]
+  },
+  "gloridifice/WaterSource/1.20.1-fabric": {
+    "sha": "e22da9b81f51cd5a0511992fa74a2c285ddb1cf3",
+    "images": [
+      "src/main/resources/assets/watersource/textures/item/coconut_chicken.png",
+      "src/main/resources/assets/watersource/textures/item/coconut_juice_bottle.png",
+      "src/main/resources/assets/watersource/textures/item/coconut_juice_bucket.png",
+      "src/main/resources/assets/watersource/textures/item/coconut_milk_bottle.png"
+    ]
+  },
+  "MaxBogomol/WizardsReborn/master": {
+    "sha": "7ba78764cf6b4b0ca60e39722ca1452f7bd7f66b",
+    "images": [
+      "src/main/resources/assets/wizards_reborn/textures/item/advanced_air_crystal.png",
+      "src/main/resources/assets/wizards_reborn/textures/item/applejack_bottle_stage.png",
+      "src/main/resources/assets/wizards_reborn/textures/item/arcane_gold_pickaxe.png",
+      "src/main/resources/assets/wizards_reborn/textures/item/arcane_wood_bow.png"
+    ]
+  },
+  "MatterOverdrive/MatterOverdrive-Legacy-Edition/1.12.2": {
+    "sha": "26b47baa05df5bed1c76f565e466b5f53e5b550a",
+    "images": [
+      "src/main/resources/assets/matteroverdrive/textures/items/2527.png",
+      "src/main/resources/assets/matteroverdrive/textures/items/barrel_doomsday.png",
+      "src/main/resources/assets/matteroverdrive/textures/items/battery.png",
+      "src/main/resources/assets/matteroverdrive/textures/items/container_top_full.png"
+    ]
+  },
+  "Globox1997/AdventureZ/1.21": {
+    "sha": "692a33a3190bd0303a0edba62aee8f951873cb79",
+    "images": [
+      "src/main/resources/assets/adventurez/textures/item/blackstone_golem_arm_activated.png",
+      "src/main/resources/assets/adventurez/textures/item/blackstone_golem_arm.png",
+      "src/main/resources/assets/adventurez/textures/item/chorus_fruit_on_a_stick.png",
+      "src/main/resources/assets/adventurez/textures/item/cooked_iguana_meat.png"
+    ]
+  },
+  "Shinoow/AbyssalCraft/master": {
+    "sha": "3301772d65f114341e743e5afc51ac1befa27cfe",
+    "images": [
+      "src/main/resources/assets/abyssalcraft/textures/items/aa.png",
+      "src/main/resources/assets/abyssalcraft/textures/items/acbp.png",
+      "src/main/resources/assets/abyssalcraft/textures/items/addb.png",
+      "src/main/resources/assets/abyssalcraft/textures/items/adsp.png"
+    ]
+  },
+  "MysticMods/Roots/1.21.1": {
+    "sha": "23cde80daea67813bf99aaec69ab4c440b79a237",
+    "images": [
+      "src/main/resources/assets/roots/textures/item/antler_hat.png",
+      "src/main/resources/assets/roots/textures/item/beetle_leggings.png",
+      "src/main/resources/assets/roots/textures/item/cooked_aubergine.png",
+      "src/main/resources/assets/roots/textures/item/copper_hoe.png"
+    ]
+  },
+  "Luke100000/ImmersiveAircraft/1.21.1": {
+    "sha": "7690eb782e8ca3d652a628c8ef74018722f64b0e",
+    "images": [
+      "common/src/main/resources/assets/immersive_aircraft/textures/item/airship_color.png",
+      "common/src/main/resources/assets/immersive_aircraft/textures/item/airship.png",
+      "common/src/main/resources/assets/immersive_aircraft/textures/item/bamboo_hopper.png",
+      "common/src/main/resources/assets/immersive_aircraft/textures/item/biplane.png"
+    ]
+  },
+  "FrozenBlock/WilderWild/master": {
+    "sha": "cd031362ab26b0a24cdc97442517f497f62a3918",
+    "images": [
+      "common/src/main/resources/assets/wilderwild/textures/item/acacia_leaf_litter.png",
+      "common/src/main/resources/assets/wilderwild/textures/item/baobab_door.png",
+      "common/src/main/resources/assets/wilderwild/textures/item/birch_leaf_litter.png",
+      "common/src/main/resources/assets/wilderwild/textures/item/butterfly_spawn_egg.png"
+    ]
+  },
+  "AstralOrdana/Spelunkery/1.21.1": {
+    "sha": "105af1336d2de4bae44f28fd362f5c6977ea7809",
+    "images": [
+      "common/src/main/resources/assets/spelunkery/textures/item/basalt_pebble.png",
+      "common/src/main/resources/assets/spelunkery/textures/item/bunny_ears_3d.png",
+      "common/src/main/resources/assets/spelunkery/textures/item/copper_nugget.png",
+      "common/src/main/resources/assets/spelunkery/textures/item/depth_gauge/depth_gauge_12.png"
+    ]
+  },
+  "CyclopsMC/EvilCraft/master-26-lts": {
+    "sha": "3b6bfb4a6c16f1fff10bb1ed19a791a2fd6cf379",
+    "images": [
+      "src/main/resources/assets/evilcraft/textures/item/biome_extract.png",
+      "src/main/resources/assets/evilcraft/textures/item/blood_orb_filled.png",
+      "src/main/resources/assets/evilcraft/textures/item/blood_stain.png",
+      "src/main/resources/assets/evilcraft/textures/item/blook.png"
+    ]
+  },
+  "SammySemicolon/Malum-Mod/1.21.1": {
+    "sha": "eb33a531f42511aa884b94423fd1191baec62451",
+    "images": [
+      "src/main/resources/assets/malum/textures/item/accelerating_inlay.png",
+      "src/main/resources/assets/malum/textures/item/alchemy/metallics/fractured_impetus_copper.png",
+      "src/main/resources/assets/malum/textures/item/alchemy/metallics/impetus_copper.png",
+      "src/main/resources/assets/malum/textures/item/alchemy/metallics/node_tin.png"
+    ]
+  },
+  "AppliedEnergistics/Applied-Energistics-2/main": {
+    "sha": "b141e91764897d3844c9debd4210396b5f9b5238",
+    "images": [
+      "src/main/resources/assets/ae2/textures/item/advanced_card.png",
+      "src/main/resources/assets/ae2/textures/item/calculation_processor.png",
+      "src/main/resources/assets/ae2/textures/item/card_fuzzy.png",
+      "src/main/resources/assets/ae2/textures/item/cell_component_1k.png"
+    ]
+  },
+  "P3pp3rF1y/Reliquary/1.21.x-dev": {
+    "sha": "b28b6f4d8aba55414652c071e4b175377a9f85c3",
+    "images": [
+      "src/main/resources/assets/reliquary/textures/item/alkahest_tome.png",
+      "src/main/resources/assets/reliquary/textures/item/bat_wing.png",
+      "src/main/resources/assets/reliquary/textures/item/bullet_ender.png",
+      "src/main/resources/assets/reliquary/textures/item/bullet.png"
+    ]
+  },
+  "MosaicModding/Sullys-Mod/latest": {
+    "sha": "8ae403346a19b66ac605014390d97fa63762c237",
+    "images": [
+      "src/main/resources/assets/sullysmod/textures/item/amber_encased_bug.png",
+      "src/main/resources/assets/sullysmod/textures/item/broken_bottle.png",
+      "src/main/resources/assets/sullysmod/textures/item/broken_mug.png",
+      "src/main/resources/assets/sullysmod/textures/item/cooked_bug_meat.png"
+    ]
+  },
+  "TobishiroGinko/Casualness-Delight/1.20.1-Forge": {
+    "sha": "9c30f4222a553fd78c2f4a83c3fc7bdb340051dc",
+    "images": [
+      "src/main/resources/assets/casualness_delight/textures/item/beef_bobo_chicken.png",
+      "src/main/resources/assets/casualness_delight/textures/item/beef_noodles.png",
+      "src/main/resources/assets/casualness_delight/textures/item/bowl_of_fried_dumpling.png",
+      "src/main/resources/assets/casualness_delight/textures/item/bowl_of_sweet_rice.png"
+    ]
+  },
+  "Negodya1/Create-Vintage-Improvements/1.20.1": {
+    "sha": "3ecf11cb9455c28e0a81569cbe9431f1b2250f7a",
+    "images": [
+      "src/main/resources/assets/vintageimprovements/textures/item/aluminum_rod.png",
+      "src/main/resources/assets/vintageimprovements/textures/item/andesite_sheet.png",
+      "src/main/resources/assets/vintageimprovements/textures/item/calorite_rod.png",
+      "src/main/resources/assets/vintageimprovements/textures/item/cobalt_spring.png"
+    ]
+  },
+  "Uraneptus/FrycooksDelight/main": {
+    "sha": "abb508cac20e81c7db9432bd00eb0370b2c0b934",
+    "images": [
+      "src/main/resources/assets/frycooks_delight/textures/item/burnt_morsel.png",
+      "src/main/resources/assets/frycooks_delight/textures/item/canola_oil.png",
+      "src/main/resources/assets/frycooks_delight/textures/item/canola_seeds.png",
+      "src/main/resources/assets/frycooks_delight/textures/item/canola.png"
+    ]
+  },
+  "pouffy/Bundled-Delights/1.21.1/dev": {
+    "sha": "4ab2b7076cc33b5219f51c3288ef7fb92c73bac8",
+    "images": [
+      "src/main/resources/assets/bundledelight/textures/item/adzuki_milk_tea_cup.png",
+      "src/main/resources/assets/bundledelight/textures/item/beer_swig.png",
+      "src/main/resources/assets/bundledelight/textures/item/bloody_mary_swig.png",
+      "src/main/resources/assets/bundledelight/textures/item/carrot_cake_slice.png"
+    ]
+  },
+  "ZhuckovAlex/wizardry_delight/master": {
+    "sha": "967cd9845479dfac2635306387ca799a8b4529ae",
+    "images": [
+      "src/main/resources/assets/wizardry_delight/textures/item/a_drop_of_love.png",
+      "src/main/resources/assets/wizardry_delight/textures/item/apple_jam.png",
+      "src/main/resources/assets/wizardry_delight/textures/item/blackstone_rod.png",
+      "src/main/resources/assets/wizardry_delight/textures/item/cheese_2.png"
+    ]
+  },
+  "IriDark/Valoria/main": {
+    "sha": "bb987f8df8ca086552b96b1ee646075f55f14f38",
+    "images": [
+      "src/main/resources/assets/valoria/textures/item/abyssal_glowfern.png",
+      "src/main/resources/assets/valoria/textures/item/aquarius_crossbow_firework.png",
+      "src/main/resources/assets/valoria/textures/item/base_empty_slot_bottle.png",
+      "src/main/resources/assets/valoria/textures/item/broken_bloodsight_monocle.png"
+    ]
+  },
+  "TheValiantSquidward/rainbow-reef/master": {
+    "sha": "7fa908c7ce618396883af637a16f16ef163986ab",
+    "images": [
+      "src/main/resources/assets/rainbow_reef/textures/item/angelfish_bucket.png",
+      "src/main/resources/assets/rainbow_reef/textures/item/basslet_bucket.png",
+      "src/main/resources/assets/rainbow_reef/textures/item/blue_puffer_lantern.png",
+      "src/main/resources/assets/rainbow_reef/textures/item/buttered_toast.png"
+    ]
+  },
+  "Coda1552/UnusualFish/1.20.1": {
+    "sha": "ccd5de59ab33cf2acbf771f9ba97c930b1dbcc13",
+    "images": [
+      "src/main/resources/assets/unusualfishmod/textures/item/aero_mono_bucket.png",
+      "src/main/resources/assets/unusualfishmod/textures/item/beaked_herring_bucket.png",
+      "src/main/resources/assets/unusualfishmod/textures/item/bumphead_bucket.png",
+      "src/main/resources/assets/unusualfishmod/textures/item/cooked_lobster.png"
+    ]
+  },
+  "VoidArkana/Fintastic/master": {
+    "sha": "f3ebce67220342cb9e6af396f47f2db023f3e9f5",
+    "images": [
+      "src/main/resources/assets/fintastic/textures/item/anubias.png",
+      "src/main/resources/assets/fintastic/textures/item/arapaima_spawn_egg.png",
+      "src/main/resources/assets/fintastic/textures/item/axolotl_music_disc.png",
+      "src/main/resources/assets/fintastic/textures/item/baked_lotus_root.png"
+    ]
+  },
+  "LopyMine/Texturized-Particles/master": {
+    "sha": "5f3ec9a6bf35e4164d457dcb54699632efb4ce52",
+    "images": [
+      "src/main/resources/assets/particle_effects/textures/particle/absorption/1.png",
+      "src/main/resources/assets/particle_effects/textures/particle/bad_omen/2.png",
+      "src/main/resources/assets/particle_effects/textures/particle/breath_of_the_nautilus/2.png",
+      "src/main/resources/assets/particle_effects/textures/particle/darkness/1.png"
+    ]
+  },
+  "Alexthw46/Eidolon-Repraised/1.20.1-Neo": {
+    "sha": "95fdceb9703431f6b6dff5c1f91362ea8c68c6e8",
+    "images": [
+      "src/main/resources/assets/eidolon/textures/item/alchemists_tongs.png",
+      "src/main/resources/assets/eidolon/textures/item/arcane_gold_nugget.png",
+      "src/main/resources/assets/eidolon/textures/item/basic_ring.png",
+      "src/main/resources/assets/eidolon/textures/item/bonelord_greaves.png"
+    ]
+  },
+  "Elenterius/Biomancy/mc1.20.1/prod": {
+    "sha": "2e3c2baf9e06f891ded74a602bc3367f0da36a85",
+    "images": [
+      "src/main/resources/assets/biomancy/textures/item/armor/acolyte_armor_boots.png",
+      "src/main/resources/assets/biomancy/textures/item/armor/acolyte_armor_leggings.png",
+      "src/main/resources/assets/biomancy/textures/item/armor/warrior_armor_chestplate.png",
+      "src/main/resources/assets/biomancy/textures/item/bloomberry.png"
+    ]
+  },
+  "DawnTeamMC/Culinaire/main": {
+    "sha": "14d46ba5192a31e7e4df498e009ad00743aadb67",
+    "images": [
+      "src/main/resources/assets/culinaire/textures/item/apple_pie.png",
+      "src/main/resources/assets/culinaire/textures/item/blueberry_pie.png",
+      "src/main/resources/assets/culinaire/textures/item/cheese_wheel.png",
+      "src/main/resources/assets/culinaire/textures/item/cheese.png"
+    ]
+  },
+  "AverageAnime/create-food/1.20.1": {
+    "sha": "52bf48bf597acab802bff89de5bd2d34d44210fd",
+    "images": [
+      "src/main/resources/assets/createfood/textures/item/apple_cheesecake_slice.png",
+      "src/main/resources/assets/createfood/textures/item/bar_of_dark_chocolate.png",
+      "src/main/resources/assets/createfood/textures/item/berry_ice_cream_bucket.png",
+      "src/main/resources/assets/createfood/textures/item/bread_slice_melon_jam.png"
+    ]
+  },
+  "Brandcraf06/Blockus/26.3": {
+    "sha": "667a8386e7bd9cfa7d7c20f75b0502c41c4312a1",
+    "images": [
+      "src/main/resources/assets/blockus/textures/item/amethyst_lantern.png",
+      "src/main/resources/assets/blockus/textures/item/blackstone_door.png",
+      "src/main/resources/assets/blockus/textures/item/charred_boat.png",
+      "src/main/resources/assets/blockus/textures/item/charred_chest_boat.png"
+    ]
+  },
+  "VeroxUniverse/EpicKightsnMages-NeoForge/1.20.1": {
+    "sha": "252a07f19a971aa9d0d1699ed22b9927a8ff182e",
+    "images": [
+      "src/main/resources/assets/knightsnmages/textures/item/blank_elite_thread.png",
+      "src/main/resources/assets/knightsnmages/textures/item/blue_knight_boots.png",
+      "src/main/resources/assets/knightsnmages/textures/item/blue_knight_helmet.png",
+      "src/main/resources/assets/knightsnmages/textures/item/citrin_gem.png"
+    ]
+  },
+  "RazorDevs/ascended-quark/1.21.1": {
+    "sha": "343b8355f425125b68e5217052638642802d8d4e",
+    "images": [
+      "src/main/resources/assets/ascended_quark/textures/item/ambrosium_torch_arrow.png",
+      "src/main/resources/assets/ascended_quark/textures/item/blue_swet_in_a_bucket.png",
+      "src/main/resources/assets/ascended_quark/textures/item/blue_swet_in_a_skyroot_bucket.png",
+      "src/main/resources/assets/ascended_quark/textures/item/golden_swet_in_a_bucket.png"
+    ]
+  },
+  "0rc1nus/Galosphere-Main/fabric-1.21": {
+    "sha": "4a44e023ea862097c3053d8c8d13bd15bb95b8f4",
+    "images": [
+      "src/main/resources/assets/galosphere/textures/item/allurite_shard.png",
+      "src/main/resources/assets/galosphere/textures/item/barometer_01.png",
+      "src/main/resources/assets/galosphere/textures/item/barometer_03.png",
+      "src/main/resources/assets/galosphere/textures/item/barometer_05.png"
+    ]
+  },
+  "Safrodev/Archon/main": {
+    "sha": "37538ca8dfa171937bbb7c14436d98d5ee6621e3",
+    "images": [
+      "src/main/resources/assets/archon/textures/item/accelerate_scroll.png",
+      "src/main/resources/assets/archon/textures/item/breezy_harvester.png",
+      "src/main/resources/assets/archon/textures/item/charred_eye.png",
+      "src/main/resources/assets/archon/textures/item/earth_essence.png"
+    ]
+  },
+  "baileyholl/Ars-Nouveau/main": {
+    "sha": "7ee8826269df07cc599a9738d76bcaaea4d8daa7",
+    "images": [
+      "src/main/resources/assets/ars_nouveau/textures/item/abjuration_essence.png",
+      "src/main/resources/assets/ars_nouveau/textures/item/annotated_codex.png",
+      "src/main/resources/assets/ars_nouveau/textures/item/bombegranate_pod.png",
+      "src/main/resources/assets/ars_nouveau/textures/item/dampen.png"
+    ]
+  },
+  "Globox1997/EnvironmentZ/1.21": {
+    "sha": "58bb0f4d67330fbb8b19eb6b60fbff55a2a56873",
+    "images": [
+      "src/main/resources/assets/environmentz/textures/item/almost_empty_ice_pack.png",
+      "src/main/resources/assets/environmentz/textures/item/empty_ice_pack.png",
+      "src/main/resources/assets/environmentz/textures/item/heated_stones.png",
+      "src/main/resources/assets/environmentz/textures/item/heating_stones.png"
+    ]
+  },
+  "Technici4n/Powah/26.1": {
+    "sha": "42742741fdfde80bfee264d0b154d941f976ae05",
+    "images": [
+      "src/main/resources/assets/powah/textures/item/aerial_pearl.png",
+      "src/main/resources/assets/powah/textures/item/battery_basic.png",
+      "src/main/resources/assets/powah/textures/item/battery_hardened.png",
+      "src/main/resources/assets/powah/textures/item/battery_nitro.png"
+    ]
+  },
+  "masik16u/Mythic-Charms/1.20.1": {
+    "sha": "22667d39911bb37d7596b2929421def6136488ff",
+    "images": [
+      "src/main/resources/assets/mythic_charms/textures/item/aid_pottery_sherd.png",
+      "src/main/resources/assets/mythic_charms/textures/item/body_pottery_sherd.png",
+      "src/main/resources/assets/mythic_charms/textures/item/crystal_pottery_sherd.png",
+      "src/main/resources/assets/mythic_charms/textures/item/farmer_pottery_sherd.png"
+    ]
+  },
+  "quiqueck/BetterEnd/release/26.2": {
+    "sha": "39683d8c53be572b80c5c62cbb7f47b9e4a11dea",
+    "images": [
+      "src/main/resources/assets/betterend/textures/item/aeternium_axe_head.png",
+      "src/main/resources/assets/betterend/textures/item/aeternium_hoe.png",
+      "src/main/resources/assets/betterend/textures/item/aeternium_sword_blade.png",
+      "src/main/resources/assets/betterend/textures/item/blossom_berry.png"
+    ]
+  },
+  "quiqueck/BetterNether/release/26.2": {
+    "sha": "b8c4aeb604dfdd8739a4aa03d488db32f1b36180",
+    "images": [
+      "src/main/resources/assets/betternether/textures/item/agave_medicine.png",
+      "src/main/resources/assets/betternether/textures/item/basalt_stalactite.png",
+      "src/main/resources/assets/betternether/textures/item/bone_stalactite.png",
+      "src/main/resources/assets/betternether/textures/item/cincinnasite_chestplate.png"
+    ]
+  },
+  "Luke100000/minecraft-comes-alive/1.21.1": {
+    "sha": "0e9094f6131510b89af27551b2b197cca80b46b2",
+    "images": [
+      "common/src/main/resources/assets/mca/textures/item/baby_boy_empty.png",
+      "common/src/main/resources/assets/mca/textures/item/book_death.png",
+      "common/src/main/resources/assets/mca/textures/item/book_rose_gold.png",
+      "common/src/main/resources/assets/mca/textures/item/comb.png"
+    ]
+  }
+}
