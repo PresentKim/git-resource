@@ -2,6 +2,34 @@ import {fisherYatesShuffle} from './array-random'
 
 export type ExampleRepository = [string, string, string]
 
+export interface FeaturedRepository {
+  owner: string
+  name: string
+  ref: string
+  description: string
+  /** A few images from the repository, shown as a preview strip */
+  previewImages: string[]
+}
+
+/** Recommended above the examples, and left out of the shuffled list */
+export const featuredRepository: FeaturedRepository = {
+  owner: 'PresentKim',
+  name: 'ai-generated-pixelart',
+  ref: 'main',
+  description:
+    'Over 20,000 post-processed AI pixel art sprites: weapons, food, gems, potions, creatures and more.',
+  previewImages: [
+    'weapon/weapon_crystal_sword_cyan_purple_blue_jagged_blade-0001.png',
+    'potion/potion_amber_flask_brown_red_round_cork-0001.png',
+    'gem/gem_crystal_diamond_cyan_purple_pink_green_faceted-0001.png',
+    'food/food_apple_cake_gold_cream_red_round_apple_slices-0001.png',
+    'plant/plant_mushroom_beige_pale_round_cap-0001.png',
+    'magic/magic_amethyst_staff_purple_blue_crystal_head-0001.png',
+    'creature/creature_slime_face_cyan_blue_black_smiling_blob-0001.png',
+    'tool/tool_diamond_pickaxe_cyan_blue_black_crystal_head-0001.png',
+  ],
+}
+
 export const exampleRepositories: ExampleRepository[] = [
   ['Mojang', 'bedrock-samples', 'main'],
   ['ExcessiveAmountsOfZombies', 'Croptopia', 'v3_1.21'],
@@ -125,7 +153,6 @@ export const exampleRepositories: ExampleRepository[] = [
   ['tyap-lyap', 'winterly', '1.21'],
   ['SlimeKnights', 'TinkersConstruct', '1.19.2'],
   ['refinedmods', 'refinedstorage', 'develop'],
-  ['PresentKim', 'ai-generated-pixelart', 'main'],
   ['Pandarix', 'Beautify', 'main'],
   ['TeamDiopside', 'InfinityButtons', '1.21.1'],
   ['Scouter456', 'Nether_Depths_Upgrade', 'nether_depths_upgrade_1.21-fabric'],

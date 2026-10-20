@@ -2,11 +2,15 @@ import {useCallback, useState} from 'react'
 import {RefreshCw} from 'lucide-react'
 
 import {Button} from '@/shared/components/ui/button'
+import {FeaturedRepositoryCard} from '@/features/home/components/FeaturedRepositoryCard'
 import {RepoInput} from '@/features/home/components/RepoInput'
 
 import {useRepoPath} from '@/features/repo/useRepoPath'
 import {cn, pickByPartialFisherYates} from '@/shared/utils'
-import {exampleRepositories} from '@/shared/utils/example-repositories'
+import {
+  exampleRepositories,
+  featuredRepository,
+} from '@/shared/utils/example-repositories'
 import {APP_NAME} from '@/shared/utils/routeMeta'
 
 const EXAMPLE_REPO_COUNT = 5
@@ -73,6 +77,22 @@ export default function HomePage() {
         <div className="h-px flex-1 bg-border" />
         <span className="px-2 text-xs text-muted-foreground">OR</span>
         <div className="h-px flex-1 bg-border" />
+      </div>
+
+      <div className="mx-auto w-full max-w-2xl pb-8 sm:pb-10">
+        <h2 className="mb-3 ml-3 text-base font-semibold">
+          <span aria-hidden="true">• </span>Start with the featured repository
+        </h2>
+        <FeaturedRepositoryCard
+          repository={featuredRepository}
+          onOpen={() =>
+            setRepoPath(
+              featuredRepository.owner,
+              featuredRepository.name,
+              featuredRepository.ref,
+            )
+          }
+        />
       </div>
 
       <div className="mx-auto w-full max-w-2xl space-y-4">
