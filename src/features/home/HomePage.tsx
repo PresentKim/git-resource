@@ -7,6 +7,7 @@ import {RepoInput} from '@/features/home/components/RepoInput'
 import {useRepoPath} from '@/features/repo/useRepoPath'
 import {cn, pickByPartialFisherYates} from '@/shared/utils'
 import {exampleRepositories} from '@/shared/utils/example-repositories'
+import {APP_NAME} from '@/shared/utils/routeMeta'
 
 const EXAMPLE_REPO_COUNT = 5
 const REROLL_ANIMATION_DURATION_MS = 200
@@ -35,6 +36,9 @@ export default function HomePage() {
 
   return (
     <section className="flex flex-col w-full px-3">
+      {/* A repository link opened first leaves its own title in index.html
+          (see middleware.ts); this one, hoisted first, wins on the way home */}
+      <title>{APP_NAME}</title>
       <div
         className={cn(
           'inline-flex items-center justify-center w-fit mx-auto px-3 py-1 mt-24 md:mt-28 select-none',

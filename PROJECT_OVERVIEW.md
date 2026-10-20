@@ -26,6 +26,8 @@ shows one folder at a time.
   flat folder layout) and a sprite-sheet PNG ("Screenshot") of them.
 - **Minecraft animation**: `.mcmeta` animations play in the grid and the viewer.
 - **Shareable state**: the filter, sort order and open image live in the URL.
+- **Link previews**: a shared repository or image link shows that repository
+  in Discord, Slack, KakaoTalk or X, with its description and textures.
 - **Settings**: theme, pixelated rendering, animation, and an optional GitHub
   personal access token.
 
@@ -78,6 +80,10 @@ URL  /owner/repo/ref?filter=…&sort=…&image=…
   export, and APNG encoding for Minecraft animations.
 - **Vercel**: static hosting plus rewrites that proxy `github.com`,
   `raw.githubusercontent.com` and `codeload.github.com` for the fallbacks.
+  Routing Middleware writes the link-preview tags of repository URLs into
+  `index.html` from the URL alone, and a function (`@vercel/og`) draws the
+  preview image, upscaling textures with nearest-neighbour sampling because
+  Satori smooths scaled images.
 
 ### 5. Problem-Solving Cases
 

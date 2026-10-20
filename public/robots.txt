@@ -1,4 +1,5 @@
 User-agent: *
 Allow: /
+Allow: /api/og
 Disallow: /static/
 Disallow: /assets/
