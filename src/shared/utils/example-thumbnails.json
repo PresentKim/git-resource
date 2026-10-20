@@ -1821,6 +1821,297 @@
       "blocks/voidstone/raw.png"
     ]
   },
+  "Kompreya/Kompy-Textures/master": {
+    "sha": "aa596937b27eb9998116388fe3811a10da1733d2",
+    "images": [
+      "ITEMS/16x/aether_orb.png",
+      "ITEMS/16x/arcane_orb.png",
+      "ITEMS/16x/blank_charm.png",
+      "ITEMS/16x/chaos_rune.png",
+      "ITEMS/16x/DiamondCoin (1).png",
+      "ITEMS/16x/DiamondCoin (6).png",
+      "ITEMS/16x/draconic_orb.png",
+      "ITEMS/16x/egg_token.png"
+    ]
+  },
+  "rexbr3615/rexbrx-unused-content/main": {
+    "sha": "b57a256a4c2295f84ef8a88dffcb990af1e22bb8",
+    "images": [
+      "blocks/abstract_energy_cell_creative.png",
+      "blocks/break/break_bottom_to_top_14.png",
+      "blocks/cooksonia_stage1.png",
+      "blocks/floor_type1.png",
+      "blocks/grass_type_mycelium.png",
+      "blocks/nature/daisy_red.png",
+      "blocks/nature/nature_fantasy_bloomplant2.png",
+      "blocks/petroil_sand.png"
+    ]
+  },
+  "Lyuuke/LucusLeuceus/main": {
+    "sha": "20cd957170cb11559b7c6bd069179805d5210202",
+    "description": "A collection of personal artworks that have entered the public domain.",
+    "images": [
+      "artworks/2023/saturnalia/item/fox_tail.png",
+      "artworks/2023/zhongqiu/item/cooked_crab.png",
+      "artworks/2023/zhongqiu/item/mooncake_1.png",
+      "artworks/2023/zhongqiu/item/mooncake_3.png",
+      "artworks/2023/zhongqiu/item/osmanthus_1.png",
+      "artworks/2025/festa/item/acorn_jelly.png",
+      "artworks/2025/festa/item/beetroot_juice.png",
+      "artworks/2025/festa/item/bread_basket.png"
+    ]
+  },
+  "daisyUniverse/robin16x/master": {
+    "sha": "f012fb7659b49cfd3e7b2a5400b2f790937770b2",
+    "description": "a set of royalty free 16x16 textures",
+    "images": [
+      "blocks/acid.png",
+      "blocks/back_generic.png",
+      "blocks/bookshelves.png",
+      "blocks/chest_front.png",
+      "blocks/chest_side.png",
+      "blocks/coal_ore.png",
+      "blocks/crafting_table_front.png",
+      "blocks/crafting_table_side.png"
+    ]
+  },
+  "AetherealChaos/OpenPack/master": {
+    "sha": "cde22ce65df4815064dbc8a4603d7520985ba977",
+    "description": "An open source Minecraft resource pack that you can use for free",
+    "images": [
+      "assets/minecraft/textures/block/acacia_door_bottom.png",
+      "assets/minecraft/textures/block/acacia_door_top.png",
+      "assets/minecraft/textures/block/acacia_leaves.png",
+      "assets/minecraft/textures/block/acacia_sapling.png",
+      "assets/minecraft/textures/block/allium.png",
+      "assets/minecraft/textures/block/ancient_debris_side.png",
+      "assets/minecraft/textures/block/ancient_debris_top.png",
+      "assets/minecraft/textures/block/beacon.png"
+    ]
+  },
+  "Beetrootmonkey/MinecraftSprites/main": {
+    "sha": "e3ccd2e1f7c2efea5d11534f74b5d82f7f49590a",
+    "description": "A collection of sprites for items that I thought the game lacked or simply fitted it",
+    "images": [
+      "sprites/apple_jam.png",
+      "sprites/candle_wax.png",
+      "sprites/chorus_fruit_pie.png",
+      "sprites/clay_mold_plate.png",
+      "sprites/cloth_helmet.png",
+      "sprites/cooked_beetroot.png",
+      "sprites/cooked_pumpkin_slice.png",
+      "sprites/copper_knife_blade.png"
+    ]
+  },
+  "Simplexity-Development/Entity-Icons/main": {
+    "sha": "37fa10f1ed7b106dd52800fcb434d97b0d9745e3",
+    "description": "An open resource with pixel art of entities in minecraft",
+    "images": [
+      "assets/0_live_edits/0_not_done/chest/8x8/chest.png",
+      "assets/combined/16x16/llama/brown_cyan.png",
+      "assets/combined/16x16/llama/gray_purple.png",
+      "assets/combined/16x16/sign/crimson_wall_hanging.png",
+      "assets/combined/16x16/wolf/ashen_red.png",
+      "assets/combined/16x16/wolf/pale_green.png",
+      "assets/combined/16x16/wolf/snowy_yellow.png",
+      "assets/combined/16x16/wolf/woods_lime.png"
+    ]
+  },
+  "ULSTICK/GregTechRefreshed/main": {
+    "sha": "370725c47763dae247068580f9026cc17b3466c5",
+    "description": "A Modern Resource Pack for GregTech",
+    "images": [
+      "assets/gtceu/textures/item/activity_detector_cover.png",
+      "assets/gtceu/textures/item/basic_integrated_circuit.png",
+      "assets/gtceu/textures/item/compressed_coke_clay.png",
+      "assets/gtceu/textures/item/doge_coin.png",
+      "assets/gtceu/textures/item/energy_detector_cover.png",
+      "assets/gtceu/textures/item/ev_vanadium_battery/1.png",
+      "assets/gtceu/textures/item/glass_vial/base.png",
+      "assets/gtceu/textures/item/hv_cadmium_battery/4.png"
+    ]
+  },
+  "OfficialPixelBrush/LibreProg/main": {
+    "sha": "1121a9595593800bf3967ba4273a4272ce51717e",
+    "description": "A fully free and open-source set of assets for Minecraft Beta 1.7.3",
+    "images": [
+      "textures/terrain/bedrock.png",
+      "textures/terrain/blue_wool.png",
+      "textures/terrain/breaking_stage_1.png",
+      "textures/terrain/breaking_stage_4.png",
+      "textures/terrain/breaking_stage_6.png",
+      "textures/terrain/breaking_stage_8.png",
+      "textures/terrain/bricks.png",
+      "textures/terrain/chest_front.png"
+    ]
+  },
+  "TheBiochemic/free_px_assets/main": {
+    "sha": "891ba05d85f0f56594486492cb465e3a2c9acb15",
+    "description": "Free Pixel Art related Assets",
+    "images": [
+      "biocraft_textures/bow_pull_0.png",
+      "biocraft_textures/carrotOnAStick.png",
+      "biocraft_textures/chickenRaw.png",
+      "biocraft_textures/cocoa_1.png",
+      "biocraft_textures/crops_5.png",
+      "biocraft_textures/destroy_2.png",
+      "biocraft_textures/dispenser_front.png",
+      "biocraft_textures/dyePowder_orange.png"
+    ]
+  },
+  "GentlemanCheesy/CheesyCraft/main": {
+    "sha": "2d1cc1c5541430e2e8a93537c38c96321aaadbc7",
+    "description": "A collection of textures from my minecraft servers/projects.",
+    "images": [
+      "assets/aluminum_brass_ingot.png",
+      "assets/autumn_grass_top.png",
+      "assets/blistering_ingot_33.png",
+      "assets/BrazzAxe3.png",
+      "assets/ceramic_tile.png",
+      "assets/cherry_coala.png",
+      "assets/clover_crossbow.png",
+      "assets/corroded_iron_block.png"
+    ]
+  },
+  "Phyronnaz/VoxelAssets/master": {
+    "sha": "f1bb6fb20e36a47b8dacbdf23c4a10b994b6f224",
+    "description": "CC0 or CC-BY voxel-related assets",
+    "images": [
+      "GoodVibes/minecraft/textures/item/acacia_boat.png",
+      "GoodVibes/minecraft/textures/item/beef.png",
+      "GoodVibes/minecraft/textures/item/bone.png",
+      "GoodVibes/minecraft/textures/item/brick.png",
+      "GoodVibes/minecraft/textures/item/chainmail_chestplate.png",
+      "GoodVibes/minecraft/textures/item/clock_00.png",
+      "GoodVibes/minecraft/textures/item/clock_09.png",
+      "GoodVibes/minecraft/textures/item/clock_18.png"
+    ]
+  },
+  "Athemis/PixelPerfectionCE/master": {
+    "sha": "28e38cab7c1f03f86364ef704f705bebcc13cb3d",
+    "description": "A 16x resolution resource pack for Minecraft.",
+    "images": [
+      "assets/mcpppp/textures/item/quiver.png",
+      "assets/minecraft/textures/item/bed.png",
+      "assets/minecraft/textures/item/blaze_powder.png",
+      "assets/minecraft/textures/item/bowl.png",
+      "assets/minecraft/textures/item/cauldron.png",
+      "assets/minecraft/textures/item/chorus_fruit.png",
+      "assets/minecraft/textures/item/clock_08.png",
+      "assets/minecraft/textures/item/clock_18.png"
+    ]
+  },
+  "MysticTempest/REFI_Textures/master": {
+    "sha": "33f1f719930d1d202beaa5fa6251c26d3a711149",
+    "description": "A 16px texture pack for Luanti (fka. Minetest). Supports Mineclonia, Minetest Game, and much more.",
+    "images": [
+      "alternate_textures/texture_alts/basic_materials/basic_materials_aluminum_bar_alt.png",
+      "alternate_textures/texture_alts/diamonds/shields_inv_shield_diamond_alt.png",
+      "alternate_textures/texture_alts/mcl_deepslate_tuff_chiseled_top_alt.png",
+      "GUI_themes/REFI_dark_theme/dark_theme_mcl_inventory_empty_armor_slot_chestplate.png",
+      "mcimport_mods/bedrock/bedrock_bedrock.png",
+      "mcimport_mods/mesecons/mesecons_delayer/mesecons_delayer_off_3.png",
+      "mcimport_mods/nether/nether_brick_cracked.png",
+      "minetest_game_mods/3d_armor/shields/shields_inv_shield_diamond.png"
+    ]
+  },
+  "minetest-texture-packs/Good-Morning-Craft/master": {
+    "sha": "09cccc01d9a7884bf8924580fc4da527ecdb0b66",
+    "description": "🌅A simple yet quirky texture pack by Louis Durrant, licensed CC-BY-SA 4.0.",
+    "images": [
+      "beds/beds_bed_top_bottom.png",
+      "bones/bones_top.png",
+      "carts/carts_rail_straight_brk.png",
+      "ccompass/ccompass_7.png",
+      "compass/compass_7.png",
+      "default/default_acacia_tree.png",
+      "default/default_bronze_ingot.png",
+      "default/default_coal_lump.png"
+    ]
+  },
+  "minetest-texture-packs/Isabella-II/master": {
+    "sha": "8afe93927c69866de61865f3573696d306e7f24d",
+    "description": "🌧 A moody texture pack by \"Bonemouse\", licensed CC-BY 3.0",
+    "images": [
+      "beds/beds_bed_side_bottom_l.png",
+      "beds/beds_bed_top_bottom.png",
+      "default/default_acacia_bush_sapling.png",
+      "default/default_apple.png",
+      "default/default_blueberry_bush_leaves.png",
+      "default/default_bronze_block.png",
+      "default/default_coal_block.png",
+      "default/default_coral_brown.png"
+    ]
+  },
+  "minetest-texture-packs/Methro-x16/main": {
+    "sha": "16bfc460fb1b203982a6c1b5a2454cdf4e15b80b",
+    "description": "⚔ An outstanding texture pack tailored for PvP gameplay, offering enhanced comfort and compatibility with various mods.",
+    "images": [
+      "3d_armor/3d_armor_inv_chestplate_admin.png",
+      "3d_armor/3d_armor_inv_leggings_admin.png",
+      "3d_armor/others/3d_armor_stand_legs.png",
+      "3d_gloves/3d_armor_gloves_inv_gloves_mithril.png",
+      "bones/bones_top.png",
+      "cloud_items/cloud_items_cloud_block.png",
+      "cloud_items/cloud_items_tool_cloudaxe.png",
+      "ctf/ctf_traps_stone.png"
+    ]
+  },
+  "FrugalGamer/snez-texture-pack/main": {
+    "sha": "61824c63e9cb3bbbb01a76b3a09d41c6df8aced0",
+    "description": "Snez is a high-contrast non-realistic texture pack for Luanti and Voxelibre, based on the LoSpec 500 palette. It aims to create original patterns and icons that are easily recognizable at a glance and easy to distinguish from each other.",
+    "images": [
+      "Snez/awards_ui_icon.png",
+      "Snez/default_apple.png",
+      "Snez/default_furnace_side.png",
+      "Snez/default_rail_crossing.png",
+      "Snez/default_tool_diamondsword.png",
+      "Snez/default_tool_woodaxe.png",
+      "Snez/doors_trapdoor_steel.png",
+      "Snez/farming_pumpkin_top.png"
+    ]
+  },
+  "varttist/lord-textures/master": {
+    "sha": "37126aeb11f2be1dafe793935fb67d7d067cbed0",
+    "description": "LORD's texturepack",
+    "images": [
+      "BLOCKS/building_blocks_canopy.png",
+      "BLOCKS/default_brick.png",
+      "BLOCKS/default_sandstone_brick.png",
+      "BLOCKS/grass/lord_ground_dirt_dunland.png",
+      "BLOCKS/grass/lord_ground_dirt_lorien.png",
+      "BLOCKS/leaves/inv/lord_trees_apple_leaf_inv.png",
+      "BLOCKS/leaves/inv/lord_trees_pine_leaf_inv.png",
+      "BLOCKS/leaves/lord_trees_birch_leaf.png"
+    ]
+  },
+  "pithydon/hicolor/master": {
+    "sha": "3bdcc53d3eb582943df46439d1db80e15be66158",
+    "description": "16x texture pack with more color.",
+    "images": [
+      "boats_inventory.png",
+      "bones_top.png",
+      "default_brick.png",
+      "default_clay_lump.png",
+      "default_cobble.png",
+      "default_coral_orange.png",
+      "default_desert_stone_block.png",
+      "default_dirt.png"
+    ]
+  },
+  "sparklinlabs/superpowers-asset-packs/master": {
+    "sha": "e8674a03ab4456802f71f848c4df79eccca23f7a",
+    "description": "CC0-licensed asset packs for your games",
+    "images": [
+      "3d-warriors/heads/1/textureB.png",
+      "3d-warriors/weapons/1/textureB.png",
+      "ninja-adventure/characters/faceset/7.png",
+      "ninja-adventure/hud/kunai.png",
+      "ninja-adventure/items/medipack.png",
+      "ninja-adventure/monsters/6.png",
+      "western-fps-2d/hud/facesets/24.png"
+    ]
+  },
   "Minecraft-LightLand/FruitsDelight/1.20": {
     "sha": "fc274ff5932330dfcc71dc787217207d87ef9f33",
     "images": [

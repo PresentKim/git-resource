@@ -45,6 +45,10 @@ just its URL.
 3. Filter, sort or browse folders from the toolbar, then click an image (or
    focus it and press Enter) to open the viewer.
 
+Looking for textures you may reuse? [TEXTURE_REPOSITORIES.md](TEXTURE_REPOSITORIES.md)
+lists repositories that give away Minecraft-style textures, with their
+licenses and a link to browse each one here.
+
 ### URL parameters
 
 | Parameter | Example          | Meaning                                              |
