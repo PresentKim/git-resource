@@ -1,4 +1,9 @@
 {
+  "functions": {
+    "api/og.tsx": {
+      "includeFiles": "api/_fonts/**"
+    }
+  },
   "rewrites": [
     {
       "source": "/proxy/github/:path*",

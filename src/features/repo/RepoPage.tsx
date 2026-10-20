@@ -17,7 +17,22 @@ import {useFilterSync} from '@/features/repo/filter/useFilterSync'
 import {useRepoLoading} from '@/features/repo/useRepoLoading'
 import {useImageClickHandler} from '@/features/repo/useImageClickHandler'
 import {cn} from '@/shared/utils'
+import {getRouteTitle} from '@/shared/utils/routeMeta'
 import {Loader as LoaderIcon} from 'lucide-react'
+import {parseAsString, useQueryState} from 'nuqs'
+
+/**
+ * The tab title of the repository (and of the open image). React hoists the
+ * <title> into <head> and removes it again on leaving the page, which brings
+ * back the static title of index.html. Kept apart from RepoPage so opening an
+ * image re-renders only this.
+ */
+function RepoDocumentTitle() {
+  const repo = useRepoStore(state => state.repo)
+  const [imagePath] = useQueryState('image', parseAsString)
+
+  return <title>{getRouteTitle(repo, imagePath)}</title>
+}
 
 /**
  * Owns the viewer route so that opening/closing the viewer or changing the
@@ -80,6 +95,7 @@ export default function RepoPage() {
       className={cn(
         'flex w-full flex-col gap-3 sm:gap-4 bg-background px-1 py-2 sm:px-2',
       )}>
+      <RepoDocumentTitle />
       {!error && (
         // A full-width band that holds the toolbar card. It is opaque, so when
         // it sticks, images scroll away cleanly under a straight edge across

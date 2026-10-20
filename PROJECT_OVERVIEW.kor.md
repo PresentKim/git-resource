@@ -26,6 +26,8 @@ GitHub 주소를 프록시하는 역할도 맡습니다.
   폴더 없이 중 선택), 하나의 스프라이트 시트 PNG("Screenshot")로 만듭니다.
 - **Minecraft 애니메이션**: `.mcmeta` 애니메이션이 그리드와 뷰어에서 재생됩니다.
 - **공유 가능한 상태**: 필터, 정렬 순서, 열려 있는 이미지가 URL에 담깁니다.
+- **링크 미리보기**: 레포지토리나 이미지 링크를 Discord, Slack, 카카오톡, X에
+  공유하면 그 레포지토리의 설명과 텍스처가 미리보기로 보입니다.
 - **설정**: 테마, 픽셀 렌더링, 애니메이션, 선택 사항인 GitHub 개인 액세스 토큰.
 
 ### 3. 구조
@@ -74,6 +76,10 @@ URL  /owner/repo/ref?filter=…&sort=…&image=…
   내보내기, Minecraft 애니메이션용 APNG 인코딩.
 - **Vercel**: 정적 호스팅과 함께, 폴백에 쓰는 `github.com`,
   `raw.githubusercontent.com`, `codeload.github.com` 프록시를 rewrites로 제공합니다.
+  레포지토리 URL에는 Routing Middleware가 URL만으로 링크 미리보기 태그를
+  `index.html`에 써 넣고, 함수(`@vercel/og`)가 미리보기 이미지를 그립니다.
+  Satori는 확대한 이미지를 부드럽게 보간하므로 텍스처는 최근접 이웃 방식으로 직접
+  확대합니다.
 
 ### 5. 문제 해결 사례
 

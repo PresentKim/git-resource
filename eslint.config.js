@@ -28,5 +28,15 @@ export default tseslint.config(
       'no-var': 'error',
       'no-console': ['error', {allow: ['warn', 'error', 'info']}],
     },
+  },
+  {
+    // Vercel Functions and Routing Middleware run on Node.js
+    files: ['api/**/*.{ts,tsx}', 'middleware.ts'],
+    languageOptions: {
+      globals: globals.node,
+    },
+    rules: {
+      'react-refresh/only-export-components': 'off',
+    },
   }
 );

@@ -104,9 +104,19 @@ paths: `/proxy/github`, `/proxy/raw` and `/proxy/codeload`. The dev server
 provides them in `vite.config.ts`, and production provides them with the
 rewrites in `vercel.json`.
 
+Shared repository links get their own link preview. `middleware.ts` (Vercel
+Routing Middleware) serves `index.html` with the title, description and
+`og:*`/`twitter:*` tags of the repository in the URL, and `api/og.tsx` draws
+the preview image: the repository name and description with the shared image,
+or a grid of its first textures, scaled up pixel for pixel. Set `GITHUB_TOKEN`
+in the Vercel project to raise its GitHub API limit. Vite's dev server runs
+neither; use `vercel dev` to try them locally.
+
 ### Project structure
 
 ```text
+api/            Vercel Function for the link-preview image (/api/og)
+middleware.ts   Link-preview metadata for repository URLs
 src/
   features/
     home/       Home page and repository input
