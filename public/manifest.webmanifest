@@ -7,7 +7,7 @@
       "sizes": "192x192"
     },
     {
-      "src": "favicon-512.png",
+      "src": "favicon-maskable-512.png",
       "type": "image/png",
       "sizes": "512x512",
       "purpose": "maskable"
