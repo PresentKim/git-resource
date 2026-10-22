@@ -104,10 +104,13 @@ async function loadImage(url: string): Promise<{
       }
     }
 
-    // Fallback: Use Image element with original URL
-    // GitHub raw images typically work without CORS issues for canvas operations
+    // Fallback: Use Image element with original URL (createImageBitmap cannot
+    // decode SVG blobs). It must be loaded with CORS, or drawing it taints the
+    // canvas and the sprite sheet cannot be exported; raw.githubusercontent.com
+    // allows any origin
     return new Promise((resolve, reject) => {
       const img = new Image()
+      img.crossOrigin = 'anonymous'
 
       img.onload = () => {
         // Verify image loaded successfully
