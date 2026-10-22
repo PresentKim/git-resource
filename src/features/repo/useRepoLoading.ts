@@ -3,6 +3,7 @@ import {useGithubDefaultBranch} from '@/shared/api/github/hooks/useGithubDefault
 import {useGithubImageFileTree} from '@/shared/api/github/hooks/useGithubImageFileTree'
 import {useRepoPath} from '@/features/repo/useRepoPath'
 import {useRepoStore} from '@/shared/stores/repoStore'
+import {useRecentReposStore} from '@/shared/stores/recentReposStore'
 import {splitFileListing} from '@/shared/utils/fileMeta'
 
 /**
@@ -14,6 +15,7 @@ export function useRepoLoading() {
   const setRepo = useRepoStore(state => state.setRepo)
   const setImageFiles = useRepoStore(state => state.setImageFiles)
   const setError = useRepoStore(state => state.setError)
+  const addRecent = useRecentReposStore(state => state.addRecent)
 
   const ref = repoPath.ref?.trim()
 
@@ -37,6 +39,7 @@ export function useRepoLoading() {
       setError(null)
       const {paths, meta} = splitFileListing(imageFileTree.data)
       setImageFiles(paths, meta, imageFileTree.data.hashKind)
+      addRecent(repoPath)
     }
   }, [
     ref,
@@ -46,6 +49,7 @@ export function useRepoLoading() {
     setRepo,
     setImageFiles,
     setError,
+    addRecent,
   ])
 
   useEffect(() => {

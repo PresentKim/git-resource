@@ -4,6 +4,7 @@ import {RefreshCw} from 'lucide-react'
 import {Button} from '@/shared/components/ui/button'
 import {RepoInput} from '@/features/home/components/RepoInput'
 import {RepositoryCard} from '@/features/home/components/RepositoryCard'
+import {RecentRepositories} from '@/features/home/components/RecentRepositories'
 import {
   LocalOpenButtons,
   RecentLocalList,
@@ -78,6 +79,7 @@ export default function HomePage() {
           <span aria-hidden="true">• </span>Paste GitHub repository URL
         </h2>
         <RepoInput />
+        <RecentRepositories onOpen={setRepoPath} className="mt-4 ml-3" />
       </div>
 
       <div className="mx-auto w-full max-w-2xl pt-10">
