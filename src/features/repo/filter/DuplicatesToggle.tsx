@@ -16,13 +16,18 @@ export const DuplicatesToggle = memo(function DuplicatesToggle() {
   const available = useRepoStore(
     state => state.metaFields.has('hash') || state.source.kind === 'local',
   )
-  const label = duplicates ? 'Show all images' : 'Show only identical images'
+  const title = !available
+    ? 'File contents are unknown for these images'
+    : duplicates
+      ? 'Show all images'
+      : 'Show only identical images'
 
   return (
+    // A pressed state with a fixed name; the title says what a press does
     <Button
-      aria-label={label}
+      aria-label="Show only identical images"
       aria-pressed={duplicates}
-      title={available ? label : 'File contents are unknown for these images'}
+      title={title}
       disabled={!available && !duplicates}
       onClick={() => setDuplicates(duplicates ? null : true)}
       size="sm"

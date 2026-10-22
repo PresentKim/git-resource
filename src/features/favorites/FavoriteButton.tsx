@@ -42,7 +42,7 @@ export function FavoriteButton({path, large = false}: FavoriteButtonProps) {
       onClick={() =>
         toggleFavorite(location, mcmetaPaths.has(getMcmetaPath(path)))
       }
-      aria-label={label}
+      aria-label="Favorite"
       aria-pressed={starred}
       title={label}>
       <Star
