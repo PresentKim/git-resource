@@ -45,13 +45,15 @@ export const CompareBar = memo(function CompareBar() {
       className="flex flex-wrap items-center gap-x-3 gap-y-2 rounded-lg border border-border/60 bg-card px-2 py-1.5 text-xs shadow-sm"
       aria-live="polite">
       {status?.loading ? (
-        <span className="flex items-center gap-1.5 text-muted-foreground">
+        <span className="flex flex-1 items-center gap-1.5 text-muted-foreground sm:flex-none">
           <LoaderCircle className="size-3.5 animate-spin" aria-hidden="true" />
           Loading <span className="font-mono">{shortenRef(baseRef)}</span> to
           compare...
         </span>
       ) : status?.error ? (
-        <span role="alert" className="text-destructive-foreground">
+        <span
+          role="alert"
+          className="min-w-0 flex-1 text-destructive-foreground sm:flex-none">
           Could not compare with{' '}
           <span className="font-mono">{shortenRef(baseRef)}</span>:{' '}
           <span className="text-muted-foreground">{status.error}</span>
@@ -59,7 +61,7 @@ export const CompareBar = memo(function CompareBar() {
       ) : (
         comparison && (
           <>
-            <span className="text-muted-foreground">
+            <span className="flex-1 text-muted-foreground sm:flex-none">
               Changes from{' '}
               <span className="font-mono" title={baseRef}>
                 {shortenRef(baseRef)}
@@ -72,7 +74,8 @@ export const CompareBar = memo(function CompareBar() {
             <div
               role="radiogroup"
               aria-label="Changes to show"
-              className="flex flex-wrap gap-1">
+              // Below the summary and the stop button on phones
+              className="order-last flex w-full flex-wrap gap-1 sm:order-none sm:w-auto">
               {CHANGE_FILTERS.map(filter => {
                 const count =
                   filter === 'all'
