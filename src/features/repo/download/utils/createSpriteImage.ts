@@ -8,8 +8,7 @@ import {
   fetchMcmetaData,
   parseMcmeta,
 } from '@/shared/utils/mcmeta'
-import {createRawImageUrl} from '@/shared/utils/github'
-import type {GithubRepo} from '@/shared/utils/github'
+import {getImageUrl, type ImageSource} from '@/shared/utils/imageSource'
 
 export interface SpriteOptions {
   /** Gap between images in pixels */
@@ -221,7 +220,7 @@ export async function createSpriteImage(
   imageUrls: string[],
   imagePaths: string[],
   options: SpriteOptions & {
-    repo?: GithubRepo
+    source?: ImageSource
     mcmetaPaths?: Set<string>
     animationEnabled?: boolean
     githubToken?: string | null
@@ -255,7 +254,7 @@ export async function createSpriteImage(
       // Only process animated images if animation is enabled
       if (
         options.animationEnabled === true &&
-        options.repo &&
+        options.source &&
         options.mcmetaPaths &&
         options.mcmetaPaths.size > 0
       ) {
@@ -264,7 +263,7 @@ export async function createSpriteImage(
 
         if (hasMcmeta) {
           try {
-            const mcmetaUrl = createRawImageUrl(options.repo, mcmetaPath)
+            const mcmetaUrl = getImageUrl(options.source, mcmetaPath)
             const mcmetaData = await fetchMcmetaData(
               mcmetaUrl,
               options.githubToken,

@@ -14,7 +14,7 @@ import type {FlattenMode} from '@/shared/utils'
  * instead of carrying the options itself; the result is reported by a notice.
  */
 export const DownloadButton = memo(function DownloadButton() {
-  const repo = useRepoStore(state => state.repo)
+  const source = useRepoStore(state => state.source)
   const filteredImageFiles = useRepoStore(state => state.filteredImageFiles)
   const {filteredCount} = useImageCount()
   const [open, setOpen] = useState(false)
@@ -27,7 +27,7 @@ export const DownloadButton = memo(function DownloadButton() {
     handleDownload,
     outcome,
     dismissOutcome,
-  } = useImageDownload({repo, imagePaths, flattenMode})
+  } = useImageDownload({source, imagePaths, flattenMode})
 
   const handleConfirm = async () => {
     // The hook reports success and failure through `outcome`, so the dialog

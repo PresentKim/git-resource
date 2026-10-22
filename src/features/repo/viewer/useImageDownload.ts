@@ -1,10 +1,9 @@
 import {useCallback} from 'react'
 import {saveAs} from 'file-saver'
-import {createRawImageUrl} from '@/shared/utils'
-import type {GithubRepo} from '@/shared/utils'
+import {getImageUrl, type ImageSource} from '@/shared/utils/imageSource'
 
 interface UseImageDownloadProps {
-  repo: GithubRepo
+  source: ImageSource
   imagePath: string
   fileName: string
 }
@@ -14,20 +13,20 @@ interface UseImageDownloadProps {
  * Handles image download functionality
  */
 export function useImageDownload({
-  repo,
+  source,
   imagePath,
   fileName,
 }: UseImageDownloadProps) {
   const handleDownload = useCallback(async () => {
     try {
-      const url = createRawImageUrl(repo, imagePath)
+      const url = getImageUrl(source, imagePath)
       const response = await fetch(url)
       const blob = await response.blob()
       saveAs(blob, fileName || 'image.png')
     } catch (err) {
       console.error('Failed to download image', err)
     }
-  }, [repo, imagePath, fileName])
+  }, [source, imagePath, fileName])
 
   return {
     handleDownload,

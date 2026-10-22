@@ -1,86 +1,30 @@
 import {create} from 'zustand'
 import type {GithubRepo} from '@/shared/utils/github'
-import type {GithubImageFileTree} from '@/shared/api/github/types'
 import {isMcmetaFile} from '@/shared/utils'
+import type {FileMeta, HashKind} from '@/shared/utils/fileMeta'
+import type {ListingComparison} from '@/shared/utils/compareListings'
 import {
-  DEFAULT_SORT_MODE,
-  sortImagePaths,
-  type SortMode,
-} from '@/shared/utils/sortImagePaths'
+  runGalleryQuery,
+  type CellBadge,
+  type GalleryQuery,
+} from '@/shared/utils/galleryQuery'
+import {
+  EMPTY_SOURCE,
+  disposeImageSource,
+  type ImageSource,
+} from '@/shared/utils/imageSource'
+import {DEFAULT_SORT_MODE} from '@/shared/utils/sortImagePaths'
 
-/**
- * Parse filter string into include and exclude filters
- */
-function parseFilters(filter: string): {
-  includeFilters: string[]
-  excludeFilters: string[]
-} {
-  const rawFilters = filter.trim().split(/\s+/).filter(Boolean)
-  const include: string[] = []
-  const exclude: string[] = []
-
-  for (const term of rawFilters) {
-    if (term.startsWith('-')) {
-      const excludeTerm = term.slice(1).trim()
-      if (excludeTerm) {
-        exclude.push(excludeTerm)
-      }
-    } else {
-      include.push(term)
-    }
-  }
-
-  return {includeFilters: include, excludeFilters: exclude}
-}
-
-/**
- * Filter image paths based on include and exclude filters
- * Optimized: Pre-compute lowercase filters to avoid repeated toLowerCase() calls
- */
-function filterImagePaths(
-  paths: string[],
-  includeFilters: string[],
-  excludeFilters: string[],
-): string[] {
-  if (includeFilters.length === 0 && excludeFilters.length === 0) {
-    return paths
-  }
-
-  // Pre-compute lowercase filters once
-  const lowerIncludeFilters = includeFilters.map(f => f.toLowerCase())
-  const lowerExcludeFilters = excludeFilters.map(f => f.toLowerCase())
-
-  return paths.filter(path => {
-    const lowerPath = path.toLowerCase()
-
-    // All include filters must match (AND logic)
-    if (lowerIncludeFilters.length > 0) {
-      const allIncludeMatch = lowerIncludeFilters.every(term =>
-        lowerPath.includes(term),
-      )
-      if (!allIncludeMatch) {
-        return false
-      }
-    }
-
-    // Path must not match any exclude filter
-    if (lowerExcludeFilters.length > 0) {
-      const matchesExclude = lowerExcludeFilters.some(term =>
-        lowerPath.includes(term),
-      )
-      if (matchesExclude) {
-        return false
-      }
-    }
-
-    return true
-  })
+/** A comparison of the open ref with another one */
+export interface ActiveComparison extends ListingComparison {
+  /** The other ref */
+  baseRef: string
 }
 
 /**
  * Separate image files and mcmeta files
  */
-function separateImageFiles(imageFiles: GithubImageFileTree | null): {
+function separateImageFiles(imageFiles: string[] | null): {
   imageOnlyFiles: string[] | null
   mcmetaPaths: Set<string>
 } {
@@ -102,11 +46,45 @@ function separateImageFiles(imageFiles: GithubImageFileTree | null): {
   return {imageOnlyFiles: images, mcmetaPaths: mcmeta}
 }
 
+/** Which metadata fields any file has, to offer only the sorts that work */
+function getMetaFields(meta: ReadonlyMap<string, FileMeta>) {
+  const fields = new Set<keyof FileMeta>()
+  for (const value of meta.values()) {
+    if (value.size !== undefined) fields.add('size')
+    if (value.hash !== undefined) fields.add('hash')
+    if (value.modified !== undefined) fields.add('modified')
+    if (fields.size === 3) break
+  }
+  return fields
+}
+
+const DEFAULT_QUERY: GalleryQuery = {
+  filter: '',
+  sort: DEFAULT_SORT_MODE,
+  duplicates: false,
+  changes: 'all',
+}
+
+const EMPTY_META: ReadonlyMap<string, FileMeta> = new Map()
+
 interface RepoStore {
-  repo: GithubRepo
-  imageFiles: GithubImageFileTree | null
+  /** Where the images come from */
+  source: ImageSource
+  imageFiles: string[] | null
+  /** Sizes, hashes and dates of the files, as far as the source knows them */
+  fileMeta: ReadonlyMap<string, FileMeta>
+  /** How the hashes in fileMeta were made */
+  hashKind: HashKind | null
+  /** Metadata fields that at least one file has */
+  metaFields: ReadonlySet<keyof FileMeta>
+  comparison: ActiveComparison | null
   filteredImageFiles: string[] | null
-  filterCache: Map<string, string[]>
+  /** Marks for the cells of the filtered images, if the query adds any */
+  cellBadges: ReadonlyMap<string, CellBadge> | null
+  filterCache: Map<
+    string,
+    {paths: string[]; badges: ReadonlyMap<string, CellBadge> | null}
+  >
   mcmetaPaths: Set<string>
   /** Number of images excluding .mcmeta files, computed once per file list */
   totalImageCount: number
@@ -114,9 +92,22 @@ interface RepoStore {
   isFiltering: boolean
 
   // Actions
+  /** Open a GitHub repository; does nothing for the repository already open */
   setRepo: (repo: GithubRepo) => void
-  setImageFiles: (files: GithubImageFileTree | null) => void
-  updateFilteredImages: (filter: string, sort?: SortMode) => void
+  /** Open another source, clearing everything loaded for the previous one */
+  setSource: (source: ImageSource) => void
+  setImageFiles: (
+    files: string[] | null,
+    meta?: ReadonlyMap<string, FileMeta>,
+    hashKind?: HashKind | null,
+  ) => void
+  /** Add metadata found later (hashes computed on demand) */
+  mergeFileMeta: (
+    meta: ReadonlyMap<string, FileMeta>,
+    hashKind?: HashKind | null,
+  ) => void
+  setComparison: (comparison: ActiveComparison | null) => void
+  updateFilteredImages: (query?: Partial<GalleryQuery>) => void
   setError: (error: Error | null) => void
   resetRepoState: () => void
 }
@@ -127,38 +118,83 @@ interface RepoStore {
  */
 let filterRequestId = 0
 
-const initialRepo: GithubRepo = {
-  owner: '',
-  name: '',
-  ref: '',
-  url: '',
-  displayName: '',
+/** The paths only the compared ref has, which the gallery shows too */
+function getRemovedImages(comparison: ActiveComparison | null): string[] {
+  if (!comparison) return []
+  const removed: string[] = []
+  for (const [path, kind] of comparison.changes) {
+    if (kind === 'removed' && !isMcmetaFile(path)) removed.push(path)
+  }
+  return removed
+}
+
+/** The source with its comparison overlay, so removed images still load */
+function withComparison(
+  source: ImageSource,
+  comparison: ActiveComparison | null,
+): ImageSource {
+  if (source.kind !== 'github') return source
+  if (!comparison) {
+    if (!source.comparison) return source
+    return {kind: 'github', repo: source.repo}
+  }
+
+  const removed = new Set<string>()
+  for (const [path, kind] of comparison.changes) {
+    if (kind === 'removed') removed.add(path)
+  }
+  return {
+    kind: 'github',
+    repo: source.repo,
+    comparison: {
+      repo: {...source.repo, ref: comparison.baseRef},
+      removed,
+    },
+  }
 }
 
 export const useRepoStore = create<RepoStore>((set, get) => ({
-  repo: initialRepo,
+  source: EMPTY_SOURCE,
   imageFiles: null,
+  fileMeta: EMPTY_META,
+  hashKind: null,
+  metaFields: new Set(),
+  comparison: null,
   filteredImageFiles: null,
-  filterCache: new Map<string, string[]>(),
+  cellBadges: null,
+  filterCache: new Map(),
   mcmetaPaths: new Set<string>(),
   totalImageCount: 0,
   error: null,
   isFiltering: false,
 
   setRepo: (repo: GithubRepo) => {
-    set({repo})
-    // Reset related state when repo changes
+    const {source} = get()
+    if (source.kind === 'github' && source.repo === repo) return
+    get().setSource({kind: 'github', repo})
+  },
+
+  setSource: (source: ImageSource) => {
+    const previous = get().source
+    if (previous === source) return
+    disposeImageSource(previous)
+    set({source})
+    // Reset related state when the source changes
     get().resetRepoState()
   },
 
-  setImageFiles: (files: GithubImageFileTree | null) => {
+  setImageFiles: (files, meta = EMPTY_META, hashKind = null) => {
     const {imageOnlyFiles, mcmetaPaths} = separateImageFiles(files)
 
     set({
       imageFiles: files,
+      fileMeta: meta,
+      hashKind,
+      metaFields: getMetaFields(meta),
       mcmetaPaths,
       totalImageCount: imageOnlyFiles?.length ?? 0,
-      filterCache: new Map<string, string[]>(),
+      filterCache: new Map(),
+      cellBadges: null,
     })
 
     // Set initial filtered images (all images, filter will be applied separately)
@@ -169,20 +205,51 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     }
   },
 
-  updateFilteredImages: (filter: string, sort = DEFAULT_SORT_MODE) => {
+  mergeFileMeta: (meta, hashKind) => {
+    const merged = new Map(get().fileMeta)
+    for (const [path, value] of meta) {
+      merged.set(path, {...merged.get(path), ...value})
+    }
+    set({
+      fileMeta: merged,
+      hashKind: hashKind === undefined ? get().hashKind : hashKind,
+      metaFields: getMetaFields(merged),
+      filterCache: new Map(),
+    })
+  },
+
+  setComparison: comparison => {
+    set({
+      comparison,
+      source: withComparison(get().source, comparison),
+      filterCache: new Map(),
+    })
+  },
+
+  updateFilteredImages: (partialQuery = {}) => {
+    const query: GalleryQuery = {...DEFAULT_QUERY, ...partialQuery}
     const requestId = ++filterRequestId
-    const {imageFiles, filterCache} = get()
+    const {imageFiles, filterCache, comparison} = get()
     if (!imageFiles) {
       // Don't set isFiltering to false if images haven't loaded yet
       // This allows the loading screen to remain visible
-      set({filteredImageFiles: null})
+      set({filteredImageFiles: null, cellBadges: null})
       return
     }
 
-    const cacheKey = `${sort}|${filter.toLowerCase()}`
+    const cacheKey = [
+      query.sort,
+      query.duplicates,
+      comparison ? query.changes : '',
+      query.filter.toLowerCase(),
+    ].join('|')
     const cached = filterCache.get(cacheKey)
     if (cached) {
-      set({filteredImageFiles: cached, isFiltering: false})
+      set({
+        filteredImageFiles: cached.paths,
+        cellBadges: cached.badges,
+        isFiltering: false,
+      })
       return
     }
 
@@ -194,23 +261,33 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     requestAnimationFrame(() => {
       if (requestId !== filterRequestId) return
 
-      const {imageFiles: currentImageFiles} = get()
+      const {
+        imageFiles: currentImageFiles,
+        fileMeta,
+        comparison: currentComparison,
+      } = get()
       if (!currentImageFiles) {
-        set({filteredImageFiles: null, isFiltering: false})
+        set({filteredImageFiles: null, cellBadges: null, isFiltering: false})
         return
       }
 
       const {imageOnlyFiles} = separateImageFiles(currentImageFiles)
       if (!imageOnlyFiles) {
-        set({filteredImageFiles: null, isFiltering: false})
+        set({filteredImageFiles: null, cellBadges: null, isFiltering: false})
         return
       }
 
-      const {includeFilters, excludeFilters} = parseFilters(filter)
-      const filtered = sortImagePaths(
-        filterImagePaths(imageOnlyFiles, includeFilters, excludeFilters),
-        sort,
-      )
+      const removedMeta = currentComparison?.removedMeta
+      const {paths, badges} = runGalleryQuery({
+        images: currentComparison
+          ? [...imageOnlyFiles, ...getRemovedImages(currentComparison)]
+          : imageOnlyFiles,
+        query,
+        getMeta: removedMeta
+          ? path => fileMeta.get(path) ?? removedMeta.get(path)
+          : path => fileMeta.get(path),
+        changes: currentComparison?.changes ?? null,
+      })
 
       const {filterCache: currentCache} = get()
       const nextCache = new Map(currentCache)
@@ -219,9 +296,10 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
         const oldestKey = nextCache.keys().next().value
         if (oldestKey) nextCache.delete(oldestKey)
       }
-      nextCache.set(cacheKey, filtered)
+      nextCache.set(cacheKey, {paths, badges})
       set({
-        filteredImageFiles: filtered,
+        filteredImageFiles: paths,
+        cellBadges: badges,
         isFiltering: false,
         filterCache: nextCache,
       })
@@ -236,8 +314,13 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     filterRequestId++
     set({
       imageFiles: null,
+      fileMeta: EMPTY_META,
+      hashKind: null,
+      metaFields: new Set(),
+      comparison: null,
       filteredImageFiles: null,
-      filterCache: new Map<string, string[]>(),
+      cellBadges: null,
+      filterCache: new Map(),
       mcmetaPaths: new Set<string>(),
       totalImageCount: 0,
       error: null,
@@ -245,3 +328,10 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     })
   },
 }))
+
+/** The open GitHub repository, or null for other sources */
+export function useGithubRepo(): GithubRepo | null {
+  return useRepoStore(state =>
+    state.source.kind === 'github' ? state.source.repo : null,
+  )
+}

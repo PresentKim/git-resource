@@ -4,11 +4,14 @@ import {
   downloadBlob,
   type SpriteOptions,
 } from '@/features/repo/download/utils/createSpriteImage'
-import {createRawImageUrl} from '@/shared/utils'
-import type {GithubRepo} from '@/shared/utils'
+import {
+  getImageUrl,
+  getSourceFileName,
+  type ImageSource,
+} from '@/shared/utils/imageSource'
 
 interface UseSpriteDownloadProps {
-  repo: GithubRepo
+  source: ImageSource
   imagePaths: string[]
   mcmetaPaths?: Set<string>
   animationEnabled?: boolean
@@ -20,7 +23,7 @@ interface UseSpriteDownloadProps {
  * Handles download progress and state management
  */
 export function useSpriteDownload({
-  repo,
+  source,
   imagePaths,
   mcmetaPaths,
   animationEnabled,
@@ -38,7 +41,7 @@ export function useSpriteDownload({
 
       try {
         // Create image URLs
-        const imageUrls = imagePaths.map(path => createRawImageUrl(repo, path))
+        const imageUrls = imagePaths.map(path => getImageUrl(source, path))
 
         // Create sprite
         const result = await createSpriteImage(
@@ -46,7 +49,7 @@ export function useSpriteDownload({
           imagePaths,
           {
             ...options,
-            repo,
+            source,
             mcmetaPaths,
             animationEnabled,
             githubToken,
@@ -58,7 +61,7 @@ export function useSpriteDownload({
         )
 
         // Generate filename
-        const filename = `sprite-${repo.owner}-${repo.name}-${Date.now()}.png`
+        const filename = `sprite-${getSourceFileName(source)}-${Date.now()}.png`
 
         // Download
         downloadBlob(result.blob, filename)
@@ -76,7 +79,7 @@ export function useSpriteDownload({
         throw error
       }
     },
-    [repo, imagePaths, mcmetaPaths, animationEnabled, githubToken],
+    [source, imagePaths, mcmetaPaths, animationEnabled, githubToken],
   )
 
   return {

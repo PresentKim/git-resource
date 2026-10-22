@@ -1,10 +1,10 @@
 import type JSZip from 'jszip'
+import {type FlattenMode, resolveDuplicatePaths} from '@/shared/utils'
 import {
-  GithubRepo,
-  createRawImageUrl,
-  type FlattenMode,
-  resolveDuplicatePaths,
-} from '@/shared/utils'
+  getImageUrl,
+  getSourceFileName,
+  type ImageSource,
+} from '@/shared/utils/imageSource'
 
 // Constants
 /** Above this many images the UI asks for confirmation before downloading */
@@ -17,12 +17,12 @@ const MAX_CONCURRENT_DOWNLOADS = 4 // Limit concurrent downloads to reduce memor
  */
 async function downloadImageToZip(
   zip: JSZip,
-  repo: GithubRepo,
+  source: ImageSource,
   originalPath: string,
   zipPath: string,
 ): Promise<void> {
   try {
-    const url = createRawImageUrl(repo, originalPath)
+    const url = getImageUrl(source, originalPath)
     const response = await fetch(url)
 
     if (!response.ok) {
@@ -46,7 +46,7 @@ async function downloadImageToZip(
  */
 async function processWithConcurrencyLimit(
   zip: JSZip,
-  repo: GithubRepo,
+  source: ImageSource,
   imagePaths: string[],
   pathMap: Map<string, string>,
   failures: string[],
@@ -61,7 +61,7 @@ async function processWithConcurrencyLimit(
     const zipPath = pathMap.get(originalPath) || originalPath
     queue.push(async () => {
       try {
-        await downloadImageToZip(zip, repo, originalPath, zipPath)
+        await downloadImageToZip(zip, source, originalPath, zipPath)
       } catch {
         // Already logged in downloadImageToZip; remember it so the caller
         // can report it, and continue with the other images
@@ -102,7 +102,7 @@ async function processWithConcurrencyLimit(
  */
 async function processBatch(
   zip: JSZip,
-  repo: GithubRepo,
+  source: ImageSource,
   batch: string[],
   pathMap: Map<string, string>,
   failures: string[],
@@ -112,7 +112,7 @@ async function processBatch(
 ): Promise<number> {
   await processWithConcurrencyLimit(
     zip,
-    repo,
+    source,
     batch,
     pathMap,
     failures,
@@ -142,7 +142,7 @@ export interface ZipDownloadResult {
  * none could be downloaded, it throws instead of saving an empty ZIP.
  */
 export const downloadImagesAsZip = async (
-  repo: GithubRepo,
+  source: ImageSource,
   imagePaths: string[],
   onProgress?: (completed: number, total: number) => void,
   flattenMode: FlattenMode = 'original',
@@ -185,7 +185,7 @@ export const downloadImagesAsZip = async (
       const batch = imagePaths.slice(i, i + BATCH_SIZE)
       completed = await processBatch(
         zip,
-        repo,
+        source,
         batch,
         pathMap,
         failures,
@@ -206,7 +206,7 @@ export const downloadImagesAsZip = async (
 
     // Generate and save the zip file
     const content = await zip.generateAsync({type: 'blob'})
-    const fileName = `${repo.owner}-${repo.name}.zip`
+    const fileName = `${getSourceFileName(source)}.zip`
     saveAs(content, fileName)
     return {total, failed: failures}
   } catch (error) {

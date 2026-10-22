@@ -6,6 +6,7 @@ import type {
   GithubImageFileTree,
 } from '../types'
 import {encodePathSegments} from '@/shared/utils/github'
+import type {FileEntry} from '@/shared/utils/fileMeta'
 import {BaseGithubWorker, FallbackRequiredError} from './baseWorker'
 
 const IMAGE_FILE_EXTENSIONS_REGEX = /\.(png|jpe?g|gif|webp|svg)$/i
@@ -19,12 +20,28 @@ function isImageTreePath(path: string): boolean {
   )
 }
 
+/** Fields of a JSZip entry that are not in its type definitions */
+interface ZipEntryData {
+  crc32?: number
+  uncompressedSize?: number
+}
+
 class ImageFileTreeWorker extends BaseGithubWorker<
   ImageFileTreeRequest & WorkerRequestBase,
   GithubImageFileTree
 > {
   protected getCacheKey(request: ImageFileTreeRequest): string {
+    return `tree:${request.owner}/${request.name}/${request.ref}`
+  }
+
+  /** Before sizes and hashes were kept, lists were cached as plain paths */
+  private getLegacyCacheKey(request: ImageFileTreeRequest): string {
     return `${request.owner}/${request.name}/${request.ref}`
+  }
+
+  async handleRequest(request: ImageFileTreeRequest & WorkerRequestBase) {
+    void this.storage.removeCache(this.getLegacyCacheKey(request))
+    return super.handleRequest(request)
   }
 
   protected fetchData(
@@ -56,22 +73,37 @@ class ImageFileTreeWorker extends BaseGithubWorker<
     }
 
     const zipData = await new JSZip().loadAsync(await response.blob())
-    const filePaths = Object.values(zipData.files)
-      .filter(entry => !entry.dir)
-      .map(entry => entry.name)
+    const files = Object.values(zipData.files).filter(entry => !entry.dir)
 
     // GitHub archives put everything under one root folder (e.g. "repo-main/")
-    const rootFolder = filePaths[0]?.includes('/')
-      ? `${filePaths[0].split('/')[0]}/`
+    const firstPath = files[0]?.name ?? ''
+    const rootFolder = firstPath.includes('/')
+      ? `${firstPath.split('/')[0]}/`
       : ''
 
-    return filePaths
-      .map(path =>
-        rootFolder && path.startsWith(rootFolder)
-          ? path.slice(rootFolder.length)
-          : path,
-      )
-      .filter(isImageTreePath)
+    // The archive has no git hashes, but it stores a CRC-32 and the size of
+    // every file, which is enough to tell identical files apart
+    const entries: FileEntry[] = []
+    for (const file of files) {
+      const path =
+        rootFolder && file.name.startsWith(rootFolder)
+          ? file.name.slice(rootFolder.length)
+          : file.name
+      if (!isImageTreePath(path)) continue
+
+      const data = (file as unknown as {_data?: ZipEntryData})._data
+      const size = data?.uncompressedSize
+      const crc32 = data?.crc32
+      entries.push({
+        path,
+        size,
+        hash:
+          crc32 !== undefined && size !== undefined
+            ? `${(crc32 >>> 0).toString(16).padStart(8, '0')}:${size}`
+            : undefined,
+      })
+    }
+    return {entries, hashKind: 'crc32'}
   }
 
   protected parseResponse(
@@ -82,12 +114,13 @@ class ImageFileTreeWorker extends BaseGithubWorker<
       throw new FallbackRequiredError('GitHub tree response was truncated')
     }
 
-    return response.tree.reduce((acc, {path, type}) => {
+    const entries: FileEntry[] = []
+    for (const {path, type, sha, size} of response.tree) {
       if (type === 'blob' && isImageTreePath(path)) {
-        acc.push(path)
+        entries.push({path, size, hash: sha})
       }
-      return acc
-    }, [] as GithubImageFileTree)
+    }
+    return {entries, hashKind: 'git'}
   }
 }
 

@@ -1,20 +1,19 @@
 import {useMemo} from 'react'
-import {createRawImageUrl} from '@/shared/utils'
-import type {GithubRepo} from '@/shared/utils'
+import {getImageUrl, type ImageSource} from '@/shared/utils/imageSource'
 
 interface UseImageUrlProps {
-  repo: GithubRepo
+  source: ImageSource
   imagePath: string
 }
 
 /**
- * Hook for generating image URL from repository and path
+ * Hook for generating image URL from the image source and path
  * Memoizes URL to avoid recalculation
  */
-export function useImageUrl({repo, imagePath}: UseImageUrlProps) {
+export function useImageUrl({source, imagePath}: UseImageUrlProps) {
   const imageUrl = useMemo(
-    () => createRawImageUrl(repo, imagePath),
-    [repo, imagePath],
+    () => getImageUrl(source, imagePath),
+    [source, imagePath],
   )
 
   return {

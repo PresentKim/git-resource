@@ -1,3 +1,5 @@
+import type {FileListing} from '@/shared/utils/fileMeta'
+
 export interface RateLimit {
   limit: number
   remaining: number
@@ -36,8 +38,12 @@ export interface ImageFileTreeRequest {
 export interface ImageFileTreeResponse {
   tree: Array<{
     path: string
-    type: 'tree' | 'blob'
+    type: 'tree' | 'blob' | 'commit'
+    sha: string
+    /** Only on blobs */
+    size?: number
   }>
   truncated?: boolean
 }
-export type GithubImageFileTree = string[]
+/** Image and .mcmeta files with their sizes and hashes */
+export type GithubImageFileTree = FileListing

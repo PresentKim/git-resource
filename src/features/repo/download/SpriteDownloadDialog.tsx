@@ -41,7 +41,7 @@ export function SpriteDownloadDialog({
   open,
   onOpenChange,
 }: SpriteDownloadDialogProps) {
-  const repo = useRepoStore(state => state.repo)
+  const source = useRepoStore(state => state.source)
   const filteredImageFiles = useRepoStore(state => state.filteredImageFiles)
   const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
   const {
@@ -52,7 +52,7 @@ export function SpriteDownloadDialog({
   const {spriteSettings, setSpriteSettings} = useSettingStore()
   const githubToken = useSettingStore(state => state.githubToken)
   const {isDownloading, downloadProgress, handleDownload} = useSpriteDownload({
-    repo,
+    source,
     imagePaths: filteredImageFiles || [],
     mcmetaPaths,
     animationEnabled,
@@ -83,7 +83,7 @@ export function SpriteDownloadDialog({
 
     let cancelled = false
 
-    estimateSpriteSize(repo, filteredImageFiles, {
+    estimateSpriteSize(source, filteredImageFiles, {
       ...spriteSettings,
       columns: actualColumnCount,
       mcmetaPaths,
@@ -99,7 +99,7 @@ export function SpriteDownloadDialog({
       cancelled = true
     }
   }, [
-    repo,
+    source,
     filteredImageFiles,
     actualColumnCount,
     mcmetaPaths,

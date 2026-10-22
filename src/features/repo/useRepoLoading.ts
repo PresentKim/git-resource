@@ -3,6 +3,7 @@ import {useGithubDefaultBranch} from '@/shared/api/github/hooks/useGithubDefault
 import {useGithubImageFileTree} from '@/shared/api/github/hooks/useGithubImageFileTree'
 import {useRepoPath} from '@/features/repo/useRepoPath'
 import {useRepoStore} from '@/shared/stores/repoStore'
+import {splitFileListing} from '@/shared/utils/fileMeta'
 
 /**
  * Hook for managing repository loading logic
@@ -34,7 +35,8 @@ export function useRepoLoading() {
       setError(imageFileTree.error)
     } else if (imageFileTree.data) {
       setError(null)
-      setImageFiles(imageFileTree.data)
+      const {paths, meta} = splitFileListing(imageFileTree.data)
+      setImageFiles(paths, meta, imageFileTree.data.hashKind)
     }
   }, [
     ref,

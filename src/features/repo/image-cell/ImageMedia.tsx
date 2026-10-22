@@ -13,6 +13,8 @@ interface ImageMediaProps {
   pixelated?: boolean
   /** Whether to render as an animated sprite */
   shouldAnimate: boolean
+  /** URL of the animation's .mcmeta file; defaults to src + ".mcmeta" */
+  mcmetaSrc?: string
   /**
    * Callback when image loading is completed
    * AnimatedSprite: (originalDimensions, animatedDimensions, interpolate)
@@ -35,6 +37,7 @@ const ImageMedia = memo(function ImageMedia({
   className,
   pixelated,
   shouldAnimate,
+  mcmetaSrc,
   onLoad,
   onError,
   imgRef,
@@ -43,6 +46,7 @@ const ImageMedia = memo(function ImageMedia({
     return (
       <AnimatedSprite
         src={src}
+        mcmetaSrc={mcmetaSrc}
         alt={alt}
         className={className}
         pixelated={pixelated}

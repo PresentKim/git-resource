@@ -20,9 +20,33 @@ function HomeButton() {
 }
 
 function RepoInfo(props: React.ComponentProps<'div'>) {
-  const repo = useRepoStore(state => state.repo)
+  const source = useRepoStore(state => state.source)
   const error = useRepoStore(state => state.error)
 
+  if (source.kind === 'local') {
+    return (
+      <div {...props}>
+        <span
+          className="text-xs sm:text-sm text-muted-foreground"
+          title="Opened from this device">
+          {source.name}
+          <span className="opacity-70"> · on this device</span>
+        </span>
+      </div>
+    )
+  }
+
+  if (source.kind === 'favorites') {
+    return (
+      <div {...props}>
+        <span className="text-xs sm:text-sm text-muted-foreground">
+          Favorites
+        </span>
+      </div>
+    )
+  }
+
+  const {repo} = source
   if (!repo.owner) return null
 
   // A repository that failed to load may not exist, so don't link to it

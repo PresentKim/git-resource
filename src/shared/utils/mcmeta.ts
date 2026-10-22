@@ -236,6 +236,19 @@ async function fetchViaGitHubApi(
 }
 
 /**
+ * Fetch mcmeta data from a URL the browser can read as is
+ */
+async function fetchDirectly(url: string): Promise<McmetaData | null> {
+  try {
+    const response = await fetch(url)
+    if (!response.ok) return null
+    return (await response.json()) as McmetaData
+  } catch {
+    return null
+  }
+}
+
+/**
  * Fetch mcmeta data using proxy as fallback
  */
 async function fetchViaProxy(
@@ -295,6 +308,13 @@ export async function fetchMcmetaData(
   // Check cache first
   if (mcmetaCache.has(url)) {
     return mcmetaCache.get(url) ?? null
+  }
+
+  // Local files (object URLs) are read directly
+  if (url.startsWith('blob:')) {
+    const localData = await fetchDirectly(url)
+    mcmetaCache.set(url, localData)
+    return localData
   }
 
   // Try proxy services first to avoid GitHub API rate limits

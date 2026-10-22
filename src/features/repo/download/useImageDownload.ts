@@ -1,9 +1,10 @@
 import {useCallback, useState} from 'react'
 import {downloadImagesAsZip} from '@/features/repo/download/utils/downloadImagesAsZip'
-import type {GithubRepo, FlattenMode} from '@/shared/utils'
+import type {FlattenMode} from '@/shared/utils'
+import type {ImageSource} from '@/shared/utils/imageSource'
 
 interface UseImageDownloadProps {
-  repo: GithubRepo
+  source: ImageSource
   imagePaths: string[]
   flattenMode?: FlattenMode
 }
@@ -19,7 +20,7 @@ export type DownloadOutcome =
  * Handles download progress, state management and the outcome to report
  */
 export function useImageDownload({
-  repo,
+  source,
   imagePaths,
   flattenMode = 'original',
 }: UseImageDownloadProps) {
@@ -35,7 +36,7 @@ export function useImageDownload({
     setDownloadProgress(0)
     try {
       const {total, failed} = await downloadImagesAsZip(
-        repo,
+        source,
         imagePaths,
         (completed, total) => {
           const percent = Math.round((completed / total) * 100)
@@ -63,7 +64,7 @@ export function useImageDownload({
       setDownloadProgress(null)
       setIsDownloading(false)
     }
-  }, [repo, imagePaths, flattenMode])
+  }, [source, imagePaths, flattenMode])
 
   const dismissOutcome = useCallback(() => setOutcome(null), [])
 

@@ -39,8 +39,20 @@ export function getRouteTitle(
   imagePath?: string | null,
 ): string {
   if (!repo?.owner || !repo.name) return APP_NAME
+  return getPageTitle(getRepoLabel(repo, false), imagePath)
+}
 
-  const parts = [getRepoLabel(repo, false), APP_NAME]
+/**
+ * The document title of a page that shows `label` (a repository, a local
+ * folder, the favorites), with the open image's name in front
+ */
+export function getPageTitle(
+  label: string | null,
+  imagePath?: string | null,
+): string {
+  if (!label) return APP_NAME
+
+  const parts = [label, APP_NAME]
   if (imagePath) parts.unshift(getImageName(imagePath))
   return parts.join(' · ')
 }

@@ -3,14 +3,13 @@ import {useState, useCallback} from 'react'
 export interface ImageMetadata {
   width: number
   height: number
-  fileSize: number | null
   format: string
   animatedSize?: {width: number; height: number}
   interpolate?: boolean
 }
 
 /**
- * Hook for managing image metadata (dimensions, format, file size)
+ * Hook for managing image metadata (dimensions, format, animation)
  */
 export function useImageMetadata() {
   const [metadata, setMetadata] = useState<ImageMetadata | null>(null)
@@ -29,7 +28,6 @@ export function useImageMetadata() {
       setMetadata(prev => ({
         width,
         height,
-        fileSize: prev?.fileSize ?? null,
         format: imageFormat,
         animatedSize: animatedSize ?? prev?.animatedSize,
         interpolate: interpolate ?? prev?.interpolate,

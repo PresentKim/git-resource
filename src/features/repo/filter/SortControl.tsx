@@ -8,12 +8,21 @@ import {
   PopoverTrigger,
 } from '@/shared/components/ui/popover'
 import {useSortQuery} from '@/features/repo/filter/useSortQuery'
-import {SORT_MODES, sortModeLabels} from '@/shared/utils/sortImagePaths'
+import {useRepoStore} from '@/shared/stores/repoStore'
+import {
+  getAvailableSortModes,
+  sortModeLabels,
+} from '@/shared/utils/sortImagePaths'
 import {cn} from '@/shared/utils'
 
 /** Toolbar button for choosing the order of the gallery */
 export const SortControl = memo(function SortControl() {
   const {sort, setSort} = useSortQuery()
+  const metaFields = useRepoStore(state => state.metaFields)
+  // Sizes and dates are offered only when the source knows them; a mode from
+  // a shared link stays listed so it can be seen and changed
+  const modes = getAvailableSortModes(metaFields)
+  if (!modes.includes(sort)) modes.push(sort)
 
   return (
     <Popover>
@@ -32,7 +41,7 @@ export const SortControl = memo(function SortControl() {
       />
       <PopoverContent side="bottom" align="start" className="w-60">
         <div role="radiogroup" aria-label="Sort order" className="space-y-1">
-          {SORT_MODES.map(mode => (
+          {modes.map(mode => (
             <button
               key={mode}
               type="button"

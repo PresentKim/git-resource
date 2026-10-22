@@ -1,7 +1,8 @@
 import {useCallback, useEffect, useRef, useState, memo} from 'react'
 import {ImageOff} from 'lucide-react'
-import {cn} from '@/shared/utils'
-import type {GithubRepo} from '@/shared/utils'
+import {cn, getMcmetaPath} from '@/shared/utils'
+import {getImageUrl, type ImageSource} from '@/shared/utils/imageSource'
+import type {CellBadge} from '@/shared/utils/galleryQuery'
 import {ImageMedia} from './ImageMedia'
 import {useImageUrl} from '@/features/repo/image-cell/useImageUrl'
 import {useImageLoading} from '@/features/repo/image-cell/useImageLoading'
@@ -54,10 +55,35 @@ function ImagePathOverlay({path}: {path: string}) {
   )
 }
 
+const BADGE_TONES: Record<CellBadge['tone'], string> = {
+  added: 'bg-emerald-600 text-white',
+  modified: 'bg-amber-500 text-black',
+  removed: 'bg-red-600 text-white',
+  'group-even': 'bg-sky-600 text-white',
+  'group-odd': 'bg-fuchsia-600 text-white',
+}
+
+/** A small mark in the corner of a cell (a change, a duplicate group) */
+function ImageBadge({badge}: {badge: CellBadge}) {
+  return (
+    <span
+      className={cn(
+        'pointer-events-none absolute top-0.5 left-0.5 z-10 rounded-sm px-1 text-[10px] leading-4 font-bold shadow-sm',
+        BADGE_TONES[badge.tone],
+      )}
+      title={badge.title}
+      aria-hidden="true">
+      {badge.label}
+    </span>
+  )
+}
+
 interface ImageCellProps {
   path: string
   index: number
-  repo: GithubRepo
+  source: ImageSource
+  /** A mark in the corner; must be referentially stable like the rest */
+  badge?: CellBadge
   mcmetaPaths: Set<string>
   animationEnabled: boolean
   /** Must be referentially stable so memoized cells are not re-rendered */
@@ -72,7 +98,8 @@ interface ImageCellProps {
 const ImageCell = memo(function ImageCell({
   path,
   index,
-  repo,
+  source,
+  badge,
   mcmetaPaths,
   animationEnabled,
   onSelect,
@@ -80,7 +107,7 @@ const ImageCell = memo(function ImageCell({
   const onClick = useCallback(() => onSelect(index), [onSelect, index])
 
   // Image URL
-  const {imageUrl} = useImageUrl({repo, imagePath: path})
+  const {imageUrl} = useImageUrl({source, imagePath: path})
 
   // An image loaded before is in the browser cache and shows at once. Others
   // wait until the cell is near the viewport (the grid mounts far more cells
@@ -153,9 +180,9 @@ const ImageCell = memo(function ImageCell({
       className="group relative aspect-square size-full ring-foreground transition-transform duration-200 ease-out active:ring-2 active:rounded-xs focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-offset-background focus-visible:ring-foreground hover:-translate-y-0.5 hover:shadow-lg hover:shadow-black/40"
       onClick={onClick}
       onKeyDown={handleKeyDown}
-      aria-label={
-        error ? `View image: ${path} (failed to load)` : `View image: ${path}`
-      }
+      aria-label={`View image: ${path}${badge ? ` (${badge.title})` : ''}${
+        error ? ' (failed to load)' : ''
+      }`}
       title={path}>
       <>
         {error && (
@@ -183,6 +210,11 @@ const ImageCell = memo(function ImageCell({
             }
             className={cn('size-full object-contain peer', loading && 'hidden')}
             shouldAnimate={shouldAnimate}
+            mcmetaSrc={
+              shouldAnimate
+                ? getImageUrl(source, getMcmetaPath(path))
+                : undefined
+            }
             pixelated={false}
             imgRef={handleImageRef}
             onLoad={() => {
@@ -193,6 +225,7 @@ const ImageCell = memo(function ImageCell({
           />
         )}
       </>
+      {badge && <ImageBadge badge={badge} />}
       <ImagePathOverlay path={path} />
     </div>
   )

@@ -1,6 +1,5 @@
 import {getCachedImageMetadata} from '@/shared/utils/imageCache'
-import {createRawImageUrl} from '@/shared/utils/github'
-import type {GithubRepo} from '@/shared/utils/github'
+import {getImageUrl, type ImageSource} from '@/shared/utils/imageSource'
 import type {SpriteOptions} from './createSpriteImage'
 import {
   getMcmetaPath,
@@ -24,7 +23,7 @@ export interface SpriteSizeEstimate {
  * For animated images, calculates first frame size
  */
 export async function estimateSpriteSize(
-  repo: GithubRepo,
+  source: ImageSource,
   imagePaths: string[],
   options: SpriteOptions & {
     mcmetaPaths?: Set<string>
@@ -54,7 +53,7 @@ export async function estimateSpriteSize(
   let allDimensionsAvailable = true
 
   for (const path of imagePaths) {
-    const url = createRawImageUrl(repo, path)
+    const url = getImageUrl(source, path)
     const metadata = getCachedImageMetadata(url)
 
     if (metadata) {
@@ -72,7 +71,7 @@ export async function estimateSpriteSize(
 
         if (hasMcmeta) {
           try {
-            const mcmetaUrl = createRawImageUrl(repo, mcmetaPath)
+            const mcmetaUrl = getImageUrl(source, mcmetaPath)
             const mcmetaData = await fetchMcmetaData(
               mcmetaUrl,
               options.githubToken,

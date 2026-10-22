@@ -23,11 +23,11 @@ import {
 import {Button, buttonVariants} from '@/shared/components/ui/button'
 import {
   cn,
-  createGithubBlobUrl,
-  createRawImageUrl,
   getCachedObjectUrl,
+  getMcmetaPath,
   preloadImage,
 } from '@/shared/utils'
+import {getExternalUrl, getImageUrl} from '@/shared/utils/imageSource'
 import {useScrollLock} from '@/shared/hooks/useScrollLock'
 import {ImageMedia} from '../image-cell/ImageMedia'
 import {formatFileSize} from '@/shared/utils/imageViewer'
@@ -128,7 +128,7 @@ export function ImageViewer({
   onIndexChange,
 }: ImageViewerProps) {
   const dialogContentRef = useRef<HTMLDivElement>(null)
-  const repo = useRepoStore(state => state.repo)
+  const source = useRepoStore(state => state.source)
   const mcmetaPaths = useRepoStore(state => state.mcmetaPaths)
   const {pixelated, animationEnabled} = useDisplaySettings()
   const viewerChecker = useSettingStore(state => state.viewerChecker)
@@ -136,7 +136,13 @@ export function ImageViewer({
 
   const currentImage = images[currentIndex]
   const positionLabel = `${(currentIndex + 1).toLocaleString()} of ${images.length.toLocaleString()}`
-  const rawSrc = currentImage ? createRawImageUrl(repo, currentImage) : ''
+  const rawSrc = currentImage ? getImageUrl(source, currentImage) : ''
+  const fileSize = useRepoStore(state =>
+    currentImage
+      ? (state.fileMeta.get(currentImage)?.size ??
+        state.comparison?.removedMeta.get(currentImage)?.size)
+      : undefined,
+  )
   const [resolvedSrc, setResolvedSrc] = useState<{forSrc: string; url: string}>(
     () => ({forSrc: rawSrc, url: rawSrc}),
   )
@@ -217,13 +223,13 @@ export function ImageViewer({
     const nextPath = hasNext ? images[currentIndex + 1] : undefined
     const prevPath = hasPrevious ? images[currentIndex - 1] : undefined
 
-    if (nextPath) targets.push(createRawImageUrl(repo, nextPath))
-    if (prevPath) targets.push(createRawImageUrl(repo, prevPath))
+    if (nextPath) targets.push(getImageUrl(source, nextPath))
+    if (prevPath) targets.push(getImageUrl(source, prevPath))
 
     targets.forEach(src => {
       preloadImage(src)?.catch(() => {})
     })
-  }, [repo, images, currentIndex, hasNext, hasPrevious])
+  }, [source, images, currentIndex, hasNext, hasPrevious])
 
   // Image zoom
   const handleZoomImageChange = useCallback(() => {
@@ -310,7 +316,7 @@ export function ImageViewer({
   // Image download
   const {fileName} = useImagePath({imagePath: currentImage})
   const {handleDownload: handleDownloadCurrent} = useImageDownload({
-    repo,
+    source,
     imagePath: currentImage || '',
     fileName: fileName || 'image.png',
   })
@@ -401,7 +407,7 @@ export function ImageViewer({
   // Screen pixels per image pixel
   const screenPixel = picture ? picture.pixel * scale : 0
 
-  const githubUrl = currentImage ? createGithubBlobUrl(repo, currentImage) : ''
+  const githubUrl = currentImage ? getExternalUrl(source, currentImage) : null
 
   // Real size on screen (1:1 = one image pixel per screen pixel); falls back to
   // the zoom relative to the fitted size when the image cannot be measured
@@ -527,17 +533,19 @@ export function ImageViewer({
                       <RotateCw />
                       Try again
                     </Button>
-                    <a
-                      href={githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className={cn(
-                        buttonVariants({size: 'lg', variant: 'outline'}),
-                        'max-sm:h-11 max-sm:px-4',
-                      )}>
-                      <ExternalLink />
-                      Open on GitHub
-                    </a>
+                    {githubUrl && (
+                      <a
+                        href={githubUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={cn(
+                          buttonVariants({size: 'lg', variant: 'outline'}),
+                          'max-sm:h-11 max-sm:px-4',
+                        )}>
+                        <ExternalLink />
+                        Open on GitHub
+                      </a>
+                    )}
                   </div>
                 </div>
               ) : shouldAnimate ? (
@@ -554,6 +562,7 @@ export function ImageViewer({
                     // For animated sprites, always use the original raw URL.
                     // AnimatedSprite will handle caching and mcmeta loading based on this.
                     src={rawSrc}
+                    mcmetaSrc={getImageUrl(source, getMcmetaPath(currentImage))}
                     alt={`${fileName} (${positionLabel})`}
                     className={cn(
                       'relative z-10 w-full h-full object-contain',
@@ -658,8 +667,8 @@ export function ImageViewer({
                       <>
                         {metadata.width} × {metadata.height}px
                       </>
-                      {metadata.fileSize && (
-                        <> · {formatFileSize(metadata.fileSize)}</>
+                      {fileSize !== undefined && (
+                        <> · {formatFileSize(fileSize)}</>
                       )}
                       {metadata.format && <> · {metadata.format}</>}
                     </span>
@@ -671,8 +680,8 @@ export function ImageViewer({
                   <span>
                     ANIMATED: {metadata.animatedSize.width} ×{' '}
                     {metadata.animatedSize.height}px
-                    {metadata.fileSize && (
-                      <> · {formatFileSize(metadata.fileSize)}</>
+                    {fileSize !== undefined && (
+                      <> · {formatFileSize(fileSize)}</>
                     )}
                     {metadata.interpolate === true && <> · INTERPOLATE</>}
                   </span>
@@ -756,18 +765,20 @@ export function ImageViewer({
                     <Link2 className="h-3.5 w-3.5" />
                   )}
                 </Button>
-                <a
-                  href={githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={cn(
-                    buttonVariants({size: 'sm', variant: 'outline'}),
-                    'px-2 py-1',
-                  )}
-                  aria-label="Open on GitHub"
-                  title="Open on GitHub">
-                  <ExternalLink className="h-3.5 w-3.5" />
-                </a>
+                {githubUrl && (
+                  <a
+                    href={githubUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className={cn(
+                      buttonVariants({size: 'sm', variant: 'outline'}),
+                      'px-2 py-1',
+                    )}
+                    aria-label="Open on GitHub"
+                    title="Open on GitHub">
+                    <ExternalLink className="h-3.5 w-3.5" />
+                  </a>
+                )}
               </div>
               <div className="flex flex-col items-center gap-2 sm:hidden w-full">
                 <div className="flex items-center gap-4 w-full">
@@ -874,18 +885,20 @@ export function ImageViewer({
                       <Link2 className="size-5" />
                     )}
                   </Button>
-                  <a
-                    href={githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={cn(
-                      buttonVariants({size: 'icon', variant: 'outline'}),
-                      'size-11',
-                    )}
-                    aria-label="Open on GitHub"
-                    title="Open on GitHub">
-                    <ExternalLink className="size-5" />
-                  </a>
+                  {githubUrl && (
+                    <a
+                      href={githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={cn(
+                        buttonVariants({size: 'icon', variant: 'outline'}),
+                        'size-11',
+                      )}
+                      aria-label="Open on GitHub"
+                      title="Open on GitHub">
+                      <ExternalLink className="size-5" />
+                    </a>
+                  )}
                 </div>
               </div>
             </div>
