@@ -84,6 +84,7 @@ export default function LocalPage() {
   const status = useLocalStore(state => state.status)
   const progress = useLocalStore(state => state.progress)
   const error = useLocalStore(state => state.error)
+  const storeSource = useRepoStore(state => state.source)
   const setSource = useRepoStore(state => state.setSource)
   const setImageFiles = useRepoStore(state => state.setImageFiles)
 
@@ -97,16 +98,20 @@ export default function LocalPage() {
     setImageFiles(opened.paths, opened.meta, opened.hashKind)
   }, [opened, setSource, setImageFiles])
 
-  if (status === 'opening' && !opened) {
-    return (
-      <section className="flex w-full flex-col px-1 py-2 sm:px-2">
-        <title>{getPageTitle(PAGE_LABEL)}</title>
-        <GalleryLoader loading={toGalleryLoading(progress)} />
-      </section>
-    )
+  const loader = (
+    <section className="flex w-full flex-col px-1 py-2 sm:px-2">
+      <title>{getPageTitle(PAGE_LABEL)}</title>
+      <GalleryLoader loading={toGalleryLoading(progress)} />
+    </section>
+  )
+
+  if (!opened) {
+    return status === 'opening' ? loader : <LocalStart error={error} />
   }
 
-  if (!opened) return <LocalStart error={error} />
+  // Until the layout effect has put the opened files in the store, it holds
+  // the previous source, whose object URLs are revoked on the switch
+  if (storeSource !== opened.source) return loader
 
   return (
     <Gallery

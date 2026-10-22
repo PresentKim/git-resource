@@ -7,6 +7,7 @@ import {DownloadButton} from '@/features/repo/download/DownloadButton'
 import {DensityControl} from '@/features/repo/filter/DensityControl'
 import {FolderBrowser} from '@/features/repo/filter/FolderBrowser'
 import {SortControl} from '@/features/repo/filter/SortControl'
+import {DuplicatesToggle} from '@/features/repo/filter/DuplicatesToggle'
 import {SpriteDownloadDialog} from '@/features/repo/download/SpriteDownloadDialog'
 
 interface ImageCountBadgeProps {
@@ -88,6 +89,7 @@ export const FilterToolbar = memo(function FilterToolbar() {
       <div className="flex flex-wrap items-center gap-2 max-sm:[&>button]:h-9 max-sm:[&>button]:min-w-9">
         <FolderBrowser />
         <SortControl />
+        <DuplicatesToggle />
         <DensityControl />
         <ScreenshotButton />
         <DownloadButton />

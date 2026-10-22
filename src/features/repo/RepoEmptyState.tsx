@@ -1,8 +1,9 @@
-import {FilterX} from 'lucide-react'
+import {Copy, FilterX} from 'lucide-react'
 
 import {Button} from '@/shared/components/ui/button'
 import {RandomMessageLoader} from '@/shared/components/RandomMessageLoader'
 import {useFilterQuery} from '@/features/repo/filter/useFilterQuery'
+import {useDuplicatesQuery} from '@/features/repo/filter/useGalleryQuery'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {generateNoImagesMessage} from '@/shared/utils/randomMessages'
 
@@ -16,6 +17,7 @@ const containerClass =
  */
 export function RepoEmptyState() {
   const {filter, setFilter} = useFilterQuery()
+  const {duplicates, setDuplicates} = useDuplicatesQuery()
   const totalCount = useRepoStore(state => state.totalImageCount)
   const sourceKind = useRepoStore(state => state.source.kind)
   const place =
@@ -24,6 +26,24 @@ export function RepoEmptyState() {
       : sourceKind === 'favorites'
         ? 'your favorites'
         : 'this repository'
+
+  if (totalCount > 0 && duplicates && !filter.trim()) {
+    return (
+      <div role="status" className={containerClass}>
+        <Copy className="size-10 text-muted-foreground" />
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold">No identical images</h2>
+          <p className="text-sm text-muted-foreground">
+            Each of the {totalCount.toLocaleString()} images in {place} is
+            different from all the others.
+          </p>
+        </div>
+        <Button variant="outline" onClick={() => setDuplicates(null)}>
+          Show all images
+        </Button>
+      </div>
+    )
+  }
 
   if (totalCount > 0 && filter.trim()) {
     return (

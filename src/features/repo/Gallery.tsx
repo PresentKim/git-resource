@@ -14,6 +14,7 @@ import {useGridPositionStore} from '@/features/repo/gridPositionStore'
 import {useDisplaySettings} from '@/shared/stores/settingStore'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {useFilterSync} from '@/features/repo/filter/useFilterSync'
+import {useDuplicateHashes} from '@/features/repo/filter/useDuplicateHashes'
 import {useImageClickHandler} from '@/features/repo/useImageClickHandler'
 import {cn} from '@/shared/utils'
 import {getPageTitle} from '@/shared/utils/routeMeta'
@@ -121,6 +122,7 @@ export function Gallery({titleLabel, loading, error, notice}: GalleryProps) {
 
   // Sync filter changes
   useFilterSync()
+  const hashing = useDuplicateHashes()
 
   // Get state from repoStore
   const imageFiles = useRepoStore(state => state.imageFiles)
@@ -150,6 +152,7 @@ export function Gallery({titleLabel, loading, error, notice}: GalleryProps) {
 
   const shownLoading: GalleryLoading | null =
     loading ??
+    hashing.loading ??
     (isFiltering
       ? {
           title: 'Filtering images',
@@ -198,6 +201,13 @@ export function Gallery({titleLabel, loading, error, notice}: GalleryProps) {
 
       {error}
       {!error && notice}
+      {!error && hashing.error && (
+        <p
+          role="alert"
+          className="rounded-xl border border-destructive/40 bg-destructive/10 p-3 text-sm">
+          Could not compare the file contents: {hashing.error}
+        </p>
+      )}
 
       {!error && shownLoading ? (
         <GalleryLoader loading={shownLoading} />
