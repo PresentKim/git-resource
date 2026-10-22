@@ -11,21 +11,34 @@ cross-origin requests.
 
 It was built for browsing large asset repositories, such as Minecraft mods and
 resource packs with thousands of textures, where GitHub's own file browser
-shows one folder at a time.
+shows one folder at a time. The same gallery also opens folders, `.zip` and
+`.jar` files from the user's own device, without uploading them.
 
 ### 2. Key Features
 
 - **Repository image listing**: finds the default branch when none is given and
   lists every image (PNG, JPEG, GIF, WebP, SVG) in the repository.
+- **Local files**: folders, `.zip`/`.jar` archives and images opened with a
+  picker, by drag and drop, or by "Open with" on the installed app, read in the
+  browser only. Recent openings can be reopened where the browser keeps file
+  handles.
 - **Filter, folders and sort**: include and exclude keywords
-  (`keyword -exclude`), a folder browser, and sorting by path or file name.
+  (`keyword -exclude`), a folder browser, and sorting by path, file name, file
+  size or (local files) modification time.
+- **Duplicates and comparisons**: a view of the images whose content appears
+  more than once, and a comparison of two branches, tags or commits that shows
+  only the added, modified and removed images, with a before/after switch in
+  the viewer.
+- **Favorites and recent repositories**: starred images from any repository
+  in one gallery, and recently opened repositories on the home page.
 - **Full-screen viewer**: keyboard, wheel and touch navigation, zoom and pan,
   1:1 and fit-to-screen, a transparency checkerboard and a pixel grid, and
   per-image download and GitHub links.
 - **Bulk export**: a ZIP of the filtered images (original, last-folder-only or
   flat folder layout) and a sprite-sheet PNG ("Screenshot") of them.
 - **Minecraft animation**: `.mcmeta` animations play in the grid and the viewer.
-- **Shareable state**: the filter, sort order and open image live in the URL.
+- **Shareable state**: the filter, sort order, duplicates view, comparison and
+  open image live in the URL.
 - **Link previews**: a shared repository or image link shows that repository
   in Discord, Slack, KakaoTalk or X, with its description and textures.
 - **Settings**: theme, pixelated rendering, animation, and an optional GitHub
@@ -54,8 +67,17 @@ URL  /owner/repo/ref?filter=…&sort=…&image=…
   fallback path.
 - **Query layer**: TanStack Query deduplicates and shares results in memory;
   the workers own the persistent cache, so no query persister is needed.
-- **State**: Zustand stores hold the repository, its file list and the
-  settings; nuqs keeps the filter, sort and open image in the URL.
+- **Image sources**: the gallery never builds URLs itself. It holds an image
+  source (a GitHub repository at a ref, files from the device, or the
+  favorites), and the source turns a gallery path into a URL: a
+  `raw.githubusercontent.com` URL, an object URL of a local file made on first
+  use, or the repository a favorite belongs to. The grid, the viewer, the
+  `.mcmeta` animations, the ZIP and the sprite sheet work the same for all of
+  them.
+- **State**: Zustand stores hold the source, its file list with each file's
+  size, hash and date, the local files, the favorites and the settings; nuqs
+  keeps the filter, sort, duplicates view, comparison and open image in the
+  URL.
 - **Rendering**: the grid computes which rows are on screen from the scroll
   position and mounts only the rows around them. How many stay mounted adapts
   to the device: up to 10,000 cells while the browser keeps up, fewer when
@@ -148,6 +170,37 @@ only resolved branches, not tags or commits.
 Vercel rewrites in production) that requests `codeload.github.com/<repo>/zip/<ref>`
 directly. That URL needs no redirect and resolves branches, tags and full
 commit SHAs.
+
+#### One gallery for files that are not on GitHub
+
+**Problem**: opening local folders and archives needed the whole gallery
+(grid, viewer, animations, downloads), which built GitHub URLs in a dozen
+places.  
+**Solution**: an image source between the gallery and where the files live.
+
+- Every URL comes from the source, so local files only had to provide object
+  URLs; `fetch` reads them like any other URL, which kept the download and
+  sprite-sheet code unchanged.
+- Archives are unpacked in a worker, which also hashes each file; folders are
+  listed without reading their files, and are hashed in a worker only when the
+  duplicates view needs it.
+- Object URLs are revoked when another source opens. The local page renders
+  the gallery only once the store holds the opened files, so the previous
+  files are never drawn with URLs that are already revoked.
+
+#### Comparing versions without asking GitHub per file
+
+**Problem**: finding what changed between two versions file by file would
+take a request per file.  
+**Solution**: the tree listing already has the git hash of every file.
+
+- The tree worker keeps each file's hash and size, so a comparison needs only
+  the other ref's listing, from the same worker and cache.
+- Files with the same path and another hash are modified; paths on one side
+  only are added or removed. Removed images still load, from the other ref.
+- A listing from the ZIP fallback has CRC-32 values instead of git hashes. It
+  still finds duplicates, but is not compared with an API listing; the app
+  says so instead of reporting false changes.
 
 ### 6. Achievements and Reflection
 
