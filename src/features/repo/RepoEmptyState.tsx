@@ -17,6 +17,13 @@ const containerClass =
 export function RepoEmptyState() {
   const {filter, setFilter} = useFilterQuery()
   const totalCount = useRepoStore(state => state.totalImageCount)
+  const sourceKind = useRepoStore(state => state.source.kind)
+  const place =
+    sourceKind === 'local'
+      ? 'what was opened'
+      : sourceKind === 'favorites'
+        ? 'your favorites'
+        : 'this repository'
 
   if (totalCount > 0 && filter.trim()) {
     return (
@@ -25,8 +32,7 @@ export function RepoEmptyState() {
         <div className="space-y-1">
           <h2 className="text-lg font-semibold">No images match your filter</h2>
           <p className="text-sm text-muted-foreground">
-            None of the {totalCount.toLocaleString()} images in this repository
-            match{' '}
+            None of the {totalCount.toLocaleString()} images in {place} match{' '}
             <span className="break-all font-mono text-foreground">
               {filter.trim()}
             </span>
@@ -47,7 +53,7 @@ export function RepoEmptyState() {
     <div role="status" className={containerClass}>
       <RandomMessageLoader provider={generateNoImagesMessage} />
       <div className="space-y-2 text-xs text-muted-foreground">
-        <p>No images were found in this repository.</p>
+        <p>No images were found in {place}.</p>
         <p>Make sure it contains PNG, JPEG, GIF, WebP or SVG images.</p>
       </div>
     </div>

@@ -4,6 +4,10 @@ import {RefreshCw} from 'lucide-react'
 import {Button} from '@/shared/components/ui/button'
 import {RepoInput} from '@/features/home/components/RepoInput'
 import {RepositoryCard} from '@/features/home/components/RepositoryCard'
+import {
+  LocalOpenButtons,
+  RecentLocalList,
+} from '@/features/local/LocalOpenButtons'
 
 import {useRepoPath} from '@/features/repo/useRepoPath'
 import {cn, pickByPartialFisherYates} from '@/shared/utils'
@@ -74,6 +78,18 @@ export default function HomePage() {
           <span aria-hidden="true">• </span>Paste GitHub repository URL
         </h2>
         <RepoInput />
+      </div>
+
+      <div className="mx-auto w-full max-w-2xl pt-10">
+        <h2 className="mb-1 ml-3 text-base font-semibold">
+          <span aria-hidden="true">• </span>Or open images on this device
+        </h2>
+        <p className="mb-3 ml-3 text-xs text-muted-foreground">
+          A folder, a resource pack or mod (.zip, .jar), or images. You can also
+          drop them anywhere on the page; nothing is uploaded.
+        </p>
+        <LocalOpenButtons className="ml-3" />
+        <RecentLocalList className="mt-4 ml-3" />
       </div>
 
       {/* Decorative: the two headings already say what each part is for */}

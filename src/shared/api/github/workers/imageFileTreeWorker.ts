@@ -7,18 +7,8 @@ import type {
 } from '../types'
 import {encodePathSegments} from '@/shared/utils/github'
 import type {FileEntry} from '@/shared/utils/fileMeta'
+import {isImageTreePath} from '@/shared/utils/imageFiles'
 import {BaseGithubWorker, FallbackRequiredError} from './baseWorker'
-
-const IMAGE_FILE_EXTENSIONS_REGEX = /\.(png|jpe?g|gif|webp|svg)$/i
-const MCMETA_FILE_EXTENSIONS_REGEX = /\.mcmeta$/i
-
-/** Images and their .mcmeta files; the API and zip fallback share this */
-function isImageTreePath(path: string): boolean {
-  return (
-    IMAGE_FILE_EXTENSIONS_REGEX.test(path) ||
-    MCMETA_FILE_EXTENSIONS_REGEX.test(path)
-  )
-}
 
 /** Fields of a JSZip entry that are not in its type definitions */
 interface ZipEntryData {

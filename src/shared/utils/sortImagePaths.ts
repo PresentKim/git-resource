@@ -25,6 +25,17 @@ export const sortModeLabels: Record<SortMode, string> = {
   modified: 'Least recently modified first',
 }
 
+/**
+ * The label of a mode. Only GitHub lists files in a repository's order;
+ * other sources list them by path.
+ */
+export function getSortModeLabel(mode: SortMode, fromGithub: boolean): string {
+  if (fromGithub) return sortModeLabels[mode]
+  if (mode === 'path') return 'Path order'
+  if (mode === 'path-desc') return 'Path order, reversed'
+  return sortModeLabels[mode]
+}
+
 /** Modes that need a value the source may not provide */
 const REQUIRED_META: Partial<Record<SortMode, keyof FileMeta>> = {
   'size-desc': 'size',

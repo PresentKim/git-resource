@@ -11,7 +11,8 @@ import {useSortQuery} from '@/features/repo/filter/useSortQuery'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {
   getAvailableSortModes,
-  sortModeLabels,
+  getSortModeLabel,
+  type SortMode,
 } from '@/shared/utils/sortImagePaths'
 import {cn} from '@/shared/utils'
 
@@ -19,6 +20,8 @@ import {cn} from '@/shared/utils'
 export const SortControl = memo(function SortControl() {
   const {sort, setSort} = useSortQuery()
   const metaFields = useRepoStore(state => state.metaFields)
+  const fromGithub = useRepoStore(state => state.source.kind === 'github')
+  const label = (mode: SortMode) => getSortModeLabel(mode, fromGithub)
   // Sizes and dates are offered only when the source knows them; a mode from
   // a shared link stays listed so it can be seen and changed
   const modes = getAvailableSortModes(metaFields)
@@ -29,8 +32,8 @@ export const SortControl = memo(function SortControl() {
       <PopoverTrigger
         render={
           <Button
-            aria-label={`Sort images (${sortModeLabels[sort]})`}
-            title={`Sort: ${sortModeLabels[sort]}`}
+            aria-label={`Sort images (${label(sort)})`}
+            title={`Sort: ${label(sort)}`}
             size="sm"
             variant="outline"
             className="text-xs font-semibold">
@@ -55,7 +58,7 @@ export const SortControl = memo(function SortControl() {
                   ? 'bg-primary font-semibold text-primary-foreground'
                   : 'text-muted-foreground hover:bg-muted hover:text-foreground',
               )}>
-              <span>{sortModeLabels[mode]}</span>
+              <span>{label(mode)}</span>
               {sort === mode && <Check className="size-3.5" />}
             </button>
           ))}

@@ -5,6 +5,7 @@ import {useSettingStore} from '@/shared/stores/settingStore'
 const BaseLayout = lazy(() => import('@/shared/components/layout/BaseLayout'))
 const HomePage = lazy(() => import('@/features/home/HomePage'))
 const RepoPage = lazy(() => import('@/features/repo/RepoPage'))
+const LocalPage = lazy(() => import('@/features/local/LocalPage'))
 
 /** How many loading fallbacks are mounted; the spinner shows while any are */
 let mountedFallbacks = 0
@@ -72,6 +73,7 @@ function App() {
         <Routes>
           <Route element={<BaseLayout />}>
             <Route path="/" element={<HomePage />} />
+            <Route path="/local" element={<LocalPage />} />
             <Route path="/*" element={<RepoPage />} />
           </Route>
         </Routes>

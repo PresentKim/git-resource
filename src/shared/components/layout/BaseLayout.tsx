@@ -1,6 +1,7 @@
 import {Outlet} from 'react-router-dom'
 
 import Header from './Header'
+import {LocalDropZone} from '@/features/local/LocalDropZone'
 
 export default function BaseLayout() {
   return (
@@ -11,6 +12,7 @@ export default function BaseLayout() {
           <Outlet />
         </main>
       </div>
+      <LocalDropZone />
     </>
   )
 }

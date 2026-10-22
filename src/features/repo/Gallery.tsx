@@ -60,7 +60,7 @@ function GalleryImageViewer({images}: {images: string[]}) {
   )
 }
 
-function GalleryLoader({loading}: {loading: GalleryLoading}) {
+export function GalleryLoader({loading}: {loading: GalleryLoading}) {
   const {title, description, progress} = loading
   const hasProgress = progress !== undefined && progress !== null
 
@@ -107,13 +107,15 @@ interface GalleryProps {
   loading: GalleryLoading | null
   /** Shown instead of the gallery when the source failed to load */
   error?: ReactNode
+  /** Shown above the gallery, e.g. a problem that leaves it usable */
+  notice?: ReactNode
 }
 
 /**
  * The image gallery of the source in the repo store: the toolbar, the grid
  * and the viewer. Pages load a source into the store and render this.
  */
-export function Gallery({titleLabel, loading, error}: GalleryProps) {
+export function Gallery({titleLabel, loading, error, notice}: GalleryProps) {
   const {columnCount, pixelated, animationEnabled} = useDisplaySettings()
   const source = useRepoStore(state => state.source)
 
@@ -195,6 +197,7 @@ export function Gallery({titleLabel, loading, error}: GalleryProps) {
       )}
 
       {error}
+      {!error && notice}
 
       {!error && shownLoading ? (
         <GalleryLoader loading={shownLoading} />
