@@ -30,6 +30,7 @@ import {
 import {getExternalUrl, getImageUrl} from '@/shared/utils/imageSource'
 import {createRawImageUrl} from '@/shared/utils/github'
 import {ViewerChangeInfo} from '@/features/repo/compare/ViewerChangeInfo'
+import {FavoriteButton} from '@/features/favorites/FavoriteButton'
 import {useScrollLock} from '@/shared/hooks/useScrollLock'
 import {ImageMedia} from '../image-cell/ImageMedia'
 import {formatFileSize} from '@/shared/utils/imageViewer'
@@ -309,7 +310,10 @@ export function ImageViewer({
     enabled: open,
   })
 
-  // Copy a link to the open image (the address bar holds ?image=<path>)
+  // Copy a link to the open image (the address bar holds ?image=<path>).
+  // Local files and favorites live in this browser only, so their links
+  // would open nothing elsewhere.
+  const canShareLink = source.kind === 'github'
   const [copyState, setCopyState] = useState<'idle' | 'copied' | 'failed'>(
     'idle',
   )
@@ -786,20 +790,23 @@ export function ImageViewer({
                   <Download className="mr-1 h-3.5 w-3.5" />
                   DOWNLOAD
                 </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  className="px-2 py-1"
-                  onClick={handleCopyLink}
-                  aria-label={copyLabel}
-                  title={copyLabel}>
-                  {copyState === 'copied' ? (
-                    <Check className="h-3.5 w-3.5" />
-                  ) : (
-                    <Link2 className="h-3.5 w-3.5" />
-                  )}
-                </Button>
+                <FavoriteButton path={currentImage} />
+                {canShareLink && (
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="outline"
+                    className="px-2 py-1"
+                    onClick={handleCopyLink}
+                    aria-label={copyLabel}
+                    title={copyLabel}>
+                    {copyState === 'copied' ? (
+                      <Check className="h-3.5 w-3.5" />
+                    ) : (
+                      <Link2 className="h-3.5 w-3.5" />
+                    )}
+                  </Button>
+                )}
                 {githubUrl && (
                   <a
                     href={githubUrl}
@@ -906,20 +913,23 @@ export function ImageViewer({
                     aria-label="Download current image">
                     <Download className="size-5" />
                   </Button>
-                  <Button
-                    type="button"
-                    size="icon"
-                    variant="outline"
-                    className="size-11"
-                    onClick={handleCopyLink}
-                    aria-label={copyLabel}
-                    title={copyLabel}>
-                    {copyState === 'copied' ? (
-                      <Check className="size-5" />
-                    ) : (
-                      <Link2 className="size-5" />
-                    )}
-                  </Button>
+                  <FavoriteButton path={currentImage} large />
+                  {canShareLink && (
+                    <Button
+                      type="button"
+                      size="icon"
+                      variant="outline"
+                      className="size-11"
+                      onClick={handleCopyLink}
+                      aria-label={copyLabel}
+                      title={copyLabel}>
+                      {copyState === 'copied' ? (
+                        <Check className="size-5" />
+                      ) : (
+                        <Link2 className="size-5" />
+                      )}
+                    </Button>
+                  )}
                   {githubUrl && (
                     <a
                       href={githubUrl}

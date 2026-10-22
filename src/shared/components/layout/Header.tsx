@@ -1,10 +1,14 @@
 import {NavLink} from 'react-router-dom'
+import {Star} from 'lucide-react'
 
 import {FloatingHeader} from '@/shared/components/FloatingHeader'
 import {LogoIcon} from '@/shared/components/LogoIcon'
 import {SettingButton} from '@/shared/components/layout/SettingButton'
 
 import {useRepoStore} from '@/shared/stores/repoStore'
+import {useFavoritesStore} from '@/shared/stores/favoritesStore'
+import {buttonVariants} from '@/shared/components/ui/button'
+import {cn} from '@/shared/utils'
 
 function HomeButton() {
   return (
@@ -73,6 +77,28 @@ function RepoInfo(props: React.ComponentProps<'div'>) {
   )
 }
 
+/** Link to the favorites; shown once there are any */
+function FavoritesLink() {
+  const count = useFavoritesStore(state => state.favorites.length)
+  if (!count) return null
+
+  return (
+    <NavLink
+      to="/favorites"
+      aria-label={`Favorites (${count.toLocaleString()})`}
+      title="Favorites"
+      className={({isActive}) =>
+        cn(
+          buttonVariants({variant: 'ghost'}),
+          'max-sm:-my-1.5 max-sm:size-10',
+          isActive && 'bg-muted',
+        )
+      }>
+      <Star className="size-5" />
+    </NavLink>
+  )
+}
+
 export default function Header(props: React.ComponentProps<'header'>) {
   return (
     <FloatingHeader
@@ -84,7 +110,10 @@ export default function Header(props: React.ComponentProps<'header'>) {
           <HomeButton />
           <RepoInfo />
         </div>
-        <SettingButton />
+        <div className="flex items-center gap-1">
+          <FavoritesLink />
+          <SettingButton />
+        </div>
       </div>
     </FloatingHeader>
   )

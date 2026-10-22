@@ -1,4 +1,5 @@
 import type {FileMeta} from './fileMeta'
+import type {ImageSource} from './imageSource'
 
 export const SORT_MODES = [
   'path',
@@ -14,9 +15,9 @@ export type SortMode = (typeof SORT_MODES)[number]
 
 export const DEFAULT_SORT_MODE: SortMode = 'path'
 
-export const sortModeLabels: Record<SortMode, string> = {
-  path: 'Repository order',
-  'path-desc': 'Repository order, reversed',
+type ListOrderMode = 'path' | 'path-desc'
+
+const sortModeLabels: Record<Exclude<SortMode, ListOrderMode>, string> = {
   name: 'File name A–Z',
   'name-desc': 'File name Z–A',
   'size-desc': 'Largest file first',
@@ -25,15 +26,27 @@ export const sortModeLabels: Record<SortMode, string> = {
   modified: 'Least recently modified first',
 }
 
-/**
- * The label of a mode. Only GitHub lists files in a repository's order;
- * other sources list them by path.
- */
-export function getSortModeLabel(mode: SortMode, fromGithub: boolean): string {
-  if (fromGithub) return sortModeLabels[mode]
-  if (mode === 'path') return 'Path order'
-  if (mode === 'path-desc') return 'Path order, reversed'
-  return sortModeLabels[mode]
+/** The order "path" stands for, which depends on where the list came from */
+const LIST_ORDER_LABELS: Record<
+  ImageSource['kind'],
+  Record<ListOrderMode, string>
+> = {
+  github: {path: 'Repository order', 'path-desc': 'Repository order, reversed'},
+  local: {path: 'Path order', 'path-desc': 'Path order, reversed'},
+  favorites: {
+    path: 'Recently starred first',
+    'path-desc': 'Oldest starred first',
+  },
+}
+
+/** The label of a mode for a list from this kind of source */
+export function getSortModeLabel(
+  mode: SortMode,
+  sourceKind: ImageSource['kind'],
+): string {
+  return mode === 'path' || mode === 'path-desc'
+    ? LIST_ORDER_LABELS[sourceKind][mode]
+    : sortModeLabels[mode]
 }
 
 /** Modes that need a value the source may not provide */

@@ -20,8 +20,8 @@ import {cn} from '@/shared/utils'
 export const SortControl = memo(function SortControl() {
   const {sort, setSort} = useSortQuery()
   const metaFields = useRepoStore(state => state.metaFields)
-  const fromGithub = useRepoStore(state => state.source.kind === 'github')
-  const label = (mode: SortMode) => getSortModeLabel(mode, fromGithub)
+  const sourceKind = useRepoStore(state => state.source.kind)
+  const label = (mode: SortMode) => getSortModeLabel(mode, sourceKind)
   // Sizes and dates are offered only when the source knows them; a mode from
   // a shared link stays listed so it can be seen and changed
   const modes = getAvailableSortModes(metaFields)

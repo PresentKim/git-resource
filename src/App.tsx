@@ -6,6 +6,7 @@ const BaseLayout = lazy(() => import('@/shared/components/layout/BaseLayout'))
 const HomePage = lazy(() => import('@/features/home/HomePage'))
 const RepoPage = lazy(() => import('@/features/repo/RepoPage'))
 const LocalPage = lazy(() => import('@/features/local/LocalPage'))
+const FavoritesPage = lazy(() => import('@/features/favorites/FavoritesPage'))
 
 /** How many loading fallbacks are mounted; the spinner shows while any are */
 let mountedFallbacks = 0
@@ -74,6 +75,7 @@ function App() {
           <Route element={<BaseLayout />}>
             <Route path="/" element={<HomePage />} />
             <Route path="/local" element={<LocalPage />} />
+            <Route path="/favorites" element={<FavoritesPage />} />
             <Route path="/*" element={<RepoPage />} />
           </Route>
         </Routes>
