@@ -47,3 +47,14 @@ export interface ImageFileTreeResponse {
 }
 /** Image and .mcmeta files with their sizes and hashes */
 export type GithubImageFileTree = FileListing
+
+export interface RefsRequest {
+  owner: string
+  name: string
+}
+export type RefsResponse = Array<{ref: string}>
+/** Branch and tag names, to suggest what to compare with */
+export interface GithubRefs {
+  branches: string[]
+  tags: string[]
+}

@@ -120,3 +120,8 @@ export function createRawImageUrl(repo: GithubRepo, path: string): string {
 export function createGithubBlobUrl(repo: GithubRepo, path: string): string {
   return `https://github.com/${repo.owner}/${repo.name}/blob/${encodePathSegments(repo.ref)}/${encodePathSegments(path)}`
 }
+
+/** A ref for display: full commit SHAs are cut to their first 7 characters */
+export function shortenRef(ref: string): string {
+  return /^[0-9a-f]{40}$/i.test(ref) ? ref.slice(0, 7) : ref
+}

@@ -8,6 +8,7 @@ import {DensityControl} from '@/features/repo/filter/DensityControl'
 import {FolderBrowser} from '@/features/repo/filter/FolderBrowser'
 import {SortControl} from '@/features/repo/filter/SortControl'
 import {DuplicatesToggle} from '@/features/repo/filter/DuplicatesToggle'
+import {CompareControl} from '@/features/repo/compare/CompareControl'
 import {SpriteDownloadDialog} from '@/features/repo/download/SpriteDownloadDialog'
 
 interface ImageCountBadgeProps {
@@ -90,6 +91,7 @@ export const FilterToolbar = memo(function FilterToolbar() {
         <FolderBrowser />
         <SortControl />
         <DuplicatesToggle />
+        <CompareControl />
         <DensityControl />
         <ScreenshotButton />
         <DownloadButton />

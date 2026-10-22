@@ -1,6 +1,7 @@
 import {Gallery, type GalleryLoading} from '@/features/repo/Gallery'
 import {RepoError} from '@/features/repo/RepoError'
 import {useRepoLoading} from '@/features/repo/useRepoLoading'
+import {useComparison} from '@/features/repo/compare/useComparison'
 import {useGithubRepo, useRepoStore} from '@/shared/stores/repoStore'
 
 /** The gallery of a GitHub repository (/owner/repo/ref) */
@@ -9,6 +10,7 @@ export default function RepoPage() {
 
   // Load repository data
   const {isLoadRef, isLoadImagePaths, retry} = useRepoLoading()
+  useComparison()
 
   const imageFiles = useRepoStore(state => state.imageFiles)
   const error = useRepoStore(state => state.error)

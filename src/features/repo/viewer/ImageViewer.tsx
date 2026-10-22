@@ -28,6 +28,8 @@ import {
   preloadImage,
 } from '@/shared/utils'
 import {getExternalUrl, getImageUrl} from '@/shared/utils/imageSource'
+import {createRawImageUrl} from '@/shared/utils/github'
+import {ViewerChangeInfo} from '@/features/repo/compare/ViewerChangeInfo'
 import {useScrollLock} from '@/shared/hooks/useScrollLock'
 import {ImageMedia} from '../image-cell/ImageMedia'
 import {formatFileSize} from '@/shared/utils/imageViewer'
@@ -136,13 +138,31 @@ export function ImageViewer({
 
   const currentImage = images[currentIndex]
   const positionLabel = `${(currentIndex + 1).toLocaleString()} of ${images.length.toLocaleString()}`
-  const rawSrc = currentImage ? getImageUrl(source, currentImage) : ''
-  const fileSize = useRepoStore(state =>
-    currentImage
-      ? (state.fileMeta.get(currentImage)?.size ??
-        state.comparison?.removedMeta.get(currentImage)?.size)
-      : undefined,
-  )
+
+  // While comparing, a modified image can be shown as it was in the other ref
+  const comparison = useRepoStore(state => state.comparison)
+  const changeKind = currentImage
+    ? comparison?.changes.get(currentImage)
+    : undefined
+  const [beforePath, setBeforePath] = useState<string | null>(null)
+  const showingBefore = changeKind === 'modified' && beforePath === currentImage
+  const baseRepo =
+    comparison && source.kind === 'github'
+      ? {...source.repo, ref: comparison.baseRef}
+      : null
+  const getSrc = (path: string) =>
+    showingBefore && baseRepo
+      ? createRawImageUrl(baseRepo, path)
+      : getImageUrl(source, path)
+
+  const rawSrc = currentImage ? getSrc(currentImage) : ''
+  const fileSize = useRepoStore(state => {
+    if (!currentImage) return undefined
+    const baseSize = state.comparison?.baseMeta.get(currentImage)?.size
+    return showingBefore
+      ? baseSize
+      : (state.fileMeta.get(currentImage)?.size ?? baseSize)
+  })
   const [resolvedSrc, setResolvedSrc] = useState<{forSrc: string; url: string}>(
     () => ({forSrc: rawSrc, url: rawSrc}),
   )
@@ -316,7 +336,9 @@ export function ImageViewer({
   // Image download
   const {fileName} = useImagePath({imagePath: currentImage})
   const {handleDownload: handleDownloadCurrent} = useImageDownload({
-    source,
+    // The version on screen
+    source:
+      showingBefore && baseRepo ? {kind: 'github', repo: baseRepo} : source,
     imagePath: currentImage || '',
     fileName: fileName || 'image.png',
   })
@@ -471,6 +493,17 @@ export function ImageViewer({
                     {filePath}
                   </div>
                 )}
+                {changeKind && comparison && source.kind === 'github' && (
+                  <ViewerChangeInfo
+                    kind={changeKind}
+                    baseRef={comparison.baseRef}
+                    currentRef={source.repo.ref}
+                    showingBefore={showingBefore}
+                    onShowBeforeChange={before =>
+                      setBeforePath(before ? currentImage : null)
+                    }
+                  />
+                )}
               </div>
             </div>
 
@@ -481,6 +514,8 @@ export function ImageViewer({
                 // The padding keeps the fitted image clear of the title, the
                 // toolbar and (from sm) the side arrows; the image fills the rest
                 'relative flex items-center justify-center w-full flex-1 min-h-0 pt-24 pb-56 px-4 sm:px-16 sm:pb-28 overflow-hidden',
+                // Room for the change badge and version switch under the title
+                changeKind && 'pt-36 sm:pt-32',
                 'bg-background',
                 isDragging && 'cursor-grabbing',
                 scale > 1 && 'cursor-grab',
@@ -562,7 +597,7 @@ export function ImageViewer({
                     // For animated sprites, always use the original raw URL.
                     // AnimatedSprite will handle caching and mcmeta loading based on this.
                     src={rawSrc}
-                    mcmetaSrc={getImageUrl(source, getMcmetaPath(currentImage))}
+                    mcmetaSrc={getSrc(getMcmetaPath(currentImage))}
                     alt={`${fileName} (${positionLabel})`}
                     className={cn(
                       'relative z-10 w-full h-full object-contain',

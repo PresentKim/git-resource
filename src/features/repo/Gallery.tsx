@@ -9,6 +9,7 @@ import {FilterInput} from '@/features/repo/filter/FilterInput'
 import {ImageViewer} from '@/features/repo/viewer/ImageViewer'
 import {useViewerRoute} from '@/features/repo/viewer/viewerRoute'
 import {RepoEmptyState} from '@/features/repo/RepoEmptyState'
+import {CompareBar} from '@/features/repo/compare/CompareBar'
 import {useGridPositionStore} from '@/features/repo/gridPositionStore'
 
 import {useDisplaySettings} from '@/shared/stores/settingStore'
@@ -195,6 +196,9 @@ export function Gallery({titleLabel, loading, error, notice}: GalleryProps) {
               <FilterInput />
             </div>
             <FilterToolbar />
+          </div>
+          <div className="mt-2 empty:hidden">
+            <CompareBar />
           </div>
         </div>
       )}

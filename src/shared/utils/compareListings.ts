@@ -12,8 +12,8 @@ export const CHANGE_KINDS: readonly ChangeKind[] = [
 export interface ListingComparison {
   /** Every path that differs, .mcmeta files included */
   changes: Map<string, ChangeKind>
-  /** Metadata of the removed files, which the current listing does not have */
-  removedMeta: Map<string, FileMeta>
+  /** Metadata of the changed files in the base (removed and modified ones) */
+  baseMeta: Map<string, FileMeta>
   /** Changed images per kind (without .mcmeta files) */
   counts: Record<ChangeKind, number>
 }
@@ -32,13 +32,13 @@ export function compareListings(
 ): ListingComparison {
   if (!current.hashKind || current.hashKind !== base.hashKind) {
     throw new IncomparableListingsError(
-      'These versions cannot be compared: one of them is too large for the GitHub API, so its files could not be told apart.',
+      'These versions cannot be compared: one of them had to be listed from its zip archive (the GitHub API refused or cut short its file list), which identifies files differently. Try again later, or add a token in the settings.',
     )
   }
 
   const baseByPath = new Map(base.entries.map(entry => [entry.path, entry]))
   const changes = new Map<string, ChangeKind>()
-  const removedMeta = new Map<string, FileMeta>()
+  const baseMeta = new Map<string, FileMeta>()
   const counts: Record<ChangeKind, number> = {added: 0, modified: 0, removed: 0}
 
   const record = (path: string, kind: ChangeKind) => {
@@ -50,16 +50,20 @@ export function compareListings(
     const before = baseByPath.get(entry.path)
     if (!before) {
       record(entry.path, 'added')
-    } else {
-      if (before.hash !== entry.hash) record(entry.path, 'modified')
-      baseByPath.delete(entry.path)
+      continue
     }
+    if (before.hash !== entry.hash) {
+      record(entry.path, 'modified')
+      const {path, ...meta} = before
+      baseMeta.set(path, meta)
+    }
+    baseByPath.delete(entry.path)
   }
   // What is left was only in the base
   for (const {path, ...meta} of baseByPath.values()) {
     record(path, 'removed')
-    removedMeta.set(path, meta)
+    baseMeta.set(path, meta)
   }
 
-  return {changes, removedMeta, counts}
+  return {changes, baseMeta, counts}
 }

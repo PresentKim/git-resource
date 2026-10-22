@@ -21,6 +21,12 @@ export interface ActiveComparison extends ListingComparison {
   baseRef: string
 }
 
+export interface CompareStatus {
+  baseRef: string
+  loading: boolean
+  error: string | null
+}
+
 /**
  * Separate image files and mcmeta files
  */
@@ -78,6 +84,8 @@ interface RepoStore {
   /** Metadata fields that at least one file has */
   metaFields: ReadonlySet<keyof FileMeta>
   comparison: ActiveComparison | null
+  /** The ref asked to compare with, while it loads or when that failed */
+  compareStatus: CompareStatus | null
   filteredImageFiles: string[] | null
   /** Marks for the cells of the filtered images, if the query adds any */
   cellBadges: ReadonlyMap<string, CellBadge> | null
@@ -106,7 +114,10 @@ interface RepoStore {
     meta: ReadonlyMap<string, FileMeta>,
     hashKind?: HashKind | null,
   ) => void
-  setComparison: (comparison: ActiveComparison | null) => void
+  setComparison: (
+    comparison: ActiveComparison | null,
+    status?: CompareStatus | null,
+  ) => void
   updateFilteredImages: (query?: Partial<GalleryQuery>) => void
   setError: (error: Error | null) => void
   resetRepoState: () => void
@@ -160,6 +171,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
   hashKind: null,
   metaFields: new Set(),
   comparison: null,
+  compareStatus: null,
   filteredImageFiles: null,
   cellBadges: null,
   filterCache: new Map(),
@@ -218,9 +230,14 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
     })
   },
 
-  setComparison: comparison => {
+  setComparison: (comparison, status = null) => {
+    if (comparison === get().comparison) {
+      set({compareStatus: status})
+      return
+    }
     set({
       comparison,
+      compareStatus: status,
       source: withComparison(get().source, comparison),
       filterCache: new Map(),
     })
@@ -277,14 +294,15 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
         return
       }
 
-      const removedMeta = currentComparison?.removedMeta
+      // Removed images are only in the compared ref's listing
+      const baseMeta = currentComparison?.baseMeta
       const {paths, badges} = runGalleryQuery({
         images: currentComparison
           ? [...imageOnlyFiles, ...getRemovedImages(currentComparison)]
           : imageOnlyFiles,
         query,
-        getMeta: removedMeta
-          ? path => fileMeta.get(path) ?? removedMeta.get(path)
+        getMeta: baseMeta
+          ? path => fileMeta.get(path) ?? baseMeta.get(path)
           : path => fileMeta.get(path),
         changes: currentComparison?.changes ?? null,
       })
@@ -318,6 +336,7 @@ export const useRepoStore = create<RepoStore>((set, get) => ({
       hashKind: null,
       metaFields: new Set(),
       comparison: null,
+      compareStatus: null,
       filteredImageFiles: null,
       cellBadges: null,
       filterCache: new Map(),

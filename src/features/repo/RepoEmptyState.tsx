@@ -1,11 +1,15 @@
-import {Copy, FilterX} from 'lucide-react'
+import {Copy, FilterX, GitCompareArrows} from 'lucide-react'
 
 import {Button} from '@/shared/components/ui/button'
 import {RandomMessageLoader} from '@/shared/components/RandomMessageLoader'
 import {useFilterQuery} from '@/features/repo/filter/useFilterQuery'
-import {useDuplicatesQuery} from '@/features/repo/filter/useGalleryQuery'
+import {
+  useCompareQuery,
+  useDuplicatesQuery,
+} from '@/features/repo/filter/useGalleryQuery'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {generateNoImagesMessage} from '@/shared/utils/randomMessages'
+import {shortenRef} from '@/shared/utils/github'
 
 const containerClass =
   'flex flex-1 flex-col items-center justify-center gap-4 rounded-xl border border-dashed border-border/60 bg-card/40 p-6 text-center'
@@ -18,6 +22,8 @@ const containerClass =
 export function RepoEmptyState() {
   const {filter, setFilter} = useFilterQuery()
   const {duplicates, setDuplicates} = useDuplicatesQuery()
+  const {changes, setChanges, setCompareRef} = useCompareQuery()
+  const comparison = useRepoStore(state => state.comparison)
   const totalCount = useRepoStore(state => state.totalImageCount)
   const sourceKind = useRepoStore(state => state.source.kind)
   const place =
@@ -26,6 +32,34 @@ export function RepoEmptyState() {
       : sourceKind === 'favorites'
         ? 'your favorites'
         : 'this repository'
+
+  if (comparison && !duplicates && !filter.trim()) {
+    return (
+      <div role="status" className={containerClass}>
+        <GitCompareArrows className="size-10 text-muted-foreground" />
+        <div className="space-y-1">
+          <h2 className="text-lg font-semibold">
+            {changes === 'all' ? 'No changes' : `No ${changes} images`}
+          </h2>
+          <p className="text-sm text-muted-foreground">
+            {changes === 'all'
+              ? 'The images are the same in both versions.'
+              : `No image was ${changes} since ${shortenRef(comparison.baseRef)}.`}
+          </p>
+        </div>
+        <div className="flex flex-wrap justify-center gap-2">
+          {changes !== 'all' && (
+            <Button variant="outline" onClick={() => setChanges(null)}>
+              Show all changes
+            </Button>
+          )}
+          <Button variant="outline" onClick={() => setCompareRef(null)}>
+            Stop comparing
+          </Button>
+        </div>
+      </div>
+    )
+  }
 
   if (totalCount > 0 && duplicates && !filter.trim()) {
     return (
