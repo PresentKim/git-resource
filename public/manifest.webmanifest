@@ -1,5 +1,13 @@
 {
+  "id": "/",
   "name": "Git Resource Viewer",
+  "short_name": "Git Resource",
+  "description": "Browse every image of a GitHub repository, a folder or a resource pack at once",
+  "start_url": "/",
+  "scope": "/",
+  "display": "minimal-ui",
+  "background_color": "#0f0f0f",
+  "theme_color": "#0f0f0f",
   "icons": [
     {
       "src": "favicon-192.png",
@@ -17,5 +25,22 @@
       "type": "image/png",
       "sizes": "512x512"
     }
-  ]
+  ],
+  "file_handlers": [
+    {
+      "action": "/local",
+      "accept": {
+        "application/zip": [".zip"],
+        "application/java-archive": [".jar"],
+        "image/png": [".png"],
+        "image/jpeg": [".jpg", ".jpeg"],
+        "image/gif": [".gif"],
+        "image/webp": [".webp"],
+        "image/svg+xml": [".svg"]
+      }
+    }
+  ],
+  "launch_handler": {
+    "client_mode": "navigate-existing"
+  }
 }

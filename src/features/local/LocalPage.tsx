@@ -11,6 +11,7 @@ import {
   LocalOpenButtons,
   RecentLocalList,
 } from '@/features/local/LocalOpenButtons'
+import {useLaunchQueue} from '@/features/local/useLaunchQueue'
 import {useLocalStore} from '@/shared/stores/localStore'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import type {LocalProgress} from '@/shared/api/local/openLocalFiles'
@@ -80,6 +81,7 @@ function LocalStart({error}: {error: string | null}) {
 
 /** The gallery of files opened from this device (/local) */
 export default function LocalPage() {
+  useLaunchQueue()
   const opened = useLocalStore(state => state.opened)
   const status = useLocalStore(state => state.status)
   const progress = useLocalStore(state => state.progress)
