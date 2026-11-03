@@ -161,10 +161,13 @@ export function runGalleryQuery({
       const kind = changes.get(path)
       return kind && (query.changes === 'all' || query.changes === kind)
     })
-    badges = new Map()
-    for (const path of candidates) {
-      const kind = changes.get(path)!
-      badges.set(path, {...CHANGE_BADGES[kind], tone: kind})
+    // With a single kind shown every cell would carry the same mark
+    if (query.changes === 'all') {
+      badges = new Map()
+      for (const path of candidates) {
+        const kind = changes.get(path)!
+        badges.set(path, {...CHANGE_BADGES[kind], tone: kind})
+      }
     }
   }
 
