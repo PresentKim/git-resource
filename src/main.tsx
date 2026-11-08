@@ -5,7 +5,7 @@ import {QueryClient, QueryClientProvider} from '@tanstack/react-query'
 
 import './index.css'
 import App from './App.tsx'
-import {useAuthStore} from '@/shared/auth/authStore'
+import {getGithubToken, useAuthStore} from '@/shared/auth/authStore'
 import {setupAuthServiceWorker} from '@/shared/auth/authServiceWorker'
 import {useSettingStore} from '@/shared/stores/settingStore'
 
@@ -24,6 +24,17 @@ const queryClient = new QueryClient({
     },
   },
 })
+
+// Refetch GitHub queries when the effective token changes (e.g. after load())
+let lastToken = getGithubToken()
+function onTokenMaybeChanged() {
+  const token = getGithubToken()
+  if (token === lastToken) return
+  lastToken = token
+  void queryClient.invalidateQueries({queryKey: ['github']})
+}
+useAuthStore.subscribe(onTokenMaybeChanged)
+useSettingStore.subscribe(onTokenMaybeChanged)
 
 function render() {
   createRoot(document.getElementById('root')!).render(
