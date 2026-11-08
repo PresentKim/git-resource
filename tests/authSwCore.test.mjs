@@ -86,6 +86,7 @@ test('test_404_retries_with_bearer', async () => {
   );
   assert.equal(calls[1].init.headers.Authorization, 'Bearer t');
   assert.equal(calls[1].init.cache, 'no-store');
+  assert.equal(calls[1].init.credentials, 'same-origin');
 });
 
 test('test_known_private_skips_raw', async () => {

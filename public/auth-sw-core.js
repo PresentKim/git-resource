@@ -43,7 +43,7 @@
       return deps.fetch(origin + '/proxy/raw-auth/' + target.rest, {
         headers: {Authorization: 'Bearer ' + token},
         cache: 'no-store',
-        credentials: 'omit',
+        credentials: 'same-origin',
       })
     }
 
