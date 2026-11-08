@@ -1,5 +1,5 @@
 import {useState, type CSSProperties} from 'react'
-import {ArrowRight, Sparkles} from 'lucide-react'
+import {ArrowRight} from 'lucide-react'
 
 import {cn} from '@/shared/utils'
 
@@ -8,8 +8,6 @@ interface RepositoryCardProps {
   name: string
   description?: string
   thumbnailUrls: string[]
-  /** Featured cards carry a badge and keep the accent line visible */
-  featured?: boolean
   onOpen: () => void
   className?: string
   style?: CSSProperties
@@ -20,7 +18,6 @@ export function RepositoryCard({
   name,
   description,
   thumbnailUrls,
-  featured = false,
   onOpen,
   className,
   style,
@@ -33,7 +30,7 @@ export function RepositoryCard({
     <button
       type="button"
       onClick={onOpen}
-      aria-label={`Open ${featured ? 'featured' : 'example'} repository ${displayName}`}
+      aria-label={`Open example repository ${displayName}`}
       style={style}
       className={cn(
         'group relative flex w-full flex-col gap-3 overflow-hidden p-4 text-left',
@@ -48,19 +45,12 @@ export function RepositoryCard({
         aria-hidden="true"
         className={cn(
           'absolute inset-x-0 top-0 h-0.5 bg-linear-to-r from-chart-3 via-chart-8 to-chart-6',
-          !featured &&
-            'opacity-0 transition-opacity duration-150 group-hover:opacity-100',
+          'opacity-0 transition-opacity duration-150 group-hover:opacity-100',
         )}
       />
 
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 space-y-1.5">
-          {featured && (
-            <span className="inline-flex items-center gap-1 rounded-full border border-border/60 bg-background/60 px-2 py-0.5 text-xs font-medium text-muted-foreground">
-              <Sparkles className="size-3 text-chart-8" aria-hidden="true" />
-              Featured
-            </span>
-          )}
           <p className="truncate font-mono text-sm font-semibold sm:text-base">
             {displayName}
           </p>

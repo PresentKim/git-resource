@@ -12,14 +12,8 @@ import {
 
 import {useRepoPath} from '@/features/repo/useRepoPath'
 import {cn, pickByPartialFisherYates} from '@/shared/utils'
-import {
-  exampleRepositories,
-  featuredRepositories,
-} from '@/shared/utils/example-repositories'
-import {
-  getFeaturedPreview,
-  getRepositoryPreview,
-} from '@/shared/utils/example-thumbnails'
+import {exampleRepositories} from '@/shared/utils/example-repositories'
+import {getRepositoryPreview} from '@/shared/utils/example-thumbnails'
 import {APP_NAME} from '@/shared/utils/routeMeta'
 
 const EXAMPLE_REPO_COUNT = 7
@@ -99,32 +93,6 @@ export default function HomePage() {
         <div className="h-px flex-1 bg-border" />
         <span className="px-2 text-xs text-muted-foreground">OR</span>
         <div className="h-px flex-1 bg-border" />
-      </div>
-
-      <div className="mx-auto w-full max-w-2xl pb-8 sm:pb-10">
-        <h2
-          id="featured-repositories-title"
-          className="mb-3 ml-3 text-base font-semibold">
-          <span aria-hidden="true">• </span>Start with a featured repository
-        </h2>
-        <ul
-          className="grid w-full grid-cols-1 gap-3"
-          aria-labelledby="featured-repositories-title">
-          {featuredRepositories.map(featured => {
-            const {owner, name, ref} = featured
-            return (
-              <li key={`${owner}/${name}/${ref}`}>
-                <RepositoryCard
-                  owner={owner}
-                  name={name}
-                  {...getFeaturedPreview(featured)}
-                  featured
-                  onOpen={() => setRepoPath(owner, name, ref)}
-                />
-              </li>
-            )
-          })}
-        </ul>
       </div>
 
       <div className="mx-auto w-full max-w-2xl space-y-4">

@@ -1,6 +1,6 @@
 /**
- * Picks a few thumbnail images and the description of every featured and
- * example repository and writes them to src/shared/utils/example-thumbnails.json,
+ * Picks a few thumbnail images and the description of every example
+ * repository and writes them to src/shared/utils/example-thumbnails.json,
  * so the home page can show them without calling the GitHub API.
  *
  * Each entry is pinned to a commit SHA: raw.githubusercontent.com URLs for a
@@ -44,22 +44,16 @@ function getToken() {
   }
 }
 
-/**
- * The featured repositories ({owner, name, ref} objects) followed by the
- * [owner, name, ref] tuples of exampleRepositories, read from the source
- */
+/** The [owner, name, ref] tuples of exampleRepositories, read from the source */
 function readRepositories() {
   const source = readFileSync(EXAMPLES_FILE, 'utf8');
-  const examplesStart = source.indexOf('exampleRepositories:');
-  const featured = source.slice(0, examplesStart);
-  const examples = source.slice(examplesStart);
-  const objectPattern =
-    /owner: '([^']+)',\s*name: '([^']+)',\s*ref: '([^']+)'/g;
+  const examples = source.slice(source.indexOf('exampleRepositories:'));
   const tuplePattern = /\[\s*'([^']+)',\s*'([^']+)',\s*'([^']+)',?\s*\]/g;
-  return [
-    ...featured.matchAll(objectPattern),
-    ...examples.matchAll(tuplePattern),
-  ].map(([, owner, name, ref]) => ({owner, name, ref}));
+  return [...examples.matchAll(tuplePattern)].map(([, owner, name, ref]) => ({
+    owner,
+    name,
+    ref,
+  }));
 }
 
 const token = getToken();

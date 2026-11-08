@@ -1,18 +1,4 @@
 {
-  "PresentKim/ai-generated-pixelart/main": {
-    "sha": "ef2197408c8c64601ddbd0581f5e5e421c1e8c51",
-    "description": "Post-processed AI pixel art repository",
-    "images": [
-      "accessory/accessory_amber_pendant_orange_yellow_necklace-0001.png",
-      "accessory/accessory_relic_teal_gold_cyan_gem_square-0001.png",
-      "accessory/accessory_wings_white_purple_grey_butterfly_pair-0003.png",
-      "armor/armor_leggings_iron_grey_arched-0001.png",
-      "block/block_ore_stone_grey_brown_white_dots-0001.png",
-      "container/container_chest_brown_gold_round_emblem-0001.png",
-      "container/container_pouch_green_brown_tied_cord_sack-0001.png",
-      "creature/creature_crab_red_orange_claws_large-0001.png"
-    ]
-  },
   "malcolmriley/unused-textures/master": {
     "sha": "8b85ad732023174d9a9da74e6bf2272d6c0bef17",
     "description": "Repository for unused textures I have made over the years.",
