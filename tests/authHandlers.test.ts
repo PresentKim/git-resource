@@ -193,9 +193,20 @@ test('session valid cookie', async () => {
     user: {login: 'kim', avatarUrl: 'https://a/x'},
     accessToken: 'ghu_1',
     expiresAt: NOW + 3_600_000,
-    installUrl: null,
+    installUrl: 'https://github.com/apps/git-resource/installations/new',
   })
   assert.equal(cookiesOf(res).length, 0)
+})
+
+test('session valid cookie without app slug has null installUrl', async () => {
+  const noSlug = {...env, GITHUB_APP_SLUG: undefined}
+  const res = await handleSession(
+    req('/api/auth/session', `gr_session=${encodeSession(stored)}`),
+    noSlug,
+    fakeFetch([]).impl,
+    NOW,
+  )
+  assert.equal((await res.json()).installUrl, null)
 })
 
 test('test_session_no_store', async () => {

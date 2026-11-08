@@ -267,7 +267,7 @@ export async function handleSession(
       user: {login: session.login, avatarUrl: session.avatarUrl},
       accessToken: session.at,
       expiresAt: session.atExp,
-      installUrl: null,
+      installUrl,
     },
     cookie,
   )
