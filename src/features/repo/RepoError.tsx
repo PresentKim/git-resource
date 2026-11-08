@@ -2,6 +2,7 @@ import {NavLink} from 'react-router-dom'
 
 import {Button, buttonVariants} from '@/shared/components/ui/button'
 import {cn} from '@/shared/utils'
+import {useAuthStore} from '@/shared/auth/authStore'
 import {useSettingsDialogStore} from '@/shared/stores/settingsDialogStore'
 
 interface RepoErrorProps {
@@ -16,6 +17,9 @@ interface RepoErrorProps {
  */
 export function RepoError({error, onRetry}: RepoErrorProps) {
   const openSettings = useSettingsDialogStore(state => state.setOpen)
+  const authStatus = useAuthStore(state => state.status)
+  const installUrl = useAuthStore(state => state.installUrl)
+  const signIn = useAuthStore(state => state.signIn)
   const isRateLimited = error.message.includes('403')
   const isNotFound = error.message.includes('404')
 
@@ -60,6 +64,20 @@ export function RepoError({error, onRetry}: RepoErrorProps) {
           <Button size="sm" onClick={() => openSettings(true)}>
             Open settings
           </Button>
+        )}
+        {(isRateLimited || isNotFound) && authStatus === 'signedOut' && (
+          <Button size="sm" onClick={signIn}>
+            Sign in with GitHub
+          </Button>
+        )}
+        {isNotFound && authStatus === 'signedIn' && installUrl && (
+          <a
+            href={installUrl}
+            target="_blank"
+            rel="noreferrer"
+            className={cn(buttonVariants({size: 'sm'}))}>
+            Choose private repositories
+          </a>
         )}
         {isNotFound && (
           <NavLink

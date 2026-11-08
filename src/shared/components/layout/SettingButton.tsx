@@ -14,6 +14,7 @@ import {Input} from '@/shared/components/ui/input'
 import {Label} from '@/shared/components/ui/label'
 import {Switch} from '@/shared/components/ui/switch'
 
+import {useAuthStore} from '@/shared/auth/authStore'
 import {useGithubRateLimitStore} from '@/shared/stores/githubApiStore'
 import {useSettingStore, type Theme} from '@/shared/stores/settingStore'
 import {useSettingsDialog} from '@/shared/hooks/settings/useSettingsDialog'
@@ -69,6 +70,66 @@ function SwitchRow({
         className="mt-0.5 shrink-0"
       />
     </div>
+  )
+}
+
+/** Sign-in state for the GitHub App; hidden when sign-in is not configured. */
+function AccountField() {
+  const status = useAuthStore(state => state.status)
+  const user = useAuthStore(state => state.user)
+  const installUrl = useAuthStore(state => state.installUrl)
+  const signIn = useAuthStore(state => state.signIn)
+  const signOut = useAuthStore(state => state.signOut)
+
+  if (status === 'disabled') return null
+
+  return (
+    <Section title="GitHub account">
+      {status === 'loading' ? (
+        <p className="text-xs text-muted-foreground">Checking sign-in…</p>
+      ) : status === 'signedOut' ? (
+        <div className="space-y-2">
+          <Button type="button" size="sm" onClick={signIn}>
+            Sign in with GitHub
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Raises the API limit to 5,000 requests an hour. Private repositories
+            are read only and only the ones you choose.
+          </p>
+        </div>
+      ) : (
+        <div className="flex items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-2">
+            {user?.avatarUrl ? (
+              <img
+                src={user.avatarUrl}
+                alt=""
+                className="size-8 shrink-0 rounded-full"
+              />
+            ) : null}
+            <div className="min-w-0 space-y-0.5">
+              <p className="truncate text-sm font-medium">{user?.login}</p>
+              {installUrl ? (
+                <a
+                  href={installUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-xs text-accent-foreground underline underline-offset-2">
+                  Choose private repositories
+                </a>
+              ) : null}
+            </div>
+          </div>
+          <Button
+            type="button"
+            size="sm"
+            variant="secondary"
+            onClick={() => void signOut()}>
+            Sign out
+          </Button>
+        </div>
+      )}
+    </Section>
   )
 }
 
@@ -136,8 +197,9 @@ function TokenField() {
           </Button>
         </div>
         <p className="text-xs text-muted-foreground">
-          Raises the API rate limit and lets you open private repositories.
-          Stored unencrypted in this browser only.
+          Used when you are not signed in. Raises the API rate limit and lets
+          you open private repositories. Stored unencrypted in this browser
+          only.
         </p>
       </form>
     </Section>
@@ -220,6 +282,8 @@ export function SettingButton() {
             />
           </div>
         </Section>
+
+        <AccountField />
 
         <TokenField />
       </DialogContent>

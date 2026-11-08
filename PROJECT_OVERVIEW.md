@@ -158,6 +158,13 @@ large repositories could stop the app.
   the repository page's HTML.
 - `.mcmeta` files are fetched through a proxy before the API is used.
 - A personal access token can be added to raise the limit to 5,000 per hour.
+- Signing in with GitHub uses a short-lived user token instead. The refresh
+  token stays in one httpOnly cookie that is sent only to `/api/auth`, so page
+  scripts never see it. The page keeps the access token in memory and hands it
+  to a service worker, which retries raw-file requests that return 404 through
+  a same-origin proxy with the token attached. `<img>` tags therefore work
+  unchanged for private repositories. The worker is registered only while a
+  token exists.
 
 #### A fallback that the browser blocked
 

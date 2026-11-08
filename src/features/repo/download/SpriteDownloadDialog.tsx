@@ -16,6 +16,7 @@ import {Switch} from '@/shared/components/ui/switch'
 import {useSpriteDownload} from '@/features/repo/download/useSpriteDownload'
 import {useRepoStore} from '@/shared/stores/repoStore'
 import {useDisplaySettings, useSettingStore} from '@/shared/stores/settingStore'
+import {useGithubToken} from '@/shared/auth/authStore'
 import {Check, Loader as LoaderIcon} from 'lucide-react'
 import {cn} from '@/shared/utils'
 import type {SpriteOptions} from '@/features/repo/download/utils/createSpriteImage'
@@ -50,7 +51,7 @@ export function SpriteDownloadDialog({
     pixelated,
   } = useDisplaySettings()
   const {spriteSettings, setSpriteSettings} = useSettingStore()
-  const githubToken = useSettingStore(state => state.githubToken)
+  const githubToken = useGithubToken()
   const {isDownloading, downloadProgress, handleDownload} = useSpriteDownload({
     source,
     imagePaths: filteredImageFiles || [],

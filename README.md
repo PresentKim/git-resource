@@ -45,8 +45,8 @@ just its URL, or in a folder, resource pack or mod on your own device.
   comparison and the open image are kept in the URL, so a link reopens the
   same view.
 - **Settings.** Light, dark or system theme, pixelated rendering, animation on
-  or off, and an optional GitHub personal access token. The grid density is
-  set from the toolbar.
+  or off, and an optional GitHub personal access token or **Sign in with
+  GitHub**. The grid density is set from the toolbar.
 
 ## Usage
 
@@ -105,8 +105,10 @@ Adding a personal access token in the settings raises the limit to 5,000
 requests per hour. The token is stored unencrypted in this browser only and is
 sent only to `api.github.com`.
 
-Images themselves are loaded from `raw.githubusercontent.com`, which serves
-public repositories only, so private repositories are not supported.
+Images themselves are loaded from `raw.githubusercontent.com`. Raw answers
+private files with 404 when no token is sent. While you are signed in or have
+a token, a service worker repeats such a request through the uncached
+`/proxy/raw-auth` path with the token attached.
 
 The file list also holds each file's size and git hash, which the size sort,
 the duplicates view and comparisons use without further requests. Comparing
@@ -114,6 +116,22 @@ loads the other ref's file list the same way (one more request, or none when
 it is cached). When a list comes from the ZIP fallback, files are told apart by
 the CRC-32 the archive stores, so such a list can be searched for duplicates
 but not compared with one from the API.
+
+## Self-hosting: GitHub sign-in
+
+Sign-in with GitHub is optional. It needs a GitHub App that you own, and it is
+disabled while `GITHUB_APP_CLIENT_ID` or `GITHUB_APP_CLIENT_SECRET` is missing.
+
+1. Create a GitHub App (in your account or organization) with these settings:
+   - Callback URL: `https://<host>/api/auth/callback`
+   - **Expire user authorization tokens**: on
+   - Permissions: Repository → **Contents**: Read-only, and **Metadata**:
+     Read-only
+   - Webhook: off
+2. In Vercel, set these server-side environment variables:
+   - `GITHUB_APP_CLIENT_ID` and `GITHUB_APP_CLIENT_SECRET`, from the app
+   - `GITHUB_APP_SLUG` (optional): the app's slug, which enables the install
+     link
 
 ## Development
 

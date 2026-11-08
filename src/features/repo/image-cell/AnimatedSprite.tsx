@@ -6,7 +6,7 @@ import {
   fetchMcmetaData,
 } from '@/shared/utils/mcmeta'
 import {cn, getCachedObjectUrl, setCachedImageMetadata} from '@/shared/utils'
-import {useSettingStore} from '@/shared/stores/settingStore'
+import {useGithubToken} from '@/shared/auth/authStore'
 import {detectAPNGSupport} from '@/shared/utils/apngSupport'
 import {convertSpriteToAPNG} from '@/shared/utils/apngEncoder'
 
@@ -71,7 +71,7 @@ const AnimatedSprite = memo(function AnimatedSprite({
   const [apngUrl, setApngUrl] = useState<string | null>(null)
   const [apngLoaded, setApngLoaded] = useState(false)
   const imgRef = useRef<HTMLImageElement | null>(null)
-  const githubToken = useSettingStore(state => state.githubToken)
+  const githubToken = useGithubToken()
   const onLoadRef = useRef(onLoad)
   const onErrorRef = useRef(onError)
   const pausedRef = useRef(paused)

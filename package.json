@@ -8,6 +8,7 @@
     "dev": "vite",
     "build": "tsc -b && vite build",
     "preview": "vite preview",
+    "test": "node --import ./tests/register-ts.mjs --test 'tests/*.test.ts' 'tests/*.test.mjs'",
     "eslint:lint": "eslint .",
     "eslint:fix": "eslint --fix .",
     "format:lint": "prettier --check --ignore-path .prettierignore .",

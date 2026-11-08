@@ -27,6 +27,12 @@ export default defineConfig(({mode}) => {
           changeOrigin: true,
           rewrite: path => path.replace(/^\/proxy\/raw/, ''),
         },
+        // Authenticated proxy for GitHub raw files (matches Vercel rewrites)
+        '/proxy/raw-auth': {
+          target: 'https://raw.githubusercontent.com',
+          changeOrigin: true,
+          rewrite: path => path.replace(/^\/proxy\/raw-auth/, ''),
+        },
         // Proxy for GitHub pages (matches Vercel rewrites)
         '/proxy/github': {
           target: 'https://github.com',

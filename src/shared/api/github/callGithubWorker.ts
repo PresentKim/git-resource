@@ -1,5 +1,5 @@
 import {useGithubRateLimitStore} from '@/shared/stores/githubApiStore'
-import {useSettingStore} from '@/shared/stores/settingStore'
+import {getGithubToken} from '@/shared/auth/authStore'
 
 import type {WorkerResponse} from './types'
 
@@ -60,7 +60,7 @@ export function callGithubWorker<TRequest, TResponse>(
 
     worker.postMessage({
       ...request,
-      token: useSettingStore.getState().githubToken,
+      token: getGithubToken(),
     })
   })
 }
